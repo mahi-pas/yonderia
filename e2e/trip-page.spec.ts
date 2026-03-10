@@ -178,9 +178,9 @@ test("Participant sees full trip page: hero, description, participants row, and 
     await expect(page.getByText("Lisbon, Portugal")).toBeVisible();
     await expect(page.getByText("A long sunny weekend with a packed food list.")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Who's in" })).toBeVisible();
-    await expect(page.getByText("The trip map is coming next.")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Trip at a glance" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Daily plan" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Day 1/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Day 1 —/ })).toBeVisible();
   } finally {
     if (seeded) {
       await adminClient.from("trips").delete().eq("id", seeded.tripId);

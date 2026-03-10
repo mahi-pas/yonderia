@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import DayItinerary from "@/components/trip/DayItinerary";
 import ParticipantsRow from "@/components/trip/ParticipantsRow";
+import TripMap from "@/components/trip/TripMap";
 import TripHeader from "@/components/trip/TripHeader";
 import Input from "@/components/ui/Input";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -80,23 +81,6 @@ function GuestBanner({ tripId }: { tripId: string }) {
   );
 }
 
-function PlaceholderSection({
-  description,
-  title,
-}: {
-  description: string;
-  title: string;
-}) {
-  return (
-    <section className="rounded-[1.75rem] border border-[#efd5c8] bg-white/75 p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">{title}</p>
-      <div className="mt-4 flex min-h-40 items-center justify-center rounded-[1.5rem] border border-dashed border-[#e2b7a4] bg-[linear-gradient(180deg,#fff8f4,#fff2ea)] px-6 text-center text-sm leading-6 text-[#7f5d50]">
-        {description}
-      </div>
-    </section>
-  );
-}
-
 function InviteEntryForm({
   errorMessage,
   tripId,
@@ -169,10 +153,10 @@ function TripPageLayout({
           showSeeAll={!guestMode}
           tripId={data.trip.id}
         />
-
-        <PlaceholderSection
-          description="The trip map is coming next. This area will show every itinerary stop in one glance."
-          title="Map"
+        <TripMap
+          initialItems={data.itineraryItems}
+          tripEndDate={data.trip.end_date}
+          tripStartDate={data.trip.start_date}
         />
         <DayItinerary
           canManage={canManageItinerary}
