@@ -2,6 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import DayItinerary from "@/components/trip/DayItinerary";
+import EditMyInfoButton from "@/components/trip/EditMyInfoButton";
 import ParticipantsRow from "@/components/trip/ParticipantsRow";
 import TripMap from "@/components/trip/TripMap";
 import TripHeader from "@/components/trip/TripHeader";
@@ -12,6 +13,7 @@ import {
   getInviteCodeLookup,
   getParticipantMembership,
   getTripPageData,
+  type ParticipantMembership,
   type TripPageData,
 } from "@/lib/trips";
 
@@ -117,12 +119,16 @@ function InviteEntryForm({
 }
 
 function TripPageLayout({
+  canEditTrip = false,
   canManageItinerary = false,
+  currentParticipant = null,
   currentUserId,
   data,
   guestMode = false,
 }: {
+  canEditTrip?: boolean;
   canManageItinerary?: boolean;
+  currentParticipant?: ParticipantMembership | null;
   currentUserId?: string;
   data: TripPageData;
   guestMode?: boolean;
@@ -133,11 +139,13 @@ function TripPageLayout({
         {guestMode ? <GuestBanner tripId={data.trip.id} /> : null}
 
         <TripHeader
+          canEdit={canEditTrip}
           endDate={data.trip.end_date}
           imageUrl={data.trip.image_url}
           locationName={data.trip.location_name}
           name={data.trip.name}
           startDate={data.trip.start_date}
+          tripId={data.trip.id}
         />
 
         <section className="rounded-[1.75rem] border border-[#efd5c8] bg-white/75 p-5 shadow-sm">
@@ -153,6 +161,19 @@ function TripPageLayout({
           showSeeAll={!guestMode}
           tripId={data.trip.id}
         />
+        {!guestMode && currentParticipant ? (
+          <EditMyInfoButton
+            initialValues={{
+              arrivalLocation: currentParticipant.arrival_location,
+              arrivalTime: currentParticipant.arrival_time,
+              departureLocation: currentParticipant.departure_location,
+              departureTime: currentParticipant.departure_time,
+              nickname: currentParticipant.nickname,
+            }}
+            participantId={currentParticipant.id}
+            tripId={data.trip.id}
+          />
+        ) : null}
         <TripMap
           initialItems={data.itineraryItems}
           tripEndDate={data.trip.end_date}
@@ -195,7 +216,9 @@ export default async function TripPage({ params, searchParams }: PageProps) {
 
       return (
         <TripPageLayout
+          canEditTrip={membership.role === "organizer"}
           canManageItinerary={membership.role === "organizer" || membership.role === "planner"}
+          currentParticipant={membership}
           currentUserId={user.id}
           data={participantTripData}
         />

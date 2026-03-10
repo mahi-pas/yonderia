@@ -1,15 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Modal from "@/components/ui/Modal";
 import { createClient } from "@/lib/supabase/client";
 
+type NicknameModalInitialValues = {
+  arrivalLocation?: string | null;
+  arrivalTime?: string | null;
+  departureLocation?: string | null;
+  departureTime?: string | null;
+  nickname?: string | null;
+};
+
 type NicknameModalProps = {
+  cancelLabel?: string;
+  description?: string;
+  initialValues?: NicknameModalInitialValues;
   isOpen: boolean;
   onComplete: () => void;
+  onSaved?: () => void;
   participantId: string;
+  submitLabel?: string;
+  title?: string;
   tripId: string;
 };
 
@@ -27,10 +41,32 @@ function normalizeOptionalTimestamp(value: string): string | null {
   return Number.isNaN(parsedDate.getTime()) ? null : parsedDate.toISOString();
 }
 
+function formatTimestampForInput(value: string | null | undefined): string {
+  if (!value) {
+    return "";
+  }
+
+  const parsedDate = new Date(value);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "";
+  }
+
+  const pad = (segment: number) => String(segment).padStart(2, "0");
+
+  return `${parsedDate.getFullYear()}-${pad(parsedDate.getMonth() + 1)}-${pad(parsedDate.getDate())}T${pad(parsedDate.getHours())}:${pad(parsedDate.getMinutes())}`;
+}
+
 export default function NicknameModal({
+  cancelLabel = "Skip",
+  description = "This is just for this trip, so your crew can recognize you and know when you're getting in or heading out.",
+  initialValues,
   isOpen,
   onComplete,
+  onSaved,
   participantId,
+  submitLabel = "Save",
+  title = "What should people call you on this trip?",
   tripId,
 }: NicknameModalProps) {
   const [nickname, setNickname] = useState("");
@@ -40,6 +76,19 @@ export default function NicknameModal({
   const [departureLocation, setDepartureLocation] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    setNickname(initialValues?.nickname ?? "");
+    setArrivalTime(formatTimestampForInput(initialValues?.arrivalTime));
+    setArrivalLocation(initialValues?.arrivalLocation ?? "");
+    setDepartureTime(formatTimestampForInput(initialValues?.departureTime));
+    setDepartureLocation(initialValues?.departureLocation ?? "");
+    setErrorMessage(null);
+  }, [initialValues, isOpen]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -66,6 +115,7 @@ export default function NicknameModal({
         throw error;
       }
 
+      onSaved?.();
       onComplete();
     } catch (error) {
       setErrorMessage(
@@ -78,7 +128,7 @@ export default function NicknameModal({
 
   return (
     <Modal
-      description="This is just for this trip, so your crew can recognize you and know when you're getting in or heading out."
+      description={description}
       isOpen={isOpen}
       onClose={() => {
         if (!isSaving) {
@@ -86,7 +136,7 @@ export default function NicknameModal({
         }
       }}
       panelClassName="sm:max-w-2xl"
-      title="What should people call you on this trip?"
+      title={title}
       footer={
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button
@@ -96,7 +146,7 @@ export default function NicknameModal({
               onComplete();
             }}
           >
-            Skip
+            {cancelLabel}
           </Button>
           <Button
             isLoading={isSaving}
@@ -105,7 +155,7 @@ export default function NicknameModal({
               void handleSave();
             }}
           >
-            {isSaving ? "Saving..." : "Save"}
+            {isSaving ? "Saving..." : submitLabel}
           </Button>
         </div>
       }

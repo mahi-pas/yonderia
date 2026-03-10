@@ -10,6 +10,19 @@ export type TripPageParticipant = {
   role: TripParticipant["role"];
 };
 
+export type ParticipantMembership = Pick<
+  TripParticipant,
+  | "arrival_location"
+  | "arrival_time"
+  | "departure_location"
+  | "departure_time"
+  | "id"
+  | "nickname"
+  | "role"
+  | "trip_id"
+  | "user_id"
+>;
+
 export type TripPageTrip = Pick<
   Trip,
   "description" | "end_date" | "id" | "image_url" | "location_name" | "name" | "start_date"
@@ -80,10 +93,12 @@ export async function getParticipantMembership(
   supabase: SupabaseClient<Database>,
   tripId: string,
   userId: string,
-): Promise<Pick<TripParticipant, "id" | "role" | "trip_id" | "user_id"> | null> {
+): Promise<ParticipantMembership | null> {
   const { data, error } = await supabase
     .from("trip_participants")
-    .select("id, trip_id, user_id, role")
+    .select(
+      "id, trip_id, user_id, role, nickname, arrival_time, arrival_location, departure_time, departure_location",
+    )
     .eq("trip_id", tripId)
     .eq("user_id", userId)
     .maybeSingle();
@@ -92,7 +107,7 @@ export async function getParticipantMembership(
     throw new Error(error.message);
   }
 
-  return (data as Pick<TripParticipant, "id" | "role" | "trip_id" | "user_id"> | null) ?? null;
+  return (data as ParticipantMembership | null) ?? null;
 }
 
 export async function getInviteCodeLookup(

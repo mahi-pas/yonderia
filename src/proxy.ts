@@ -14,9 +14,7 @@ function getRequiredEnv(name: string, value: string | undefined): string {
 function isProtectedPath(pathname: string): boolean {
   return (
     pathname === "/dashboard" ||
-    pathname.startsWith("/dashboard/") ||
-    pathname === "/profile" ||
-    pathname.startsWith("/profile/")
+    pathname.startsWith("/dashboard/")
   );
 }
 
