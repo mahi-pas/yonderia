@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { sanitizeRedirectPath } from "@/lib/auth/redirects";
+import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
-  const redirectTo = sanitizeRedirectPath(requestUrl.searchParams.get("redirectTo"), requestUrl.origin);
+  const siteUrl = await getSiteUrl();
+  const redirectTo = sanitizeRedirectPath(requestUrl.searchParams.get("redirectTo"), siteUrl);
   const supabase = await createClient();
-  const callbackUrl = new URL("/auth/callback", requestUrl.origin);
+  const callbackUrl = new URL("/auth/callback", siteUrl);
 
   callbackUrl.searchParams.set("redirectTo", redirectTo);
 
@@ -18,7 +20,7 @@ export async function GET(request: Request) {
   });
 
   if (error || !data.url) {
-    const loginUrl = new URL("/", requestUrl.origin);
+    const loginUrl = new URL("/", siteUrl);
 
     loginUrl.searchParams.set("error", "auth_start_failed");
     loginUrl.searchParams.set("redirectTo", redirectTo);

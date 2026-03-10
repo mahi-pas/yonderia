@@ -65,6 +65,7 @@ describe("proxy auth redirects", () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "anon-key";
+    process.env.NEXT_PUBLIC_APP_URL = "http://localhost:3000";
   });
 
   it("redirects unauthenticated users from /dashboard to /", async () => {

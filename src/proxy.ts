@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import type { Database, InviteCodeType } from "@/lib/types";
+import { getSiteUrl } from "@/lib/site-url";
 
 function getRequiredEnv(name: string, value: string | undefined): string {
   if (!value) {
@@ -32,8 +33,9 @@ function getTripIdFromPath(pathname: string): string | null {
   return pathname.split("/").filter(Boolean)[1] ?? null;
 }
 
-function buildLandingRedirectUrl(request: NextRequest, redirectTo?: string): URL {
-  const loginUrl = new URL("/", request.url);
+async function buildLandingRedirectUrl(request: NextRequest, redirectTo?: string): Promise<URL> {
+  const siteUrl = await getSiteUrl();
+  const loginUrl = new URL("/", siteUrl);
   const resolvedRedirectTo = redirectTo ?? request.nextUrl.pathname + request.nextUrl.search;
 
   loginUrl.searchParams.set("redirectTo", resolvedRedirectTo);
@@ -41,8 +43,9 @@ function buildLandingRedirectUrl(request: NextRequest, redirectTo?: string): URL
   return loginUrl;
 }
 
-function buildAuthStartUrl(request: NextRequest, redirectTo: string): URL {
-  const loginUrl = new URL("/auth/login", request.url);
+async function buildAuthStartUrl(request: NextRequest, redirectTo: string): Promise<URL> {
+  const siteUrl = await getSiteUrl();
+  const loginUrl = new URL("/auth/login", siteUrl);
 
   loginUrl.searchParams.set("redirectTo", redirectTo);
 
@@ -129,12 +132,12 @@ export async function proxy(request: NextRequest) {
 
     if (inviteCodeType === "join" || inviteCodeType === "join_planner") {
       const redirectTo = `/trip/${tripId}/join?code=${encodeURIComponent(inviteCode)}`;
-      return NextResponse.redirect(buildAuthStartUrl(request, redirectTo));
+      return NextResponse.redirect(await buildAuthStartUrl(request, redirectTo));
     }
   }
 
   if (!user && isProtectedPath(request.nextUrl.pathname)) {
-    return NextResponse.redirect(buildLandingRedirectUrl(request));
+    return NextResponse.redirect(await buildLandingRedirectUrl(request));
   }
 
   return response;
