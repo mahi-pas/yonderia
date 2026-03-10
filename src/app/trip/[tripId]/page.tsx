@@ -91,7 +91,7 @@ function InviteEntryForm({
   tripId: string;
 }) {
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] px-4 py-8 sm:px-6 sm:py-10">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
       <div className="mx-auto max-w-lg rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,250,246,0.95),rgba(255,245,237,0.92))] p-6 shadow-[0_28px_90px_rgba(104,45,20,0.12)] sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Trip access</p>
         <h1 className="mt-3 font-display text-4xl leading-none text-[#34180f]">Enter your invite code</h1>
@@ -106,12 +106,14 @@ function InviteEntryForm({
               {errorMessage}
             </div>
           ) : null}
-          <button
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#c76038] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(199,96,56,0.28)] transition hover:bg-[#b55531]"
-            type="submit"
-          >
-            Continue to join
-          </button>
+          <div className="sticky bottom-3 z-10 -mx-1 rounded-[1.5rem] border border-white/80 bg-[rgba(255,249,245,0.96)] p-3 shadow-[0_16px_35px_rgba(90,40,20,0.12)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
+            <button
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#c76038] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(199,96,56,0.28)] transition hover:bg-[#b55531]"
+              type="submit"
+            >
+              Continue to join
+            </button>
+          </div>
         </form>
       </div>
     </main>

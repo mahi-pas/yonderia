@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
+import TopToast from "@/components/ui/TopToast";
 import { createClient } from "@/lib/supabase/client";
 import type { InviteCodeType, TripParticipantRole } from "@/lib/types";
 import { generateInviteCode } from "@/lib/utils";
@@ -256,20 +257,7 @@ export default function InviteManagement({
   return (
     <>
       {toast ? (
-        <div className="fixed inset-x-4 top-4 z-50 flex justify-center">
-          <div
-            className={[
-              "w-full max-w-md rounded-[1.35rem] px-4 py-3 text-sm font-semibold shadow-[0_18px_45px_rgba(90,40,20,0.18)]",
-              toast.tone === "success"
-                ? "border border-[#cfe4c7] bg-[#f4fff0] text-[#355722]"
-                : "border border-[#efb9a3] bg-[#fff1ea] text-[#8b3f22]",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          >
-            {toast.message}
-          </div>
-        </div>
+        <TopToast message={toast.message} tone={toast.tone} />
       ) : null}
 
       <div className="space-y-5">

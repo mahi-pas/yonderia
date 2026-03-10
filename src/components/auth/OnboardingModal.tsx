@@ -143,9 +143,10 @@ export default function OnboardingModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-stone-950/40 p-3 backdrop-blur-sm sm:items-center sm:justify-center sm:p-6">
-      <div className="w-full rounded-[2rem] border border-white/70 bg-[rgba(255,249,245,0.98)] p-5 shadow-[0_24px_80px_rgba(99,46,25,0.22)] sm:max-w-lg sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-end bg-stone-950/40 backdrop-blur-sm sm:items-center sm:justify-center sm:p-6">
+      <div className="flex h-[100dvh] w-full flex-col rounded-t-[2rem] border border-white/70 bg-[rgba(255,249,245,0.98)] p-5 shadow-[0_24px_80px_rgba(99,46,25,0.22)] sm:h-auto sm:max-w-lg sm:rounded-[2rem] sm:p-8">
         <div className="space-y-2">
+          <div className="mx-auto mb-4 h-1.5 w-14 rounded-full bg-[#e9c6b6] sm:hidden" />
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">
             First things first
           </p>
@@ -158,7 +159,7 @@ export default function OnboardingModal({
           </p>
         </div>
 
-        <div className="mt-6 space-y-5">
+        <div className="mt-6 flex-1 space-y-5 overflow-y-auto pb-6">
           <div className="flex items-center gap-4">
             <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-[1.75rem] bg-[linear-gradient(135deg,#ffd4be,#f4a77f)] text-2xl font-semibold text-[#5a2b1c] shadow-inner">
               {previewUrl ? (
@@ -176,7 +177,7 @@ export default function OnboardingModal({
             <label className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-[#d4a189] bg-white px-4 py-3 text-sm font-semibold text-[#5a2b1c] shadow-sm transition hover:border-[#b56445] hover:bg-[#fff4ec]">
               Choose photo
               <input
-                accept="image/jpeg,image/png,image/webp"
+                accept="image/*"
                 capture="user"
                 className="sr-only"
                 type="file"
@@ -208,9 +209,9 @@ export default function OnboardingModal({
           ) : null}
         </div>
 
-        <div className="mt-7 flex justify-end">
+        <div className="mt-7 flex justify-end border-t border-[#f2d3c6] pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:border-0 sm:pt-0 sm:pb-0">
           <button
-            className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#c85f37] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(200,95,55,0.32)] transition hover:bg-[#b95430] disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#c85f37] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(200,95,55,0.32)] transition hover:bg-[#b95430] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
             disabled={isSaving}
             type="button"
             onClick={() => {

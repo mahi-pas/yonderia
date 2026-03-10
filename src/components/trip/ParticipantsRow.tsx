@@ -60,7 +60,7 @@ export default function ParticipantsRow({
       </div>
 
       <div
-        className="overflow-x-auto rounded-[1.75rem] border border-[#f0d5c7] bg-white/75 px-4 py-4 shadow-sm [scrollbar-width:none]"
+        className="touch-pan-x overflow-x-auto overscroll-x-contain rounded-[1.75rem] border border-[#f0d5c7] bg-white/75 px-4 py-4 shadow-sm [scrollbar-width:none] [-ms-overflow-style:none]"
         role={showSeeAll ? "button" : undefined}
         style={{ WebkitOverflowScrolling: "touch" }}
         tabIndex={showSeeAll ? 0 : undefined}
@@ -76,11 +76,11 @@ export default function ParticipantsRow({
           }
         }}
       >
-        <div className="flex min-w-max items-start gap-4">
+        <div className="flex min-w-max snap-x snap-mandatory items-start gap-4 pr-1">
           {participants.map((participant) => {
             const badge = getRoleBadge(participant.role);
             const content = (
-              <div className="w-[4.5rem] shrink-0 text-center">
+              <div className="w-[4.5rem] shrink-0 snap-start text-center">
                 <div className="relative mx-auto h-16 w-16">
                   <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-[#f6c4a7] text-lg font-semibold text-[#5a2b1c] shadow-[0_12px_22px_rgba(116,58,31,0.14)]">
                     {participant.avatarUrl ? (
@@ -111,7 +111,7 @@ export default function ParticipantsRow({
               return (
                 <Link
                   key={`${participant.profilePath}-${participant.name}`}
-                  className="block"
+                  className="block snap-start"
                   href={participant.profilePath}
                   onClick={(event) => {
                     event.stopPropagation();
@@ -127,7 +127,7 @@ export default function ParticipantsRow({
 
           {showSeeAll ? (
             <button
-              className="flex h-[92px] w-[92px] shrink-0 flex-col items-center justify-center rounded-[1.5rem] border border-[#e8c3b2] bg-[linear-gradient(180deg,#fff7f2,#ffefe4)] text-center shadow-sm transition hover:border-[#cc7b58] hover:bg-[#fff4ec]"
+              className="flex h-[92px] w-[92px] shrink-0 snap-start flex-col items-center justify-center rounded-[1.5rem] border border-[#e8c3b2] bg-[linear-gradient(180deg,#fff7f2,#ffefe4)] text-center shadow-sm transition hover:border-[#cc7b58] hover:bg-[#fff4ec]"
               type="button"
               onClick={(event) => {
                 event.stopPropagation();

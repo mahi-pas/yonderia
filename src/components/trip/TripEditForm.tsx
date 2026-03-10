@@ -149,7 +149,7 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
   };
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] px-4 py-5 pb-24 sm:px-6 sm:py-7 sm:pb-7 lg:px-10">
       <div className="mx-auto max-w-4xl">
         <section className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,250,246,0.95),rgba(255,245,237,0.92))] p-5 shadow-[0_28px_90px_rgba(104,45,20,0.12)] sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -247,9 +247,10 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
               </div>
             ) : null}
 
-            <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+            <div className="sticky bottom-3 z-10 -mx-1 flex flex-col-reverse gap-3 rounded-[1.5rem] border border-white/80 bg-[rgba(255,249,245,0.96)] p-3 shadow-[0_16px_35px_rgba(90,40,20,0.12)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:pt-2 sm:shadow-none">
               <Button
                 disabled={isSubmitting}
+                className="w-full sm:w-auto"
                 variant="secondary"
                 onClick={() => {
                   router.push(`/trip/${tripId}`);
@@ -258,6 +259,7 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
                 Cancel
               </Button>
               <Button
+                className="w-full sm:w-auto"
                 isLoading={isSubmitting}
                 size="lg"
                 onClick={() => {

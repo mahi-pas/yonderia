@@ -82,7 +82,10 @@ export default function TripLocationInput({
     <Input
       ref={inputRef}
       autoComplete="off"
+      autoCapitalize="off"
+      autoCorrect="off"
       disabled={disabled}
+      enterKeyHint="search"
       hint={
         status === "ready"
           ? "Start typing and pick a Google Places suggestion."
@@ -90,6 +93,7 @@ export default function TripLocationInput({
       }
       label={label}
       placeholder="Where are you headed?"
+      spellCheck={false}
       value={value.name}
       onChange={(event) => {
         onChange({

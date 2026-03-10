@@ -199,7 +199,7 @@ function buildInfoWindowContent(point: MapPoint, onViewDetails: () => void) {
   stack.appendChild(location);
 
   const button = document.createElement("button");
-  button.className = "inline-flex min-h-10 items-center justify-center rounded-full bg-[#c76038] px-4 text-sm font-semibold text-white transition hover:bg-[#b55531]";
+  button.className = "inline-flex min-h-11 items-center justify-center rounded-full bg-[#c76038] px-4 text-sm font-semibold text-white transition hover:bg-[#b55531]";
   button.textContent = "View details";
   button.type = "button";
   button.addEventListener("click", onViewDetails);
@@ -502,7 +502,7 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
       <div
         className={[
           isFullscreen
-            ? "fixed inset-0 z-50 flex flex-col bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] p-4"
+            ? "fixed inset-0 z-50 flex flex-col bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] p-4 pt-[calc(env(safe-area-inset-top)+1rem)]"
             : "mt-4",
         ]
           .filter(Boolean)
@@ -538,11 +538,11 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
             </div>
           ) : null}
 
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="touch-pan-x flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
             <button
               aria-pressed={activeDay === "all"}
               className={[
-                "inline-flex min-h-10 shrink-0 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
+                "inline-flex min-h-11 shrink-0 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
                 activeDay === "all"
                   ? "bg-[#c76038] text-white shadow-[0_18px_45px_rgba(199,96,56,0.28)]"
                   : "border border-[#e6b9a3] bg-white/80 text-[#6b4131] hover:bg-[#fff2ea]",
@@ -565,7 +565,7 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
                   key={day.dayDate}
                   aria-pressed={isActive}
                   className={[
-                    "inline-flex min-h-10 shrink-0 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
+                    "inline-flex min-h-11 shrink-0 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
                     isActive
                       ? "bg-[#c76038] text-white shadow-[0_18px_45px_rgba(199,96,56,0.28)]"
                       : "border border-[#e6b9a3] bg-white/80 text-[#6b4131] hover:bg-[#fff2ea]",
@@ -657,7 +657,7 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
                     <button
                       key={point.key}
                       aria-label={`Open ${point.item.title} pin`}
-                      className="absolute flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white text-xs font-bold text-white shadow-[0_12px_24px_rgba(78,41,22,0.18)]"
+                      className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white text-xs font-bold text-white shadow-[0_12px_24px_rgba(78,41,22,0.18)]"
                       data-day={point.item.day_date}
                       data-item-id={point.item.id}
                       data-item-type={point.item.item_type}
@@ -705,7 +705,7 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
 
                       <div className="flex gap-2">
                         <button
-                          className="inline-flex min-h-10 items-center justify-center rounded-full bg-[#c76038] px-4 text-sm font-semibold text-white transition hover:bg-[#b55531]"
+                          className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#c76038] px-4 text-sm font-semibold text-white transition hover:bg-[#b55531]"
                           type="button"
                           onClick={() => {
                             setSelectedItem(selectedPoint.item);
@@ -714,7 +714,7 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
                           View details
                         </button>
                         <button
-                          className="inline-flex min-h-10 items-center justify-center rounded-full border border-[#ddb39f] bg-white/90 px-4 text-sm font-semibold text-[#5a2b1c] shadow-sm transition hover:border-[#c67b5a] hover:bg-[#fff3ec]"
+                          className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#ddb39f] bg-white/90 px-4 text-sm font-semibold text-[#5a2b1c] shadow-sm transition hover:border-[#c67b5a] hover:bg-[#fff3ec]"
                           type="button"
                           onClick={() => {
                             setActivePointKey(null);
