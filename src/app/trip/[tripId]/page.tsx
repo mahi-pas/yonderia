@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import DayItinerary from "@/components/trip/DayItinerary";
 import ParticipantsRow from "@/components/trip/ParticipantsRow";
 import TripHeader from "@/components/trip/TripHeader";
 import Input from "@/components/ui/Input";
@@ -132,9 +133,13 @@ function InviteEntryForm({
 }
 
 function TripPageLayout({
+  canManageItinerary = false,
+  currentUserId,
   data,
   guestMode = false,
 }: {
+  canManageItinerary?: boolean;
+  currentUserId?: string;
   data: TripPageData;
   guestMode?: boolean;
 }) {
@@ -169,9 +174,14 @@ function TripPageLayout({
           description="The trip map is coming next. This area will show every itinerary stop in one glance."
           title="Map"
         />
-        <PlaceholderSection
-          description={`The itinerary builder arrives in a later session. ${data.itineraryItems.length} item${data.itineraryItems.length === 1 ? "" : "s"} are already connected to this trip behind the scenes.`}
-          title="Itinerary"
+        <DayItinerary
+          canManage={canManageItinerary}
+          currentUserId={currentUserId}
+          initialItems={data.itineraryItems}
+          readOnly={guestMode}
+          tripEndDate={data.trip.end_date}
+          tripId={data.trip.id}
+          tripStartDate={data.trip.start_date}
         />
       </div>
     </main>
@@ -199,7 +209,13 @@ export default async function TripPage({ params, searchParams }: PageProps) {
         notFound();
       }
 
-      return <TripPageLayout data={participantTripData} />;
+      return (
+        <TripPageLayout
+          canManageItinerary={membership.role === "organizer" || membership.role === "planner"}
+          currentUserId={user.id}
+          data={participantTripData}
+        />
+      );
     }
   }
 

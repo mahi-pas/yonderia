@@ -18,6 +18,15 @@ type InviteRow = {
   isActive: boolean;
 };
 
+type InsertedInviteRow = {
+  code: string;
+  code_type: InviteCodeType;
+  created_at: string;
+  created_by: string | null;
+  id: string;
+  is_active: boolean;
+};
+
 type InviteManagementProps = {
   currentUserDisplayName: string | null;
   currentUserId: string;
@@ -156,9 +165,9 @@ export default function InviteManagement({
     const code = generateInviteCode();
 
     try {
-      // @ts-expect-error Supabase infers `never` here from the handcrafted Database type.
-      const { data, error } = await supabase
-        .from("invite_codes")
+      const inviteInsertQuery = supabase.from("invite_codes");
+      const { data, error } = await inviteInsertQuery
+        // @ts-expect-error Supabase infers `never` here from the handcrafted Database type.
         .insert({
           code,
           code_type: inviteType,
@@ -173,16 +182,17 @@ export default function InviteManagement({
         throw error ?? new Error("We couldn't create a new invite.");
       }
 
+      const insertedInvite = data as InsertedInviteRow;
       const nextInvite: InviteRow = {
-        code: data.code,
-        codeType: data.code_type,
-        createdAt: data.created_at,
-        createdBy: data.created_by,
+        code: insertedInvite.code,
+        codeType: insertedInvite.code_type,
+        createdAt: insertedInvite.created_at,
+        createdBy: insertedInvite.created_by,
         creatorName: currentUserDisplayName?.trim() || "You",
-        id: data.id,
-        isActive: data.is_active,
+        id: insertedInvite.id,
+        isActive: insertedInvite.is_active,
       };
-      const nextLink = buildInviteLink(siteOrigin, tripId, data.code);
+      const nextLink = buildInviteLink(siteOrigin, tripId, insertedInvite.code);
 
       setInvites((current) => [nextInvite, ...current]);
       setGeneratedLink(nextLink);

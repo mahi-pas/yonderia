@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/types";
 import { getParticipantMembership } from "@/lib/trips";
 
 type RevokeInviteRequest = {
   inviteId?: unknown;
   tripId?: unknown;
 };
+
+type InviteStatusRow = Pick<Database["public"]["Tables"]["invite_codes"]["Row"], "id" | "is_active" | "trip_id">;
 
 function getStringValue(value: unknown): string | null {
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
@@ -60,12 +63,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invite not found." }, { status: 404 });
   }
 
-  if (!invite.is_active) {
+  const resolvedInvite = invite as InviteStatusRow;
+
+  if (!resolvedInvite.is_active) {
     return NextResponse.json({ success: true });
   }
 
-  const { error: updateError } = await adminSupabase
-    .from("invite_codes")
+  const inviteUpdateQuery = adminSupabase.from("invite_codes");
+  const { error: updateError } = await inviteUpdateQuery
+    // @ts-expect-error Supabase infers `never` here from the handcrafted Database type.
     .update({ is_active: false })
     .eq("id", inviteId)
     .eq("trip_id", tripId);

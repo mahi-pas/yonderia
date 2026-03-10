@@ -9,6 +9,12 @@ type ValidateInviteRequest = {
   tripId?: unknown;
 };
 
+type TripPlannerPreferenceRow = Pick<
+  Database["public"]["Tables"]["trips"]["Row"],
+  "default_planner_permission" | "id"
+>;
+type ParticipantIdRow = Pick<Database["public"]["Tables"]["trip_participants"]["Row"], "id">;
+
 function getStringValue(value: unknown): string | null {
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
 }
@@ -89,8 +95,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Trip not found." }, { status: 404 });
   }
 
+  const resolvedTrip = trip as TripPlannerPreferenceRow;
   const role: TripParticipantRole =
-    inviteCode.codeType === "join_planner" || trip.default_planner_permission ? "planner" : "member";
+    inviteCode.codeType === "join_planner" || resolvedTrip.default_planner_permission ? "planner" : "member";
 
   const newParticipant: Database["public"]["Tables"]["trip_participants"]["Insert"] = {
     arrival_location: null,
@@ -104,9 +111,9 @@ export async function POST(request: Request) {
     user_id: user.id,
   };
 
-  // @ts-expect-error Supabase infers `never` from the handcrafted Database type.
-  const { data: insertedParticipant, error: insertError } = await adminSupabase
-    .from("trip_participants")
+  const participantInsertQuery = adminSupabase.from("trip_participants");
+  const { data: insertedParticipant, error: insertError } = await participantInsertQuery
+    // @ts-expect-error Supabase infers `never` here from the handcrafted Database type.
     .insert(newParticipant)
     .select("id")
     .single();
@@ -129,9 +136,10 @@ export async function POST(request: Request) {
     throw new Error(insertError.message);
   }
 
+  const resolvedParticipant = insertedParticipant as ParticipantIdRow;
   return NextResponse.json({
     alreadyParticipant: false,
-    participantId: insertedParticipant.id,
+    participantId: resolvedParticipant.id,
     redirectTo: `/trip/${tripId}`,
     success: true,
     tripId,

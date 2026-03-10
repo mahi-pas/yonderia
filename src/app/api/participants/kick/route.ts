@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/types";
 import { getParticipantMembership } from "@/lib/trips";
 
 type KickParticipantRequest = {
   participantId?: unknown;
   tripId?: unknown;
 };
+
+type ParticipantRow = Pick<
+  Database["public"]["Tables"]["trip_participants"]["Row"],
+  "id" | "role" | "trip_id" | "user_id"
+>;
 
 function getStringValue(value: unknown): string | null {
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
@@ -60,11 +66,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Participant not found." }, { status: 404 });
   }
 
-  if (participant.user_id === user.id) {
+  const resolvedParticipant = participant as ParticipantRow;
+
+  if (resolvedParticipant.user_id === user.id) {
     return NextResponse.json({ error: "The organizer can't remove themselves from the trip." }, { status: 403 });
   }
 
-  if (participant.role === "organizer") {
+  if (resolvedParticipant.role === "organizer") {
     return NextResponse.json({ error: "The organizer can't be removed from the trip." }, { status: 403 });
   }
 

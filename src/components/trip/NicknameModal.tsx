@@ -55,8 +55,9 @@ export default function NicknameModal({
         nickname: normalizeOptionalText(nickname),
       };
 
-      const { error } = await supabase
-        .from("trip_participants")
+      const participantUpdateQuery = supabase.from("trip_participants");
+      const { error } = await participantUpdateQuery
+        // @ts-expect-error Supabase infers `never` here from the handcrafted Database type.
         .update(updates)
         .eq("id", participantId)
         .eq("trip_id", tripId);

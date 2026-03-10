@@ -30,6 +30,10 @@ type ParticipantListRow = Pick<
 >;
 
 type ProfileRow = Pick<Profile, "avatar_url" | "display_name" | "id">;
+type TripHeaderRow = {
+  id: string;
+  name: string;
+};
 
 type ParticipantViewModel = {
   arrivalLocation: string | null;
@@ -162,6 +166,8 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
     notFound();
   }
 
+  const resolvedTrip = trip as TripHeaderRow;
+
   const typedParticipantRows = (participantRows ?? []) as ParticipantListRow[];
   const inviteRows = (inviteResult.data ?? []) as Array<{
     code: string;
@@ -234,7 +240,7 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Participants</p>
               <h1 className="mt-2 text-balance font-display text-4xl leading-none text-[#34180f] sm:text-5xl">
-                {trip.name}
+                {resolvedTrip.name}
               </h1>
             </div>
           </div>
