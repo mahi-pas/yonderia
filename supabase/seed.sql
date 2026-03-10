@@ -1,0 +1,522 @@
+begin;
+
+-- Fixed IDs make the seed repeatable and easy to reference.
+-- Re-running the file replaces only this demo dataset.
+
+delete from public.invite_codes
+where trip_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+
+delete from public.itinerary_items
+where trip_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+
+delete from public.trip_participants
+where trip_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+
+delete from public.trips
+where id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+
+delete from auth.users
+where id in (
+  '11111111-1111-1111-1111-111111111111',
+  '22222222-2222-2222-2222-222222222222',
+  '33333333-3333-3333-3333-333333333333',
+  '44444444-4444-4444-4444-444444444444'
+);
+
+insert into auth.users (
+  instance_id,
+  id,
+  aud,
+  role,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at,
+  confirmation_token,
+  email_change,
+  email_change_token_new,
+  recovery_token
+) values
+(
+  '00000000-0000-0000-0000-000000000000',
+  '11111111-1111-1111-1111-111111111111',
+  'authenticated',
+  'authenticated',
+  'maya@yonderia.test',
+  crypt('password123', gen_salt('bf')),
+  now(),
+  '{"provider":"email","providers":["email"]}',
+  '{"full_name":"Maya Chen","avatar_url":"https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80"}',
+  now(),
+  now(),
+  '',
+  '',
+  '',
+  ''
+),
+(
+  '00000000-0000-0000-0000-000000000000',
+  '22222222-2222-2222-2222-222222222222',
+  'authenticated',
+  'authenticated',
+  'leo@yonderia.test',
+  crypt('password123', gen_salt('bf')),
+  now(),
+  '{"provider":"email","providers":["email"]}',
+  '{"full_name":"Leo Park","avatar_url":"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80"}',
+  now(),
+  now(),
+  '',
+  '',
+  '',
+  ''
+),
+(
+  '00000000-0000-0000-0000-000000000000',
+  '33333333-3333-3333-3333-333333333333',
+  'authenticated',
+  'authenticated',
+  'aina@yonderia.test',
+  crypt('password123', gen_salt('bf')),
+  now(),
+  '{"provider":"email","providers":["email"]}',
+  '{"full_name":"Aina Sato","avatar_url":"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=600&q=80"}',
+  now(),
+  now(),
+  '',
+  '',
+  '',
+  ''
+),
+(
+  '00000000-0000-0000-0000-000000000000',
+  '44444444-4444-4444-4444-444444444444',
+  'authenticated',
+  'authenticated',
+  'noah@yonderia.test',
+  crypt('password123', gen_salt('bf')),
+  now(),
+  '{"provider":"email","providers":["email"]}',
+  '{"full_name":"Noah Rivera","avatar_url":"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80"}',
+  now(),
+  now(),
+  '',
+  '',
+  '',
+  ''
+);
+
+update public.profiles
+set has_completed_onboarding = true
+where id in (
+  '11111111-1111-1111-1111-111111111111',
+  '22222222-2222-2222-2222-222222222222',
+  '33333333-3333-3333-3333-333333333333',
+  '44444444-4444-4444-4444-444444444444'
+);
+
+insert into public.trips (
+  id,
+  name,
+  description,
+  image_url,
+  location_name,
+  latitude,
+  longitude,
+  start_date,
+  end_date,
+  default_planner_permission,
+  created_by,
+  created_at
+) values (
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'Spring in Japan',
+  'A two-week group trip through Tokyo, Hakone, Kyoto, and Osaka with a mix of food spots, temples, train rides, and a little room for spontaneous detours.',
+  'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1400&q=80',
+  'Tokyo, Hakone, Kyoto, Osaka',
+  35.6762,
+  139.6503,
+  date '2026-04-10',
+  date '2026-04-20',
+  false,
+  '11111111-1111-1111-1111-111111111111',
+  now()
+);
+
+insert into public.trip_participants (
+  id,
+  trip_id,
+  user_id,
+  nickname,
+  role,
+  arrival_time,
+  departure_time,
+  arrival_location,
+  departure_location,
+  joined_at,
+  created_at
+) values
+(
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  '11111111-1111-1111-1111-111111111111',
+  'Maya',
+  'organizer',
+  '2026-04-10 15:30:00+09',
+  '2026-04-20 16:45:00+09',
+  'Haneda Airport',
+  'Kansai International Airport',
+  now(),
+  now()
+),
+(
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb2',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  '22222222-2222-2222-2222-222222222222',
+  'Leo',
+  'planner',
+  '2026-04-10 17:10:00+09',
+  '2026-04-20 12:15:00+09',
+  'Narita Airport',
+  'Itami Airport',
+  now(),
+  now()
+),
+(
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb3',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  '33333333-3333-3333-3333-333333333333',
+  'Aina',
+  'member',
+  '2026-04-10 14:20:00+09',
+  '2026-04-19 20:30:00+09',
+  'Haneda Airport',
+  'Kansai International Airport',
+  now(),
+  now()
+),
+(
+  'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb4',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  '44444444-4444-4444-4444-444444444444',
+  'Noah',
+  'member',
+  '2026-04-11 09:10:00+09',
+  '2026-04-20 18:10:00+09',
+  'Tokyo Station',
+  'Shin-Osaka Station',
+  now(),
+  now()
+);
+
+insert into public.invite_codes (
+  id,
+  trip_id,
+  code,
+  code_type,
+  is_active,
+  created_by,
+  created_at
+) values
+(
+  'cccccccc-cccc-cccc-cccc-ccccccccc001',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'JPNMEMBER1',
+  'join',
+  true,
+  '11111111-1111-1111-1111-111111111111',
+  now()
+),
+(
+  'cccccccc-cccc-cccc-cccc-ccccccccc002',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'JPNPLANR01',
+  'join_planner',
+  true,
+  '22222222-2222-2222-2222-222222222222',
+  now()
+),
+(
+  'cccccccc-cccc-cccc-cccc-ccccccccc003',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'JPNVIEW001',
+  'view',
+  true,
+  '11111111-1111-1111-1111-111111111111',
+  now()
+),
+(
+  'cccccccc-cccc-cccc-cccc-ccccccccc004',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'OLDTOKYO99',
+  'join',
+  false,
+  '11111111-1111-1111-1111-111111111111',
+  now()
+);
+
+insert into public.itinerary_items (
+  id,
+  trip_id,
+  item_type,
+  title,
+  description,
+  image_url,
+  day_date,
+  start_time,
+  end_time,
+  location_name,
+  latitude,
+  longitude,
+  destination_name,
+  destination_latitude,
+  destination_longitude,
+  sort_order,
+  created_by,
+  created_at
+) values
+(
+  'dddddddd-dddd-dddd-dddd-ddddddddd001',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'hotel',
+  'Shibuya Stay',
+  'Our first hotel in Tokyo, close to the scramble crossing and late-night ramen spots.',
+  'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
+  date '2026-04-10',
+  '2026-04-10 19:00:00+09',
+  '2026-04-13 10:00:00+09',
+  'Shibuya, Tokyo',
+  35.6595,
+  139.7005,
+  null,
+  null,
+  null,
+  0,
+  '11111111-1111-1111-1111-111111111111',
+  now()
+),
+(
+  'dddddddd-dddd-dddd-dddd-ddddddddd002',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'event',
+  'Welcome Dinner at Omoide Yokocho',
+  'Casual first-night dinner with yakitori and a wander through the alleyways.',
+  'https://images.unsplash.com/photo-1554797589-7241bb691973?auto=format&fit=crop&w=1200&q=80',
+  date '2026-04-10',
+  '2026-04-10 20:30:00+09',
+  '2026-04-10 22:00:00+09',
+  'Omoide Yokocho, Shinjuku',
+  35.6938,
+  139.6993,
+  null,
+  null,
+  null,
+  1,
+  '22222222-2222-2222-2222-222222222222',
+  now()
+),
+(
+  'dddddddd-dddd-dddd-dddd-ddddddddd003',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'event',
+  'Senso-ji and Asakusa Morning',
+  'Start early for temple grounds, street snacks, and souvenir shopping before the crowds build.',
+  'https://images.unsplash.com/photo-1528164344705-47542687000d?auto=format&fit=crop&w=1200&q=80',
+  date '2026-04-11',
+  '2026-04-11 09:00:00+09',
+  '2026-04-11 12:30:00+09',
+  'Senso-ji Temple, Asakusa',
+  35.7148,
+  139.7967,
+  null,
+  null,
+  null,
+  0,
+  '11111111-1111-1111-1111-111111111111',
+  now()
+),
+(
+  'dddddddd-dddd-dddd-dddd-ddddddddd004',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'commute',
+  'Romancecar to Hakone',
+  'Train from Shinjuku to Hakone for an overnight ryokan stay and onsen reset.',
+  'https://images.unsplash.com/photo-1492571350019-22de08371fd3?auto=format&fit=crop&w=1200&q=80',
+  date '2026-04-13',
+  '2026-04-13 10:00:00+09',
+  '2026-04-13 11:25:00+09',
+  'Shinjuku Station',
+  35.6900,
+  139.7006,
+  'Hakone-Yumoto Station',
+  35.2323,
+  139.1069,
+  0,
+  '22222222-2222-2222-2222-222222222222',
+  now()
+),
+(
+  'dddddddd-dddd-dddd-dddd-ddddddddd005',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'hotel',
+  'Ryokan in Hakone',
+  'Traditional tatami rooms, kaiseki dinner, and an onsen with mountain views.',
+  'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80',
+  date '2026-04-13',
+  '2026-04-13 15:00:00+09',
+  '2026-04-14 10:00:00+09',
+  'Hakone, Kanagawa',
+  35.2323,
+  139.1069,
+  null,
+  null,
+  null,
+  1,
+  '11111111-1111-1111-1111-111111111111',
+  now()
+),
+(
+  'dddddddd-dddd-dddd-dddd-ddddddddd006',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'commute',
+  'Shinkansen to Kyoto',
+  'Transfer from Odawara and head west for the Kyoto half of the trip.',
+  'https://images.unsplash.com/photo-1510337550647-e84f83e341ca?auto=format&fit=crop&w=1200&q=80',
+  date '2026-04-14',
+  '2026-04-14 11:30:00+09',
+  '2026-04-14 13:45:00+09',
+  'Odawara Station',
+  35.2556,
+  139.1597,
+  'Kyoto Station',
+  34.9855,
+  135.7586,
+  0,
+  '22222222-2222-2222-2222-222222222222',
+  now()
+),
+(
+  'dddddddd-dddd-dddd-dddd-ddddddddd007',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'hotel',
+  'Gion Machiya Stay',
+  'A townhouse stay in Gion with easy walks to Yasaka Shrine and late-night dessert runs.',
+  'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
+  date '2026-04-14',
+  '2026-04-14 15:00:00+09',
+  '2026-04-18 10:00:00+09',
+  'Gion, Kyoto',
+  35.0037,
+  135.7788,
+  null,
+  null,
+  null,
+  1,
+  '11111111-1111-1111-1111-111111111111',
+  now()
+),
+(
+  'dddddddd-dddd-dddd-dddd-ddddddddd008',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'event',
+  'Fushimi Inari Sunrise Walk',
+  'Beat the tour buses with an early hike through the torii gates and city views.',
+  'https://images.unsplash.com/photo-1526481280695-3c4693f8f8d9?auto=format&fit=crop&w=1200&q=80',
+  date '2026-04-15',
+  '2026-04-15 06:30:00+09',
+  '2026-04-15 09:30:00+09',
+  'Fushimi Inari Taisha',
+  34.9671,
+  135.7727,
+  null,
+  null,
+  null,
+  0,
+  '11111111-1111-1111-1111-111111111111',
+  now()
+),
+(
+  'dddddddd-dddd-dddd-dddd-ddddddddd009',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'event',
+  'Arashiyama Bamboo Grove and Lunch',
+  'Morning bamboo grove walk followed by tofu lunch near the river.',
+  'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=1200&q=80',
+  date '2026-04-16',
+  '2026-04-16 09:00:00+09',
+  '2026-04-16 13:00:00+09',
+  'Arashiyama, Kyoto',
+  35.0170,
+  135.6713,
+  null,
+  null,
+  null,
+  0,
+  '22222222-2222-2222-2222-222222222222',
+  now()
+),
+(
+  'dddddddd-dddd-dddd-dddd-ddddddddd010',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'commute',
+  'Day Trip to Osaka',
+  'Quick train down for street food, neon signs, and an evening back in Kyoto.',
+  'https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=1200&q=80',
+  date '2026-04-17',
+  '2026-04-17 10:00:00+09',
+  '2026-04-17 10:30:00+09',
+  'Kyoto Station',
+  34.9855,
+  135.7586,
+  'Namba Station',
+  34.6647,
+  135.5019,
+  0,
+  '22222222-2222-2222-2222-222222222222',
+  now()
+),
+(
+  'dddddddd-dddd-dddd-dddd-ddddddddd011',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'event',
+  'Dotonbori Food Crawl',
+  'Takoyaki, okonomiyaki, cheesecake, and a lot of indecisive snack sharing.',
+  'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=1200&q=80',
+  date '2026-04-17',
+  '2026-04-17 18:00:00+09',
+  '2026-04-17 21:30:00+09',
+  'Dotonbori, Osaka',
+  34.6687,
+  135.5031,
+  null,
+  null,
+  null,
+  1,
+  '33333333-3333-3333-3333-333333333333',
+  now()
+),
+(
+  'dddddddd-dddd-dddd-dddd-ddddddddd012',
+  'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+  'hotel',
+  'Osaka Finale Hotel',
+  'Last two nights near Umeda before everyone splits for flights home.',
+  'https://images.unsplash.com/photo-1455587734955-081b22074882?auto=format&fit=crop&w=1200&q=80',
+  date '2026-04-18',
+  '2026-04-18 16:00:00+09',
+  '2026-04-20 10:00:00+09',
+  'Umeda, Osaka',
+  34.7055,
+  135.4983,
+  null,
+  null,
+  null,
+  0,
+  '11111111-1111-1111-1111-111111111111',
+  now()
+);
+
+commit;
