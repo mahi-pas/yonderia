@@ -2,7 +2,7 @@
 
 import { eachDayOfInterval, format, parseISO } from "date-fns";
 import { useMemo, useState } from "react";
-import { useItinerary, type ItineraryListItem } from "@/hooks/useItinerary";
+import { groupItineraryItemsByDay, type ItineraryListItem } from "@/hooks/useItinerary";
 import AddEventModal from "./AddEventModal";
 import ItineraryCard from "./ItineraryCard";
 import ItineraryDetail from "./ItineraryDetail";
@@ -10,8 +10,11 @@ import ItineraryDetail from "./ItineraryDetail";
 type DayItineraryProps = {
   canManage: boolean;
   currentUserId?: string;
-  initialItems: ItineraryListItem[];
-  readOnly?: boolean;
+  error?: string | null;
+  groupedByDay?: Map<string, ItineraryListItem[]>;
+  isLoading?: boolean;
+  items: ItineraryListItem[];
+  onCreated?: (item: ItineraryListItem) => void;
   tripEndDate: string;
   tripId: string;
   tripStartDate: string;
@@ -20,8 +23,11 @@ type DayItineraryProps = {
 export default function DayItinerary({
   canManage,
   currentUserId,
-  initialItems,
-  readOnly = false,
+  error = null,
+  groupedByDay,
+  isLoading = false,
+  items,
+  onCreated,
   tripEndDate,
   tripId,
   tripStartDate,
@@ -31,11 +37,7 @@ export default function DayItinerary({
     [tripStartDate]: true,
   }));
   const [selectedItem, setSelectedItem] = useState<ItineraryListItem | null>(null);
-  const { error, groupedByDay, isLoading, itineraryItems, upsertLocalItem } = useItinerary({
-    enabled: !readOnly,
-    initialItems,
-    tripId,
-  });
+  const resolvedGroupedByDay = useMemo(() => groupedByDay ?? groupItineraryItemsByDay(items), [groupedByDay, items]);
 
   const days = useMemo(
     () =>
@@ -57,7 +59,7 @@ export default function DayItinerary({
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Itinerary</p>
           <h2 className="mt-1 font-display text-3xl leading-none text-[#34180f]">Daily plan</h2>
         </div>
-        <p className="text-sm text-[#7e5b4c]">{itineraryItems.length} items</p>
+        <p className="text-sm text-[#7e5b4c]">{items.length} items</p>
       </div>
 
       {error ? (
@@ -68,7 +70,7 @@ export default function DayItinerary({
 
       <div className="space-y-3">
         {days.map((day) => {
-          const dayItems = groupedByDay.get(day.dayDate) ?? [];
+          const dayItems = resolvedGroupedByDay.get(day.dayDate) ?? [];
           const isExpanded = expandedDays[day.dayDate] ?? day.index === 0;
 
           return (
@@ -158,13 +160,15 @@ export default function DayItinerary({
         <AddEventModal
           currentUserId={currentUserId}
           dayDate={activeDayForAdd}
-          existingItems={itineraryItems}
+          existingItems={items}
           isOpen={Boolean(activeDayForAdd)}
           tripId={tripId}
           onClose={() => {
             setActiveDayForAdd(null);
           }}
-          onCreated={upsertLocalItem}
+          onCreated={(item) => {
+            onCreated?.(item);
+          }}
         />
       ) : null}
 

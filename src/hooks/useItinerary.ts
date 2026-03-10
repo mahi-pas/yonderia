@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { ItineraryItem } from "@/lib/types";
 
@@ -123,6 +123,16 @@ export function useItinerary({ enabled = true, initialItems = [], tripId }: UseI
     sortItineraryItems(initialItems),
   );
 
+  const upsertItineraryItem = useCallback((item: ItineraryListItem) => {
+    setItineraryItems((current) =>
+      sortItineraryItems([...current.filter((existingItem) => existingItem.id !== item.id), item]),
+    );
+  }, []);
+
+  const removeItineraryItem = useCallback((itemId: string) => {
+    setItineraryItems((current) => current.filter((item) => item.id !== itemId));
+  }, []);
+
   useEffect(() => {
     setItineraryItems(sortItineraryItems(initialItems));
   }, [initialItems]);
@@ -137,7 +147,7 @@ export function useItinerary({ enabled = true, initialItems = [], tripId }: UseI
     let isMounted = true;
 
     const loadItems = async () => {
-      setIsLoading(true);
+      setIsLoading(initialItems.length === 0);
       setError(null);
 
       const { data, error: itineraryError } = await supabase
@@ -179,24 +189,25 @@ export function useItinerary({ enabled = true, initialItems = [], tripId }: UseI
             return;
           }
 
-          if (payload.eventType === "DELETE") {
-            const deletedId = getPayloadRecordId(payload.old) || getPayloadRecordId(payload.new);
+          switch (payload.eventType) {
+            case "DELETE": {
+              const deletedId = getPayloadRecordId(payload.old) || getPayloadRecordId(payload.new);
 
-            if (!deletedId) {
+              if (!deletedId) {
+                return;
+              }
+
+              removeItineraryItem(deletedId);
               return;
             }
-
-            setItineraryItems((current) => current.filter((item) => item.id !== deletedId));
-            return;
+            case "INSERT":
+            case "UPDATE": {
+              upsertItineraryItem(toItineraryListItem(payload.new as ItineraryItem));
+              return;
+            }
+            default:
+              return;
           }
-
-          const nextItem = toItineraryListItem(payload.new as ItineraryItem);
-          setItineraryItems((current) =>
-            sortItineraryItems([
-              ...current.filter((item) => item.id !== nextItem.id),
-              nextItem,
-            ]),
-          );
         },
       )
       .subscribe();
@@ -205,7 +216,7 @@ export function useItinerary({ enabled = true, initialItems = [], tripId }: UseI
       isMounted = false;
       void supabase.removeChannel(channel);
     };
-  }, [enabled, tripId]);
+  }, [enabled, initialItems.length, removeItineraryItem, tripId, upsertItineraryItem]);
 
   const groupedByDay = useMemo(() => groupItineraryItemsByDay(itineraryItems), [itineraryItems]);
 
@@ -214,13 +225,6 @@ export function useItinerary({ enabled = true, initialItems = [], tripId }: UseI
     groupedByDay,
     isLoading,
     itineraryItems,
-    upsertLocalItem: (item: ItineraryListItem) => {
-      setItineraryItems((current) =>
-        sortItineraryItems([
-          ...current.filter((existingItem) => existingItem.id !== item.id),
-          item,
-        ]),
-      );
-    },
+    upsertLocalItem: upsertItineraryItem,
   };
 }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import DayItinerary from "@/components/trip/DayItinerary";
-import EditMyInfoButton from "@/components/trip/EditMyInfoButton";
+import LiveTripOverview from "@/components/trip/LiveTripOverview";
 import ParticipantsRow from "@/components/trip/ParticipantsRow";
 import TripMap from "@/components/trip/TripMap";
 import TripHeader from "@/components/trip/TripHeader";
@@ -155,39 +155,35 @@ function TripPageLayout({
           </div>
         </section>
 
-        <ParticipantsRow
-          participants={data.participants}
-          showProfileLinks={!guestMode}
-          showSeeAll={!guestMode}
-          tripId={data.trip.id}
-        />
-        {!guestMode && currentParticipant ? (
-          <EditMyInfoButton
-            initialValues={{
-              arrivalLocation: currentParticipant.arrival_location,
-              arrivalTime: currentParticipant.arrival_time,
-              departureLocation: currentParticipant.departure_location,
-              departureTime: currentParticipant.departure_time,
-              nickname: currentParticipant.nickname,
-            }}
-            participantId={currentParticipant.id}
+        {guestMode ? (
+          <>
+            <ParticipantsRow
+              participants={data.participants}
+              showProfileLinks={false}
+              showSeeAll={false}
+              tripId={data.trip.id}
+            />
+            <TripMap items={data.itineraryItems} tripEndDate={data.trip.end_date} tripStartDate={data.trip.start_date} />
+            <DayItinerary
+              canManage={false}
+              items={data.itineraryItems}
+              tripEndDate={data.trip.end_date}
+              tripId={data.trip.id}
+              tripStartDate={data.trip.start_date}
+            />
+          </>
+        ) : (
+          <LiveTripOverview
+            canManageItinerary={canManageItinerary}
+            currentParticipant={currentParticipant}
+            currentUserId={currentUserId}
+            initialItineraryItems={data.itineraryItems}
+            initialParticipants={data.participants}
+            tripEndDate={data.trip.end_date}
             tripId={data.trip.id}
+            tripStartDate={data.trip.start_date}
           />
-        ) : null}
-        <TripMap
-          initialItems={data.itineraryItems}
-          tripEndDate={data.trip.end_date}
-          tripStartDate={data.trip.start_date}
-        />
-        <DayItinerary
-          canManage={canManageItinerary}
-          currentUserId={currentUserId}
-          initialItems={data.itineraryItems}
-          readOnly={guestMode}
-          tripEndDate={data.trip.end_date}
-          tripId={data.trip.id}
-          tripStartDate={data.trip.start_date}
-        />
+        )}
       </div>
     </main>
   );

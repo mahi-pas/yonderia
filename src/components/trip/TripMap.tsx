@@ -9,7 +9,7 @@ import ItineraryDetail from "./ItineraryDetail";
 import { formatItineraryItemTime } from "./ItineraryCard";
 
 type TripMapProps = {
-  initialItems: ItineraryListItem[];
+  items: ItineraryListItem[];
   tripEndDate: string;
   tripStartDate: string;
 };
@@ -209,12 +209,15 @@ function buildInfoWindowContent(point: MapPoint, onViewDetails: () => void) {
   return root;
 }
 
-export default function TripMap({ initialItems, tripEndDate, tripStartDate }: TripMapProps) {
+export default function TripMap({ items = [], tripEndDate, tripStartDate }: TripMapProps) {
   const searchParams = useSearchParams();
+  const isMockMode = searchParams.get("mapMock") === "1";
   const [activeDay, setActiveDay] = useState<"all" | string>("all");
   const [activePointKey, setActivePointKey] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [mapStatus, setMapStatus] = useState<"loading" | "ready" | "unavailable">("loading");
+  const [mapStatus, setMapStatus] = useState<"loading" | "ready" | "unavailable">(
+    isMockMode ? "ready" : "loading",
+  );
   const [selectedItem, setSelectedItem] = useState<ItineraryListItem | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<GoogleMapInstance | null>(null);
@@ -222,7 +225,6 @@ export default function TripMap({ initialItems, tripEndDate, tripStartDate }: Tr
   const infoWindowRef = useRef<InstanceType<GoogleMapsWindow["maps"]["InfoWindow"]> | null>(null);
   const markerEntriesRef = useRef<MarkerEntry[]>([]);
   const polylinesRef = useRef<Array<{ setMap: (map: unknown) => void }>>([]);
-  const isMockMode = searchParams.get("mapMock") === "1";
 
   const days = useMemo<DayOption[]>(
     () =>
@@ -238,8 +240,8 @@ export default function TripMap({ initialItems, tripEndDate, tripStartDate }: Tr
   );
 
   const visibleItems = useMemo(
-    () => (activeDay === "all" ? initialItems : initialItems.filter((item) => item.day_date === activeDay)),
-    [activeDay, initialItems],
+    () => (activeDay === "all" ? items : items.filter((item) => item.day_date === activeDay)),
+    [activeDay, items],
   );
 
   const visiblePoints = useMemo(() => visibleItems.flatMap(buildMapPoints), [visibleItems]);
@@ -287,7 +289,6 @@ export default function TripMap({ initialItems, tripEndDate, tripStartDate }: Tr
     let cancelled = false;
 
     if (isMockMode) {
-      setMapStatus("ready");
       return;
     }
 
@@ -341,15 +342,6 @@ export default function TripMap({ initialItems, tripEndDate, tripStartDate }: Tr
       infoWindowRef.current?.close();
     };
   }, [clearMapArtifacts, isMockMode]);
-
-  useEffect(() => {
-    const missingActivePoint =
-      activePointKey !== null && !visiblePoints.some((point) => point.key === activePointKey);
-
-    if (missingActivePoint) {
-      setActivePointKey(null);
-    }
-  }, [activePointKey, visiblePoints]);
 
   useEffect(() => {
     if (isMockMode) {
