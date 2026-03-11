@@ -93,7 +93,7 @@ export async function loadGoogleMapsApi(
     window.__yonderiaGoogleMapsPromise = new Promise<GoogleMapsWindow>((resolve, reject) => {
       const script = document.createElement("script");
       script.async = true;
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=${encodeURIComponent(libraries.join(","))}&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=${encodeURIComponent(libraries.join(","))}`;
       script.onload = () => {
         if (window.google?.maps) {
           resolve(window.google);

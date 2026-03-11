@@ -2,11 +2,26 @@ import { headers } from "next/headers";
 
 /**
  * Returns the public site URL for the current request context.
- * Uses NEXT_PUBLIC_APP_URL or VERCEL_URL when set (production), otherwise
- * derives from request headers (x-forwarded-host, x-forwarded-proto) for correct
- * behavior behind proxies.
+ * In development, always derives from request headers (localhost).
+ * In production, uses NEXT_PUBLIC_APP_URL or VERCEL_URL when set, otherwise
+ * derives from request headers (x-forwarded-host, x-forwarded-proto).
  */
 export async function getSiteUrl(): Promise<string> {
+  const headerStore = await headers();
+  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
+  const protocol =
+    headerStore.get("x-forwarded-proto") ?? (process.env.NODE_ENV === "development" ? "http" : "https");
+
+  if (host) {
+    return `${protocol}://${host}`;
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    throw new Error(
+      "Unable to determine site URL in development. Ensure request has Host header.",
+    );
+  }
+
   const explicit = process.env.NEXT_PUBLIC_APP_URL;
   if (explicit) {
     return explicit.replace(/\/$/, "");
@@ -15,15 +30,6 @@ export async function getSiteUrl(): Promise<string> {
   const vercelUrl = process.env.VERCEL_URL;
   if (vercelUrl) {
     return `https://${vercelUrl}`;
-  }
-
-  const headerStore = await headers();
-  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
-  const protocol =
-    headerStore.get("x-forwarded-proto") ?? (process.env.NODE_ENV === "development" ? "http" : "https");
-
-  if (host) {
-    return `${protocol}://${host}`;
   }
 
   throw new Error(

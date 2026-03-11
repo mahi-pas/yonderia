@@ -22,7 +22,10 @@ export default function LoginButton() {
       const storedRedirect =
         typeof window === "undefined"
           ? DEFAULT_AUTH_REDIRECT
-          : sanitizeRedirectPath(window.localStorage.getItem(REDIRECT_STORAGE_KEY));
+          : sanitizeRedirectPath(
+              window.localStorage.getItem(REDIRECT_STORAGE_KEY),
+              window.location.origin,
+            );
       const redirectTarget =
         searchRedirect === DEFAULT_AUTH_REDIRECT ? storedRedirect : searchRedirect;
 

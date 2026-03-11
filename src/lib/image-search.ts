@@ -22,7 +22,7 @@ function getRequiredEnv(name: string, value: string | undefined): string {
   return value;
 }
 
-export async function searchImages(query: string): Promise<ImageSearchResult[]> {
+export async function searchImages(query: string, referer?: string): Promise<ImageSearchResult[]> {
   const normalizedQuery = query.trim();
 
   if (!normalizedQuery) {
@@ -43,10 +43,22 @@ export async function searchImages(query: string): Promise<ImageSearchResult[]> 
 
   const response = await fetch(url, {
     cache: "no-store",
+    headers: referer ? { Referer: referer } : undefined,
   });
 
   if (!response.ok) {
-    throw new Error("Google image search request failed.");
+    let detail = `HTTP ${response.status}`;
+
+    try {
+      const body = (await response.json()) as { error?: { message?: string; status?: string } };
+      if (body.error?.message) {
+        detail = body.error.status ? `${body.error.status}: ${body.error.message}` : body.error.message;
+      }
+    } catch {
+      // ignore JSON parse errors
+    }
+
+    throw new Error(`Google image search request failed. ${detail}`);
   }
 
   const data = (await response.json()) as GoogleCustomSearchResponse;
