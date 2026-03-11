@@ -143,12 +143,12 @@ describe("POST /api/participants/kick", () => {
 
     expect(response.status).toBe(403);
     await expect(response.json()).resolves.toEqual({
-      error: "The organizer can't remove themselves from the trip.",
+      error: "You can't remove yourself from the trip.",
     });
     expect(getDeleteCallCount(adminClient)).toBe(0);
   });
 
-  it("Planner cannot kick anyone -> returns 403", async () => {
+  it("Planner can kick a member -> participant row deleted, returns success", async () => {
     const user = createUser("planner-123");
     serverClient.setAuthUser(user);
     getParticipantMembershipMock.mockResolvedValue({
@@ -157,12 +157,75 @@ describe("POST /api/participants/kick", () => {
       trip_id: "trip-123",
       user_id: user.id,
     });
+    adminClient.queueQuery("trip_participants", "select", {
+      data: {
+        id: "participant-456",
+        role: "member",
+        trip_id: "trip-123",
+        user_id: "member-456",
+      },
+    });
+    adminClient.queueQuery("trip_participants", "delete", {
+      data: null,
+    });
 
     const response = await POST(createRequest({ participantId: "participant-456", tripId: "trip-123" }));
 
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ success: true });
+    expect(getDeleteCallCount(adminClient)).toBe(1);
+  });
+
+  it("Planner cannot kick another planner -> returns 403", async () => {
+    const user = createUser("planner-123");
+    serverClient.setAuthUser(user);
+    getParticipantMembershipMock.mockResolvedValue({
+      id: "membership-1",
+      role: "planner",
+      trip_id: "trip-123",
+      user_id: user.id,
+    });
+    adminClient.queueQuery("trip_participants", "select", {
+      data: {
+        id: "participant-789",
+        role: "planner",
+        trip_id: "trip-123",
+        user_id: "planner-789",
+      },
+    });
+
+    const response = await POST(createRequest({ participantId: "participant-789", tripId: "trip-123" }));
+
     expect(response.status).toBe(403);
     await expect(response.json()).resolves.toEqual({
-      error: "Only the organizer can remove participants.",
+      error: "Planners can only remove members from the trip.",
+    });
+    expect(getDeleteCallCount(adminClient)).toBe(0);
+  });
+
+  it("Planner cannot kick the organizer -> returns 403", async () => {
+    const user = createUser("planner-123");
+    serverClient.setAuthUser(user);
+    getParticipantMembershipMock.mockResolvedValue({
+      id: "membership-1",
+      role: "planner",
+      trip_id: "trip-123",
+      user_id: user.id,
+    });
+    adminClient.queueQuery("trip_participants", "select", {
+      data: {
+        id: "participant-999",
+        role: "organizer",
+        trip_id: "trip-123",
+        user_id: "organizer-999",
+      },
+    });
+
+    const response = await POST(createRequest({ participantId: "participant-999", tripId: "trip-123" }));
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({
+      error: "The organizer can't be removed from the trip.",
     });
     expect(getDeleteCallCount(adminClient)).toBe(0);
   });
@@ -181,7 +244,7 @@ describe("POST /api/participants/kick", () => {
 
     expect(response.status).toBe(403);
     await expect(response.json()).resolves.toEqual({
-      error: "Only the organizer can remove participants.",
+      error: "Only organizers and planners can remove participants.",
     });
     expect(getDeleteCallCount(adminClient)).toBe(0);
   });
@@ -195,7 +258,7 @@ describe("POST /api/participants/kick", () => {
 
     expect(response.status).toBe(403);
     await expect(response.json()).resolves.toEqual({
-      error: "Only the organizer can remove participants.",
+      error: "Only organizers and planners can remove participants.",
     });
     expect(getDeleteCallCount(adminClient)).toBe(0);
   });

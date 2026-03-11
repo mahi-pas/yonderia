@@ -44,11 +44,7 @@ export default function Modal({
   }, []);
 
   useEffect(() => {
-    if (!isOpen) {
-      setIsVisible(false);
-      setSheetOffset(0);
-      return;
-    }
+    if (!isOpen) return;
 
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -68,6 +64,8 @@ export default function Modal({
       window.cancelAnimationFrame(animationFrame);
       document.body.style.overflow = originalOverflow;
       window.removeEventListener("keydown", handleEscape);
+      setIsVisible(false);
+      setSheetOffset(0);
     };
   }, [isOpen, onClose]);
 
@@ -149,7 +147,7 @@ export default function Modal({
           role="dialog"
           style={{
             transform: isMobile ? `translateY(${sheetOffset + (isVisible ? 0 : 32)}px)` : undefined,
-            transitionDuration: isDraggingRef.current ? "0ms" : undefined,
+            transitionDuration: sheetOffset > 0 ? "0ms" : undefined,
           }}
         >
           <div

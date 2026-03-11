@@ -97,49 +97,40 @@ async function seedJoinScenario(adminClient: ReturnType<typeof createAdminClient
   };
 }
 
-test("Visiting /trip/{tripId}?code={join_code} when not logged in redirects to login, then returns to join and completes", async ({
-  baseURL,
+test("Visiting /trip/{tripId}?code={join_code} when not logged in redirects to invite landing", async ({
   browser,
   request,
 }) => {
   const adminClient = createAdminClient();
   const seeded = await seedJoinScenario(adminClient);
-  const { context, user } = await createAuthenticatedContext(browser, { baseURL });
+  let context: import("@playwright/test").BrowserContext | undefined;
 
   try {
-    await markProfileReady(adminClient, user.id, "Returning Joiner");
-
     const response = await request.get(`/trip/${seeded.trip.id}?code=${seeded.joinInvite.code}`, {
       maxRedirects: 0,
     });
 
     expect(response.status()).toBe(307);
     expect(response.headers().location).toBe(
-      `/auth/login?redirectTo=${encodeURIComponent(`/trip/${seeded.trip.id}/join?code=${seeded.joinInvite.code}`)}`,
+      `/trip/${seeded.trip.id}/invite-landing?code=${seeded.joinInvite.code}`,
     );
 
-    const loginRedirectUrl = new URL(`http://localhost:3000${response.headers().location}`);
-    const redirectTo = loginRedirectUrl.searchParams.get("redirectTo");
+    context = await browser.newContext();
     const page = await context.newPage();
 
-    expect(redirectTo).toBe(`/trip/${seeded.trip.id}/join?code=${seeded.joinInvite.code}`);
+    await page.goto(`/trip/${seeded.trip.id}?code=${seeded.joinInvite.code}`);
 
-    await page.goto(redirectTo ?? `/trip/${seeded.trip.id}/join?code=${seeded.joinInvite.code}`);
-
-    await expect(
-      page.getByRole("heading", { name: "What should people call you on this trip?" }),
-    ).toBeVisible();
-
-    await page.getByLabel("What should people call you on this trip?").fill("Road Captain");
-    await page.getByRole("button", { name: "Save" }).click();
-
-    await expect(page).toHaveURL(new RegExp(`/trip/${seeded.trip.id}$`));
+    await expect(page).toHaveURL(
+      new RegExp(`/trip/${seeded.trip.id}/invite-landing\\?code=${seeded.joinInvite.code}$`),
+    );
+    await expect(page.getByRole("heading", { name: "You're invited!" })).toBeVisible();
     await expect(page.getByRole("heading", { name: seeded.trip.name })).toBeVisible();
+    await expect(page.getByText("Hosted by")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Sign in with Google to join" })).toBeVisible();
   } finally {
-    await context.close();
+    await context?.close();
     await adminClient.from("trips").delete().eq("id", seeded.trip.id);
     await deleteUser(adminClient, seeded.organizerId);
-    await deleteUser(adminClient, user.id);
   }
 });
 
@@ -156,17 +147,18 @@ test("Visiting /trip/{tripId}?code={join_code} when logged in auto-validates, sh
 
     const page = await context.newPage();
     await page.goto(`/trip/${seeded.trip.id}?code=${seeded.joinInvite.code}`);
+    const nicknameModal = page.getByRole("dialog", { name: "What should people call you on this trip?" });
 
-    await expect(
-      page.getByRole("heading", { name: "What should people call you on this trip?" }),
-    ).toBeVisible();
+    await expect(nicknameModal).toBeVisible();
 
-    await page.getByLabel("What should people call you on this trip?").fill("Snack Captain");
-    await page.getByLabel("Arrival date and time").fill("2026-05-01T14:30");
-    await page.getByLabel("Arrival location").fill("JFK Airport");
-    await page.getByLabel("Departure date and time").fill("2026-05-05T09:15");
-    await page.getByLabel("Departure location").fill("LAX Airport");
-    await page.getByRole("button", { name: "Save" }).click();
+    await nicknameModal.getByRole("textbox").first().fill("Snack Captain");
+    await nicknameModal.locator('input[type="date"]').first().fill("2026-05-01");
+    await nicknameModal.locator('input[type="time"]').first().fill("14:30");
+    await nicknameModal.getByRole("textbox", { name: "Arrival location" }).fill("JFK Airport");
+    await nicknameModal.locator('input[type="date"]').nth(1).fill("2026-05-05");
+    await nicknameModal.locator('input[type="time"]').nth(1).fill("09:15");
+    await nicknameModal.getByRole("textbox", { name: "Departure location" }).fill("LAX Airport");
+    await nicknameModal.getByRole("button", { name: "Save" }).click();
 
     await expect(page).toHaveURL(new RegExp(`/trip/${seeded.trip.id}$`));
     await expect(page.getByRole("heading", { name: seeded.trip.name })).toBeVisible();
@@ -226,12 +218,12 @@ test("Entering a valid code manually works the same as the URL flow", async ({
     await page.getByLabel("Invite code").fill(seeded.joinInvite.code);
     await page.getByRole("button", { name: "Join trip" }).click();
 
-    await expect(
-      page.getByRole("heading", { name: "What should people call you on this trip?" }),
-    ).toBeVisible();
+    const nicknameModal = page.getByRole("dialog", { name: "What should people call you on this trip?" });
 
-    await page.getByLabel("What should people call you on this trip?").fill("Manual Entry");
-    await page.getByRole("button", { name: "Save" }).click();
+    await expect(nicknameModal).toBeVisible();
+
+    await nicknameModal.getByRole("textbox").first().fill("Manual Entry");
+    await nicknameModal.getByRole("button", { name: "Save" }).click();
 
     await expect(page).toHaveURL(new RegExp(`/trip/${seeded.trip.id}$`));
     await expect(page.getByRole("heading", { name: seeded.trip.name })).toBeVisible();

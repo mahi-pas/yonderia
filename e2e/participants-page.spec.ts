@@ -92,6 +92,25 @@ async function getParticipant(
   return data;
 }
 
+async function getParticipantNickname(
+  adminClient: ReturnType<typeof createAdminClient>,
+  tripId: string,
+  userId: string,
+) {
+  const { data, error } = await adminClient
+    .from("trip_participants")
+    .select("nickname")
+    .eq("trip_id", tripId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data?.nickname ?? null;
+}
+
 async function getInviteCodes(adminClient: ReturnType<typeof createAdminClient>, tripId: string) {
   const { data, error } = await adminClient
     .from("invite_codes")
@@ -280,6 +299,9 @@ test("Organizer can kick a participant: click kick -> confirmation dialog -> con
     await page.getByRole("button", { name: "Open actions for Peter Planner" }).click();
     await page.getByRole("button", { name: "Kick from Trip" }).click();
     await expect(page.getByRole("heading", { name: "Kick participant" })).toBeVisible();
+    await expect(
+      page.getByText("Remove Peter Planner from this trip? They'll lose access to the itinerary and all trip details."),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Remove from trip" }).click();
 
     await expect(page.getByText("Participant removed from the trip.")).toBeVisible();
@@ -315,7 +337,31 @@ test('Organizer can change a participant\'s role: click "Make Planner" -> role b
   }
 });
 
-test("Planner sees the participant list but no action menus", async () => {
+test('Organizer can change a participant\'s nickname: click "Edit Name" -> save -> name updates', async () => {
+  const adminClient = createAdminClient();
+  let scenario: SeededParticipantsScenario | null = null;
+  let page: Page | null = null;
+
+  try {
+    scenario = await seedParticipantsScenario();
+    page = await scenario.organizerContext.newPage();
+    await page.goto(`/trip/${scenario.tripId}/participants`);
+
+    await page.getByRole("button", { name: "Open actions for Maya Member" }).click();
+    await page.getByRole("button", { name: "Edit Name" }).click();
+    await page.getByRole("dialog", { name: "Edit nickname" }).getByRole("textbox", { name: /Nickname/i }).fill("Map Master");
+    await page.getByRole("button", { name: "Save nickname" }).click();
+
+    await expect(page.getByText("Updated Maya Member to Map Master")).toBeVisible();
+    await expect(getPeopleList(page).getByText("Map Master")).toBeVisible();
+    await expect(await getParticipantNickname(adminClient, scenario.tripId, scenario.memberUserId)).toBe("Map Master");
+  } finally {
+    await page?.close();
+    await cleanupScenario(scenario);
+  }
+});
+
+test("Planner only sees action menus on member rows", async () => {
   let scenario: SeededParticipantsScenario | null = null;
   let page: Page | null = null;
 
@@ -325,7 +371,37 @@ test("Planner sees the participant list but no action menus", async () => {
     await page.goto(`/trip/${scenario.tripId}/participants`);
 
     await expect(getPeopleList(page)).toHaveCount(3);
-    await expect(page.getByRole("button", { name: /Open actions for/i })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Open actions for Olivia Organizer" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Open actions for Peter Planner" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Open actions for Maya Member" })).toHaveCount(1);
+  } finally {
+    await page?.close();
+    await cleanupScenario(scenario);
+  }
+});
+
+test("Planner can kick a member but cannot change roles", async () => {
+  const adminClient = createAdminClient();
+  let scenario: SeededParticipantsScenario | null = null;
+  let page: Page | null = null;
+
+  try {
+    scenario = await seedParticipantsScenario();
+    page = await scenario.plannerContext.newPage();
+    await page.goto(`/trip/${scenario.tripId}/participants`);
+
+    await page.getByRole("button", { name: "Open actions for Maya Member" }).click();
+    await expect(page.getByRole("button", { name: "Make Planner" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Make Member" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Kick from Trip" }).click();
+    await expect(
+      page.getByText("Remove Maya Member from this trip? They'll lose access to the itinerary and all trip details."),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Remove from trip" }).click();
+
+    await expect(page.getByText("Participant removed from the trip.")).toBeVisible();
+    await expect(page.getByText("Maya Member")).toHaveCount(0);
+    await expect(await getParticipant(adminClient, scenario.tripId, scenario.memberUserId)).toBeNull();
   } finally {
     await page?.close();
     await cleanupScenario(scenario);

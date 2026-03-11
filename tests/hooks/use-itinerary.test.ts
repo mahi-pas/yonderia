@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   compareItineraryItems,
+  getItineraryItemDaySpan,
   groupItineraryItemsByDay,
   sortItineraryItems,
   type ItineraryListItem,
@@ -78,6 +79,27 @@ describe("useItinerary helpers", () => {
     ]);
   });
 
+  it("sorts items with the same start time by end_time", () => {
+    const shorterEvent = createItem({
+      end_time: "2026-03-14T11:00:00.000Z",
+      id: "shorter-event",
+      start_time: "2026-03-14T10:00:00.000Z",
+      title: "Shorter event",
+    });
+    const longerEvent = createItem({
+      end_time: "2026-03-14T12:00:00.000Z",
+      id: "longer-event",
+      start_time: "2026-03-14T10:00:00.000Z",
+      title: "Longer event",
+    });
+
+    expect(compareItineraryItems(shorterEvent, longerEvent)).toBeLessThan(0);
+    expect(sortItineraryItems([longerEvent, shorterEvent]).map((item) => item.id)).toEqual([
+      "shorter-event",
+      "longer-event",
+    ]);
+  });
+
   it("groups items by day while preserving sorted order inside each day", () => {
     const grouped = groupItineraryItemsByDay([
       createItem({
@@ -102,5 +124,49 @@ describe("useItinerary helpers", () => {
 
     expect(grouped.get("2026-03-14")?.map((item) => item.id)).toEqual(["earlier", "later"]);
     expect(grouped.get("2026-03-15")?.map((item) => item.id)).toEqual(["next-day"]);
+  });
+
+  it("spreads multi-day items across every day they cover", () => {
+    const overnightEvent = createItem({
+      day_date: "2026-03-14",
+      end_time: "2026-03-16T10:00:00.000Z",
+      id: "overnight-event",
+      start_time: "2026-03-14T20:00:00.000Z",
+      title: "Overnight event",
+    });
+
+    expect(getItineraryItemDaySpan(overnightEvent)).toEqual([
+      "2026-03-14",
+      "2026-03-15",
+      "2026-03-16",
+    ]);
+
+    const grouped = groupItineraryItemsByDay([overnightEvent]);
+    expect(grouped.get("2026-03-14")?.map((item) => item.id)).toEqual(["overnight-event"]);
+    expect(grouped.get("2026-03-15")?.map((item) => item.id)).toEqual(["overnight-event"]);
+    expect(grouped.get("2026-03-16")?.map((item) => item.id)).toEqual(["overnight-event"]);
+  });
+
+  it("keeps items without end_time on only their start day", () => {
+    const singleDayEvent = createItem({
+      day_date: "2026-03-14",
+      id: "single-day-event",
+      start_time: "2026-03-14T20:00:00.000Z",
+      title: "Single day event",
+    });
+
+    expect(getItineraryItemDaySpan(singleDayEvent)).toEqual(["2026-03-14"]);
+  });
+
+  it("keeps untimed hotels on their original day only", () => {
+    const untimedHotel = createItem({
+      day_date: "2026-03-14",
+      id: "untimed-hotel",
+      item_type: "hotel",
+      start_time: null,
+      title: "Untimed hotel",
+    });
+
+    expect(getItineraryItemDaySpan(untimedHotel)).toEqual(["2026-03-14"]);
   });
 });

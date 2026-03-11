@@ -1,0 +1,27 @@
+---
+description: Verify the project builds successfully after making code changes
+globs: src/**/*.{ts,tsx}, next.config.ts
+alwaysApply: false
+---
+
+# Build Verification
+
+After making substantive code changes (new files, renamed exports, changed types, modified imports, updated configs), run the build to catch errors early:
+
+```bash
+npm run build
+```
+
+If the build fails, fix all errors before considering the task complete. Common issues:
+- Missing or incorrect imports
+- TypeScript type errors
+- Invalid Next.js route exports
+- Unused variables in strict mode
+
+Also run the linter after changes:
+
+```bash
+npm run lint
+```
+
+When fixing build or lint errors, do NOT weaken TypeScript strictness or add `@ts-ignore` / `eslint-disable` unless there is a genuine reason. Fix the root cause instead.

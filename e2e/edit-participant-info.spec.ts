@@ -143,7 +143,7 @@ async function cleanupScenario(scenario: SeededParticipantInfoScenario | null) {
 
 async function openTripPage(page: Page, tripId: string) {
   await page.goto(`/trip/${tripId}`);
-  await expect(page.getByRole("button", { name: "Edit my info" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Update your info/i })).toBeVisible();
 }
 
 async function saveParticipantEdits(page: Page, values: {
@@ -153,13 +153,15 @@ async function saveParticipantEdits(page: Page, values: {
   departureTime: string;
   nickname: string;
 }) {
-  await page.getByRole("button", { name: "Edit my info" }).click();
+  await page.getByRole("button", { name: /Update your info/i }).click();
   await expect(page.getByRole("heading", { name: "Edit your trip details" })).toBeVisible();
-  await page.getByLabel("What should people call you on this trip?").fill(values.nickname);
-  await page.getByLabel("Arrival date and time").fill(values.arrivalTime);
-  await page.getByLabel("Arrival location").fill(values.arrivalLocation);
-  await page.getByLabel("Departure date and time").fill(values.departureTime);
-  await page.getByLabel("Departure location").fill(values.departureLocation);
+  await page.getByRole("textbox", { name: "Trip nickname" }).fill(values.nickname);
+  await page.getByLabel("Arrival date").fill(values.arrivalTime.split("T")[0] ?? "");
+  await page.getByLabel("Arrival time").fill(values.arrivalTime.split("T")[1] ?? "");
+  await page.getByRole("textbox", { name: "Arrival location", exact: true }).fill(values.arrivalLocation);
+  await page.getByLabel("Departure date").fill(values.departureTime.split("T")[0] ?? "");
+  await page.getByLabel("Departure time").fill(values.departureTime.split("T")[1] ?? "");
+  await page.getByRole("textbox", { name: "Departure location", exact: true }).fill(values.departureLocation);
   await page.getByRole("button", { name: "Save changes" }).click();
   await expect(page.getByRole("heading", { name: "Edit your trip details" })).toHaveCount(0);
 }
@@ -204,7 +206,7 @@ test('Participant can click "Edit my info" on the trip page', async () => {
     page = await scenario.memberContext.newPage();
 
     await openTripPage(page, scenario.tripId);
-    await page.getByRole("button", { name: "Edit my info" }).click();
+    await page.getByRole("button", { name: /Update your info/i }).click();
     await expect(page.getByRole("heading", { name: "Edit your trip details" })).toBeVisible();
   } finally {
     await page?.close();
@@ -221,17 +223,17 @@ test("NicknameModal opens pre-filled with their current nickname and arrival/dep
     page = await scenario.memberContext.newPage();
 
     await openTripPage(page, scenario.tripId);
-    await page.getByRole("button", { name: "Edit my info" }).click();
+    await page.getByRole("button", { name: /Update your info/i }).click();
 
-    await expect(page.getByLabel("What should people call you on this trip?")).toHaveValue("MJ");
-    await expect(page.getByLabel("Arrival date and time")).toHaveValue(
-      formatTimestampForInput("2026-05-01T09:30:00.000Z"),
-    );
-    await expect(page.getByLabel("Arrival location")).toHaveValue("JFK Airport");
-    await expect(page.getByLabel("Departure date and time")).toHaveValue(
-      formatTimestampForInput("2026-05-05T20:15:00.000Z"),
-    );
-    await expect(page.getByLabel("Departure location")).toHaveValue("LAX Airport");
+    await expect(page.getByRole("textbox", { name: "Trip nickname" })).toHaveValue("MJ");
+    const expectedArrival = formatTimestampForInput("2026-05-01T09:30:00.000Z").split("T");
+    const expectedDeparture = formatTimestampForInput("2026-05-05T20:15:00.000Z").split("T");
+    await expect(page.getByLabel("Arrival date")).toHaveValue(expectedArrival[0] ?? "");
+    await expect(page.getByLabel("Arrival time")).toHaveValue(expectedArrival[1] ?? "");
+    await expect(page.getByRole("textbox", { name: "Arrival location", exact: true })).toHaveValue("JFK Airport");
+    await expect(page.getByLabel("Departure date")).toHaveValue(expectedDeparture[0] ?? "");
+    await expect(page.getByLabel("Departure time")).toHaveValue(expectedDeparture[1] ?? "");
+    await expect(page.getByRole("textbox", { name: "Departure location", exact: true })).toHaveValue("LAX Airport");
   } finally {
     await page?.close();
     await cleanupScenario(scenario);

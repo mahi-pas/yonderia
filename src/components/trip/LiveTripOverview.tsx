@@ -1,11 +1,14 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import DayItinerary from "@/components/trip/DayItinerary";
 import EditMyInfoButton from "@/components/trip/EditMyInfoButton";
 import ParticipantsRow from "@/components/trip/ParticipantsRow";
 import TripMap from "@/components/trip/TripMap";
 import { useItinerary, type ItineraryListItem } from "@/hooks/useItinerary";
 import { useParticipants, type ParticipantListItem } from "@/hooks/useParticipants";
+import { createClient } from "@/lib/supabase/client";
 import type { TripParticipant } from "@/lib/types";
 
 type CurrentParticipant = Pick<
@@ -39,6 +42,7 @@ export default function LiveTripOverview({
   tripId,
   tripStartDate,
 }: LiveTripOverviewProps) {
+  const router = useRouter();
   const {
     error: itineraryError,
     groupedByDay,
@@ -53,6 +57,29 @@ export default function LiveTripOverview({
     initialParticipants,
     tripId,
   });
+
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`trip-overview:${tripId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          filter: `trip_id=eq.${tripId}`,
+          schema: "public",
+          table: "trip_participants",
+        },
+        () => {
+          router.refresh();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [router, tripId]);
 
   return (
     <>

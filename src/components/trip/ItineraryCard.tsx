@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import type { ItineraryListItem } from "@/hooks/useItinerary";
 
 type ItineraryCardProps = {
@@ -30,6 +30,18 @@ function getBadgeIcon(itemType: ItineraryListItem["item_type"]): string {
   return "🗓";
 }
 
+function formatTimeOrDateTime(value: string, includeDate: boolean): string {
+  return format(new Date(value), includeDate ? "MMM d, h:mm a" : "h:mm a");
+}
+
+function spansMultipleDays(item: Pick<ItineraryListItem, "end_time" | "start_time">): boolean {
+  if (!item.start_time || !item.end_time) {
+    return false;
+  }
+
+  return !isSameDay(new Date(item.start_time), new Date(item.end_time));
+}
+
 export function formatItineraryItemTime(item: ItineraryListItem): string {
   if (!item.start_time && item.item_type === "hotel") {
     return "Check-in time TBD";
@@ -39,7 +51,8 @@ export function formatItineraryItemTime(item: ItineraryListItem): string {
     return "Time TBD";
   }
 
-  const start = format(new Date(item.start_time), "h:mm a");
+  const includeDate = spansMultipleDays(item);
+  const start = formatTimeOrDateTime(item.start_time, includeDate);
 
   if (!item.end_time) {
     if (item.item_type === "hotel") {
@@ -53,17 +66,17 @@ export function formatItineraryItemTime(item: ItineraryListItem): string {
     return start;
   }
 
-  const end = format(new Date(item.end_time), "h:mm a");
+  const end = formatTimeOrDateTime(item.end_time, includeDate);
 
   if (item.item_type === "hotel") {
     return `${start} check-in • ${end} check-out`;
   }
 
   if (item.item_type === "commute") {
-    return `${start} - ${end}`;
+    return `Departs ${start} → Arrives ${end}`;
   }
 
-  return `${start} - ${end}`;
+  return `${start} – ${end}`;
 }
 
 export function getItineraryBadge(itemType: ItineraryListItem["item_type"]) {

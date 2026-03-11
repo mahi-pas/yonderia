@@ -58,12 +58,26 @@ export type InviteCodeLookup = {
   tripId: string;
 };
 
+export type InvitePreview = {
+  codeType: InviteCodeType;
+  organizer: {
+    avatarUrl: string | null;
+    displayName: string | null;
+  };
+  trip: Pick<Trip, "end_date" | "image_url" | "location_name" | "name" | "start_date">;
+  tripId: string;
+};
+
 type TripParticipantListRow = Pick<TripParticipant, "nickname" | "role" | "trip_id" | "user_id">;
 type ProfileRow = Pick<Profile, "avatar_url" | "display_name" | "id">;
 type InviteCodeRow = {
   code_type: InviteCodeType;
   trip_id: string;
 };
+type InvitePreviewTripRow = Pick<
+  Trip,
+  "created_by" | "end_date" | "image_url" | "location_name" | "name" | "start_date"
+>;
 
 function compareParticipants(
   left: Pick<TripParticipant, "role" | "user_id"> & { display_name: string | null; nickname: string | null },
@@ -135,6 +149,74 @@ export async function getInviteCodeLookup(
 
   return {
     codeType: inviteCode.code_type,
+    tripId: inviteCode.trip_id,
+  };
+}
+
+export async function getInvitePreview(
+  supabase: SupabaseClient<Database>,
+  code: string,
+): Promise<InvitePreview | null> {
+  const { data: inviteCodeData, error: inviteCodeError } = await supabase
+    .from("invite_codes")
+    .select("trip_id, code_type")
+    .eq("code", code)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (inviteCodeError) {
+    throw new Error(inviteCodeError.message);
+  }
+
+  const inviteCode = inviteCodeData as InviteCodeRow | null;
+
+  if (!inviteCode) {
+    return null;
+  }
+
+  const { data: tripData, error: tripError } = await supabase
+    .from("trips")
+    .select("created_by, name, image_url, start_date, end_date, location_name")
+    .eq("id", inviteCode.trip_id)
+    .maybeSingle();
+
+  if (tripError) {
+    throw new Error(tripError.message);
+  }
+
+  const trip = tripData as InvitePreviewTripRow | null;
+
+  if (!trip) {
+    return null;
+  }
+
+  const { data: organizerData, error: organizerError } = trip.created_by
+    ? await supabase
+        .from("profiles")
+        .select("id, display_name, avatar_url")
+        .eq("id", trip.created_by)
+        .maybeSingle()
+    : { data: null, error: null };
+
+  if (organizerError) {
+    throw new Error(organizerError.message);
+  }
+
+  const organizer = organizerData as ProfileRow | null;
+
+  return {
+    codeType: inviteCode.code_type,
+    organizer: {
+      avatarUrl: organizer?.avatar_url ?? null,
+      displayName: organizer?.display_name ?? null,
+    },
+    trip: {
+      end_date: trip.end_date,
+      image_url: trip.image_url,
+      location_name: trip.location_name,
+      name: trip.name,
+      start_date: trip.start_date,
+    },
     tripId: inviteCode.trip_id,
   };
 }

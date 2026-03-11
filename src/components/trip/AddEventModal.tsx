@@ -39,15 +39,17 @@ type AddEventModalProps = {
 };
 
 type FormState = {
-  commuteDepartureTime: string;
+  commuteArrivalDateTime: string;
+  commuteDepartureDateTime: string;
   commuteDestination: LocationState;
   commuteOrigin: LocationState;
   dayDate: string;
   description: string;
+  eventEndDateTime: string;
   eventLocation: LocationState;
-  eventTime: string;
-  hotelCheckInTime: string;
-  hotelCheckOutTime: string;
+  eventStartDateTime: string;
+  hotelCheckInDateTime: string;
+  hotelCheckOutDateTime: string;
   hotelLocation: LocationState;
   title: string;
 };
@@ -68,15 +70,17 @@ function createEmptyLocation(): LocationState {
 
 function createInitialFormState(dayDate: string): FormState {
   return {
-    commuteDepartureTime: "",
+    commuteArrivalDateTime: "",
+    commuteDepartureDateTime: "",
     commuteDestination: createEmptyLocation(),
     commuteOrigin: createEmptyLocation(),
     dayDate,
     description: "",
+    eventEndDateTime: "",
     eventLocation: createEmptyLocation(),
-    eventTime: "",
-    hotelCheckInTime: "",
-    hotelCheckOutTime: "",
+    eventStartDateTime: "",
+    hotelCheckInDateTime: "",
+    hotelCheckOutDateTime: "",
     hotelLocation: createEmptyLocation(),
     title: "",
   };
@@ -86,12 +90,29 @@ function sanitizeSingleLine(value: string): string {
   return value.trim().replace(/\s+/g, " ");
 }
 
-function combineDateAndTime(dayDate: string, time: string): string | null {
-  if (!dayDate || !time) {
+function toIsoDateTime(value: string): string | null {
+  if (!value) {
     return null;
   }
 
-  return new Date(`${dayDate}T${time}:00`).toISOString();
+  return new Date(value).toISOString();
+}
+
+function getDatePart(value: string): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const [datePart] = value.split("T");
+  return datePart || null;
+}
+
+function isEndTimeAfterStart(startTime: string | null, endTime: string | null): boolean {
+  if (!startTime || !endTime) {
+    return true;
+  }
+
+  return new Date(endTime).getTime() > new Date(startTime).getTime();
 }
 
 function getNextSortOrder(items: ItineraryListItem[], dayDate: string): number {
@@ -248,8 +269,8 @@ export default function AddEventModal({
     }
 
     if (itemType === "event") {
-      if (!formState.eventTime) {
-        setErrorMessage("Add a time for this event.");
+      if (!formState.eventStartDateTime) {
+        setErrorMessage("Add a start date and time for this event.");
         return;
       }
 
@@ -265,8 +286,8 @@ export default function AddEventModal({
     }
 
     if (itemType === "commute") {
-      if (!formState.commuteDepartureTime) {
-        setErrorMessage("Add a departure time for this commute.");
+      if (!formState.commuteDepartureDateTime) {
+        setErrorMessage("Add a departure date and time for this commute.");
         return;
       }
 
@@ -280,20 +301,51 @@ export default function AddEventModal({
     setErrorMessage(null);
 
     const description = formState.description.trim();
-    const eventStartTime = combineDateAndTime(formState.dayDate, formState.eventTime);
-    const hotelCheckInTime = combineDateAndTime(formState.dayDate, formState.hotelCheckInTime);
-    const hotelCheckOutTime = combineDateAndTime(formState.dayDate, formState.hotelCheckOutTime);
-    const commuteDepartureTime = combineDateAndTime(formState.dayDate, formState.commuteDepartureTime);
+    const eventStartTime = toIsoDateTime(formState.eventStartDateTime);
+    const eventEndTime = toIsoDateTime(formState.eventEndDateTime);
+    const hotelCheckInTime = toIsoDateTime(formState.hotelCheckInDateTime);
+    const hotelCheckOutTime = toIsoDateTime(formState.hotelCheckOutDateTime);
+    const commuteArrivalTime = toIsoDateTime(formState.commuteArrivalDateTime);
+    const commuteDepartureTime = toIsoDateTime(formState.commuteDepartureDateTime);
+    const itemDayDate =
+      itemType === "event"
+        ? getDatePart(formState.eventStartDateTime)
+        : itemType === "hotel"
+          ? getDatePart(formState.hotelCheckInDateTime)
+          : getDatePart(formState.commuteDepartureDateTime);
+
+    if (itemType === "event" && !isEndTimeAfterStart(eventStartTime, eventEndTime)) {
+      setErrorMessage("Choose an end time that's after the start time.");
+      setIsSaving(false);
+      return;
+    }
+
+    if (itemType === "commute" && !isEndTimeAfterStart(commuteDepartureTime, commuteArrivalTime)) {
+      setErrorMessage("Choose an arrival time that's after the departure time.");
+      setIsSaving(false);
+      return;
+    }
+
+    if (itemType === "hotel" && !isEndTimeAfterStart(hotelCheckInTime, hotelCheckOutTime)) {
+      setErrorMessage("Choose a check-out time that's after check-in.");
+      setIsSaving(false);
+      return;
+    }
 
     const nextItem = {
       created_by: currentUserId,
-      day_date: formState.dayDate,
+      day_date: itemDayDate ?? formState.dayDate,
       description: description || null,
       destination_latitude: itemType === "commute" ? formState.commuteDestination.latitude : null,
       destination_longitude: itemType === "commute" ? formState.commuteDestination.longitude : null,
       destination_name:
         itemType === "commute" ? sanitizeSingleLine(formState.commuteDestination.name) || null : null,
-      end_time: itemType === "hotel" ? hotelCheckOutTime : null,
+      end_time:
+        itemType === "event"
+          ? eventEndTime
+          : itemType === "hotel"
+            ? hotelCheckOutTime
+            : commuteArrivalTime,
       id: draftItemId,
       image_url: customImage?.publicUrl ?? selectedSuggestion?.imageUrl ?? null,
       item_type: itemType,
@@ -315,7 +367,7 @@ export default function AddEventModal({
           : itemType === "hotel"
             ? formState.hotelLocation.longitude
             : formState.commuteOrigin.longitude,
-      sort_order: getNextSortOrder(existingItems, formState.dayDate),
+      sort_order: getNextSortOrder(existingItems, itemDayDate ?? formState.dayDate),
       start_time:
         itemType === "event" ? eventStartTime : itemType === "hotel" ? hotelCheckInTime : commuteDepartureTime,
       title,
@@ -445,25 +497,27 @@ export default function AddEventModal({
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Input
                     disabled={isSaving}
-                    label="Date"
-                    type="date"
-                    value={formState.dayDate}
+                    label="Start"
+                    type="datetime-local"
+                    value={formState.eventStartDateTime}
                     onChange={(event) => {
+                      setErrorMessage(null);
                       setFormState((current) => ({
                         ...current,
-                        dayDate: event.target.value,
+                        eventStartDateTime: event.target.value,
                       }));
                     }}
                   />
                   <Input
                     disabled={isSaving}
-                    label="Time"
-                    type="time"
-                    value={formState.eventTime}
+                    label="End"
+                    type="datetime-local"
+                    value={formState.eventEndDateTime}
                     onChange={(event) => {
+                      setErrorMessage(null);
                       setFormState((current) => ({
                         ...current,
-                        eventTime: event.target.value,
+                        eventEndDateTime: event.target.value,
                       }));
                     }}
                   />
@@ -489,26 +543,28 @@ export default function AddEventModal({
                   <Input
                     disabled={isSaving}
                     hint="Optional"
-                    label="Check-in time"
-                    type="time"
-                    value={formState.hotelCheckInTime}
+                    label="Check-in"
+                    type="datetime-local"
+                    value={formState.hotelCheckInDateTime}
                     onChange={(event) => {
+                      setErrorMessage(null);
                       setFormState((current) => ({
                         ...current,
-                        hotelCheckInTime: event.target.value,
+                        hotelCheckInDateTime: event.target.value,
                       }));
                     }}
                   />
                   <Input
                     disabled={isSaving}
                     hint="Optional"
-                    label="Check-out time"
-                    type="time"
-                    value={formState.hotelCheckOutTime}
+                    label="Check-out"
+                    type="datetime-local"
+                    value={formState.hotelCheckOutDateTime}
                     onChange={(event) => {
+                      setErrorMessage(null);
                       setFormState((current) => ({
                         ...current,
-                        hotelCheckOutTime: event.target.value,
+                        hotelCheckOutDateTime: event.target.value,
                       }));
                     }}
                   />
@@ -532,13 +588,27 @@ export default function AddEventModal({
               <>
                 <Input
                   disabled={isSaving}
-                  label="Departure time"
-                  type="time"
-                  value={formState.commuteDepartureTime}
+                  label="Departure"
+                  type="datetime-local"
+                  value={formState.commuteDepartureDateTime}
                   onChange={(event) => {
+                    setErrorMessage(null);
                     setFormState((current) => ({
                       ...current,
-                      commuteDepartureTime: event.target.value,
+                      commuteDepartureDateTime: event.target.value,
+                    }));
+                  }}
+                />
+                <Input
+                  disabled={isSaving}
+                  label="Arrival"
+                  type="datetime-local"
+                  value={formState.commuteArrivalDateTime}
+                  onChange={(event) => {
+                    setErrorMessage(null);
+                    setFormState((current) => ({
+                      ...current,
+                      commuteArrivalDateTime: event.target.value,
                     }));
                   }}
                 />

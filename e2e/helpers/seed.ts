@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import type {

@@ -49,7 +49,7 @@ begin
 end;
 $$;
 
-select plan(39);
+select plan(45);
 
 delete from public.invite_codes
 where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001';
@@ -67,7 +67,8 @@ delete from auth.users
 where id in (
   '00000000-0000-0000-0000-0000000000a1',
   '00000000-0000-0000-0000-0000000000b2',
-  '00000000-0000-0000-0000-0000000000c3'
+  '00000000-0000-0000-0000-0000000000c3',
+  '00000000-0000-0000-0000-0000000000d4'
 );
 
 insert into auth.users (
@@ -138,15 +139,33 @@ values
   '',
   '',
   ''
+),
+(
+  '00000000-0000-0000-0000-000000000000',
+  '00000000-0000-0000-0000-0000000000d4',
+  'authenticated',
+  'authenticated',
+  'user_d_rls@yonderia.test',
+  crypt('password123', gen_salt('bf')),
+  now(),
+  '{"provider":"email","providers":["email"]}',
+  '{"full_name":"User D"}',
+  now(),
+  now(),
+  '',
+  '',
+  '',
+  ''
 );
 
 select is(
   (select count(*) from public.profiles where id in (
     '00000000-0000-0000-0000-0000000000a1',
     '00000000-0000-0000-0000-0000000000b2',
-    '00000000-0000-0000-0000-0000000000c3'
+    '00000000-0000-0000-0000-0000000000c3',
+    '00000000-0000-0000-0000-0000000000d4'
   )),
-  3::bigint,
+  4::bigint,
   'handle_new_user created profiles rows for all test users'
 );
 
@@ -232,6 +251,12 @@ values
   'aaaaaaaa-0000-0000-0000-000000000001',
   '00000000-0000-0000-0000-0000000000c3',
   'member'
+),
+(
+  'bbbbbbbb-0000-0000-0000-0000000000d4',
+  'aaaaaaaa-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-0000000000d4',
+  'member'
 );
 
 select ok(
@@ -252,6 +277,16 @@ select ok(
       and role = 'member'
   ),
   'user_a added user_c as a member'
+);
+
+select ok(
+  exists (
+    select 1 from public.trip_participants
+    where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001'
+      and user_id = '00000000-0000-0000-0000-0000000000d4'
+      and role = 'member'
+  ),
+  'user_a added user_d as a member'
 );
 
 select pg_temp.authenticate_as(
@@ -378,7 +413,7 @@ select is(
     update public.trip_participants
     set role = 'planner'
     where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001'
-      and user_id = '00000000-0000-0000-0000-0000000000c3'
+      and user_id = '00000000-0000-0000-0000-0000000000d4'
   $$),
   1::bigint,
   'user_a can promote a participant role'
@@ -388,7 +423,7 @@ select is(
   (
     select role from public.trip_participants
     where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001'
-      and user_id = '00000000-0000-0000-0000-0000000000c3'
+      and user_id = '00000000-0000-0000-0000-0000000000d4'
   ),
   'planner',
   'user_a role update persisted'
@@ -397,12 +432,23 @@ select is(
 select is(
   pg_temp.exec_row_count($$
     update public.trip_participants
-    set role = 'member'
+    set nickname = 'Navigator Nick'
     where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001'
-      and user_id = '00000000-0000-0000-0000-0000000000c3'
+      and user_id = '00000000-0000-0000-0000-0000000000d4'
   $$),
   1::bigint,
-  'user_a can demote a participant role'
+  'user_a can update a participant nickname'
+);
+
+select is(
+  pg_temp.exec_row_count($$
+    update public.trip_participants
+    set arrival_location = 'Not Allowed'
+    where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001'
+      and user_id = '00000000-0000-0000-0000-0000000000d4'
+  $$),
+  0::bigint,
+  'user_a cannot update another participant travel details'
 );
 
 insert into public.invite_codes (
@@ -679,6 +725,21 @@ select is(
 );
 
 select pg_temp.authenticate_as(
+  '00000000-0000-0000-0000-0000000000c3',
+  'user_c_rls@yonderia.test'
+);
+
+select is(
+  pg_temp.exec_row_count($$
+    delete from public.trip_participants
+    where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001'
+      and user_id = '00000000-0000-0000-0000-0000000000b2'
+  $$),
+  0::bigint,
+  'user_c cannot kick user_b'
+);
+
+select pg_temp.authenticate_as(
   '00000000-0000-0000-0000-0000000000b2',
   'user_b_rls@yonderia.test'
 );
@@ -687,10 +748,40 @@ select is(
   pg_temp.exec_row_count($$
     delete from public.trip_participants
     where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001'
-      and user_id = '00000000-0000-0000-0000-0000000000c3'
+      and user_id = '00000000-0000-0000-0000-0000000000a1'
   $$),
   0::bigint,
-  'user_b cannot kick user_c'
+  'user_b cannot kick user_a'
+);
+
+select is(
+  pg_temp.exec_row_count($$
+    delete from public.trip_participants
+    where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001'
+      and user_id = '00000000-0000-0000-0000-0000000000d4'
+  $$),
+  0::bigint,
+  'user_b cannot kick user_d'
+);
+
+select is(
+  pg_temp.exec_row_count($$
+    delete from public.trip_participants
+    where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001'
+      and user_id = '00000000-0000-0000-0000-0000000000c3'
+  $$),
+  1::bigint,
+  'user_b can kick user_c'
+);
+
+select is(
+  (
+    select count(*) from public.trip_participants
+    where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001'
+      and user_id = '00000000-0000-0000-0000-0000000000c3'
+  ),
+  0::bigint,
+  'user_c participant row was deleted by a planner'
 );
 
 select pg_temp.authenticate_as(
@@ -712,20 +803,20 @@ select is(
   pg_temp.exec_row_count($$
     delete from public.trip_participants
     where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001'
-      and user_id = '00000000-0000-0000-0000-0000000000c3'
+      and user_id = '00000000-0000-0000-0000-0000000000d4'
   $$),
   1::bigint,
-  'user_a can kick user_c'
+  'user_a can kick user_d'
 );
 
 select is(
   (
     select count(*) from public.trip_participants
     where trip_id = 'aaaaaaaa-0000-0000-0000-000000000001'
-      and user_id = '00000000-0000-0000-0000-0000000000c3'
+      and user_id = '00000000-0000-0000-0000-0000000000d4'
   ),
   0::bigint,
-  'user_c participant row was deleted'
+  'user_d participant row was deleted'
 );
 
 select * from finish();

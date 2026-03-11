@@ -1,7 +1,8 @@
+import { format } from "date-fns";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import type { ItineraryListItem } from "@/hooks/useItinerary";
-import { formatDateTime, formatDayLabel } from "@/lib/utils";
+import { formatDayLabel } from "@/lib/utils";
 import { formatItineraryItemTime, getItineraryBadge } from "./ItineraryCard";
 
 type ItineraryDetailProps = {
@@ -23,6 +24,14 @@ function DetailRow({ label, value }: { label: string; value: string | null }) {
   );
 }
 
+function formatDetailDateTime(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  return format(new Date(value), "MMM d, yyyy h:mm a");
+}
+
 export default function ItineraryDetail({ isOpen, item, onClose }: ItineraryDetailProps) {
   if (!item) {
     return null;
@@ -31,6 +40,9 @@ export default function ItineraryDetail({ isOpen, item, onClose }: ItineraryDeta
   const badge = getItineraryBadge(item.item_type);
   const originLabel = item.location_name ?? "Location coming together";
   const destinationLabel = item.destination_name ?? "Destination coming together";
+  const startTimeLabel = formatDetailDateTime(item.start_time);
+  const endTimeLabel = formatDetailDateTime(item.end_time);
+  const eventTimeLabel = item.item_type === "event" ? formatItineraryItemTime(item) : null;
 
   return (
     <Modal
@@ -73,15 +85,24 @@ export default function ItineraryDetail({ isOpen, item, onClose }: ItineraryDeta
 
         <div className="grid gap-3 sm:grid-cols-2">
           <DetailRow label="Day" value={formatDayLabel(item.day_date)} />
-          <DetailRow label="Starts" value={item.start_time ? formatDateTime(item.start_time) : null} />
-          <DetailRow label="Ends" value={item.end_time ? formatDateTime(item.end_time) : null} />
           {item.item_type === "commute" ? (
             <>
+              <DetailRow label="Departure" value={startTimeLabel} />
+              <DetailRow label="Arrival" value={endTimeLabel} />
               <DetailRow label="Origin" value={`📍 ${originLabel}`} />
               <DetailRow label="Destination" value={`📍 ${destinationLabel}`} />
             </>
+          ) : item.item_type === "event" ? (
+            <>
+              <DetailRow label="Time" value={eventTimeLabel} />
+              <DetailRow label="Location" value={`📍 ${originLabel}`} />
+            </>
           ) : (
-            <DetailRow label="Location" value={`📍 ${originLabel}`} />
+            <>
+              <DetailRow label="Starts" value={startTimeLabel} />
+              <DetailRow label="Ends" value={endTimeLabel} />
+              <DetailRow label="Location" value={`📍 ${originLabel}`} />
+            </>
           )}
         </div>
       </div>

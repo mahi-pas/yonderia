@@ -7,7 +7,19 @@ import { createClient } from "@/lib/supabase/client";
 
 const REDIRECT_STORAGE_KEY = "yonderia-auth-redirect";
 
-export default function LoginButton() {
+type LoginButtonProps = {
+  buttonClassName?: string;
+  buttonLabel?: string;
+  containerClassName?: string;
+  redirectTo?: string;
+};
+
+export default function LoginButton({
+  buttonClassName = "",
+  buttonLabel = "Sign in with Google",
+  containerClassName = "",
+  redirectTo,
+}: LoginButtonProps) {
   const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -18,7 +30,7 @@ export default function LoginButton() {
 
     try {
       const supabase = createClient();
-      const searchRedirect = sanitizeRedirectPath(searchParams.get("redirectTo"));
+      const searchRedirect = sanitizeRedirectPath(redirectTo ?? searchParams.get("redirectTo"));
       const storedRedirect =
         typeof window === "undefined"
           ? DEFAULT_AUTH_REDIRECT
@@ -55,9 +67,14 @@ export default function LoginButton() {
   };
 
   return (
-    <div className="w-full max-w-sm">
+    <div className={["w-full max-w-sm", containerClassName].filter(Boolean).join(" ")}>
       <button
-        className="group inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full bg-[#c76038] px-5 py-4 text-base font-semibold text-white shadow-[0_18px_45px_rgba(199,96,56,0.33)] transition hover:-translate-y-0.5 hover:bg-[#b55531] focus:outline-none focus:ring-4 focus:ring-[#ffd4be] disabled:cursor-not-allowed disabled:opacity-70"
+        className={[
+          "group inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full bg-[#c76038] px-5 py-4 text-base font-semibold text-white shadow-[0_18px_45px_rgba(199,96,56,0.33)] transition hover:-translate-y-0.5 hover:bg-[#b55531] focus:outline-none focus:ring-4 focus:ring-[#ffd4be] disabled:cursor-not-allowed disabled:opacity-70",
+          buttonClassName,
+        ]
+          .filter(Boolean)
+          .join(" ")}
         disabled={isSubmitting}
         type="button"
         onClick={() => {
@@ -67,7 +84,7 @@ export default function LoginButton() {
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-base text-[#c76038] shadow-sm">
           G
         </span>
-        <span>{isSubmitting ? "Opening Google..." : "Sign in with Google"}</span>
+        <span>{isSubmitting ? "Opening Google..." : buttonLabel}</span>
       </button>
 
       {errorMessage ? (

@@ -5,7 +5,6 @@
 Before starting, do two things in Cursor:
 
 1. **Add SPEC.md as a Project Rule.** Go to Settings → Rules → Project Rules → Add Rule. Paste the entire contents of `yonderia-prompt.md`. Name the rule "Yonderia Spec". This makes the spec available to every Composer session without you having to reference it manually or burn context window tokens.
-
 2. **Use Agent mode.** When you open Composer (Cmd+I), toggle "Agent" on at the top. This lets Cursor run terminal commands, install packages, and create files autonomously rather than just showing you diffs.
 
 ---
@@ -1485,3 +1484,4 @@ ALTERNATIVE (most aggressive parallelism, higher merge conflict risk):
   Batch 2:  15 + 16 + 21              (3 parallel — resolve event detail conflicts after)
   Batch 3:  22                         (integration tests)
 ```
+

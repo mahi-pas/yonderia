@@ -345,6 +345,38 @@ test("changing a participant role updates the badge in another participant conte
   }
 });
 
+test("changing a participant nickname updates another participant context", async () => {
+  let scenario: SeededRealtimeScenario | null = null;
+  let organizerPage: Page | null = null;
+  let viewerPage: Page | null = null;
+
+  try {
+    scenario = await seedRealtimeScenario();
+    organizerPage = await organizerAuth.context.newPage();
+    viewerPage = await viewerAuth.context.newPage();
+
+    await organizerPage.goto(buildTripUrl(scenario.tripId));
+    await viewerPage.goto(buildTripUrl(scenario.tripId));
+
+    await expect(getParticipantsSection(viewerPage).getByText(scenario.targetParticipantName)).toBeVisible();
+
+    await organizerPage.goto(`/trip/${scenario.tripId}/participants`);
+    await organizerPage.getByRole("button", { name: `Open actions for ${scenario.targetParticipantName}` }).click();
+    await organizerPage.getByRole("button", { name: "Edit Name" }).click();
+    await organizerPage
+      .getByRole("dialog", { name: "Edit nickname" })
+      .getByRole("textbox", { name: /Nickname/i })
+      .fill("Signal Scout");
+    await organizerPage.getByRole("button", { name: "Save nickname" }).click();
+
+    await expect(getParticipantsSection(viewerPage).getByText("Signal Scout")).toBeVisible({ timeout: 15000 });
+  } finally {
+    await organizerPage?.close();
+    await viewerPage?.close();
+    await cleanupScenario(scenario);
+  }
+});
+
 test("view-only visitors keep a snapshot and do not receive realtime updates", async ({ browser }) => {
   let scenario: SeededRealtimeScenario | null = null;
   let organizerPage: Page | null = null;

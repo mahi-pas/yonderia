@@ -1,3 +1,4 @@
+import { eachDayOfInterval, format, parseISO } from "date-fns";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { ItineraryItem } from "@/lib/types";
@@ -27,6 +28,45 @@ type UseItineraryOptions = {
   tripId: string;
 };
 
+function getItemStartDay(item: Pick<ItineraryListItem, "day_date" | "start_time">): string {
+  if (!item.start_time) {
+    return item.day_date;
+  }
+
+  return format(new Date(item.start_time), "yyyy-MM-dd");
+}
+
+function getItemEndDay(item: Pick<ItineraryListItem, "end_time">, fallbackDay: string): string {
+  if (!item.end_time) {
+    return fallbackDay;
+  }
+
+  return format(new Date(item.end_time), "yyyy-MM-dd");
+}
+
+export function getItineraryItemDaySpan(item: ItineraryListItem): string[] {
+  if (!item.start_time) {
+    return [item.day_date];
+  }
+
+  const startDay = getItemStartDay(item);
+
+  if (!item.end_time) {
+    return [startDay];
+  }
+
+  const endDay = getItemEndDay(item, startDay);
+
+  if (endDay < startDay) {
+    return [startDay];
+  }
+
+  return eachDayOfInterval({
+    end: parseISO(endDay),
+    start: parseISO(startDay),
+  }).map((date) => format(date, "yyyy-MM-dd"));
+}
+
 function compareNullableTimes(left: string | null, right: string | null): number {
   if (!left && !right) {
     return 0;
@@ -44,7 +84,7 @@ function compareNullableTimes(left: string | null, right: string | null): number
 }
 
 export function compareItineraryItems(left: ItineraryListItem, right: ItineraryListItem): number {
-  const dayDifference = left.day_date.localeCompare(right.day_date);
+  const dayDifference = getItemStartDay(left).localeCompare(getItemStartDay(right));
 
   if (dayDifference !== 0) {
     return dayDifference;
@@ -54,6 +94,12 @@ export function compareItineraryItems(left: ItineraryListItem, right: ItineraryL
 
   if (timeDifference !== 0) {
     return timeDifference;
+  }
+
+  const endTimeDifference = compareNullableTimes(left.end_time, right.end_time);
+
+  if (endTimeDifference !== 0) {
+    return endTimeDifference;
   }
 
   const sortOrderDifference = left.sort_order - right.sort_order;
@@ -73,14 +119,16 @@ export function groupItineraryItemsByDay(items: ItineraryListItem[]): Map<string
   const groups = new Map<string, ItineraryListItem[]>();
 
   for (const item of sortItineraryItems(items)) {
-    const existingItems = groups.get(item.day_date);
+    for (const day of getItineraryItemDaySpan(item)) {
+      const existingItems = groups.get(day);
 
-    if (existingItems) {
-      existingItems.push(item);
-      continue;
+      if (existingItems) {
+        existingItems.push(item);
+        continue;
+      }
+
+      groups.set(day, [item]);
     }
-
-    groups.set(item.day_date, [item]);
   }
 
   return groups;

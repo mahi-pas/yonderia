@@ -43,15 +43,6 @@ async function buildLandingRedirectUrl(request: NextRequest, redirectTo?: string
   return loginUrl;
 }
 
-async function buildAuthStartUrl(request: NextRequest, redirectTo: string): Promise<URL> {
-  const siteUrl = await getSiteUrl();
-  const loginUrl = new URL("/auth/login", siteUrl);
-
-  loginUrl.searchParams.set("redirectTo", redirectTo);
-
-  return loginUrl;
-}
-
 async function lookupInviteCodeType(
   tripId: string,
   code: string,
@@ -131,8 +122,11 @@ export async function proxy(request: NextRequest) {
     const inviteCodeType = await lookupInviteCodeType(tripId, inviteCode);
 
     if (inviteCodeType === "join" || inviteCodeType === "join_planner") {
-      const redirectTo = `/trip/${tripId}/join?code=${encodeURIComponent(inviteCode)}`;
-      return NextResponse.redirect(await buildAuthStartUrl(request, redirectTo));
+      const landingUrl = request.nextUrl.clone();
+      landingUrl.pathname = `/trip/${tripId}/invite-landing`;
+      landingUrl.search = "";
+      landingUrl.searchParams.set("code", inviteCode);
+      return NextResponse.redirect(landingUrl);
     }
   }
 

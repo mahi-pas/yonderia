@@ -47,8 +47,8 @@ export async function POST(request: Request) {
   const adminSupabase = createAdminClient();
   const membership = await getParticipantMembership(adminSupabase, tripId, user.id);
 
-  if (!membership || membership.role !== "organizer") {
-    return NextResponse.json({ error: "Only the organizer can remove participants." }, { status: 403 });
+  if (!membership || membership.role === "member") {
+    return NextResponse.json({ error: "Only organizers and planners can remove participants." }, { status: 403 });
   }
 
   const { data: participant, error: participantError } = await adminSupabase
@@ -69,11 +69,15 @@ export async function POST(request: Request) {
   const resolvedParticipant = participant as ParticipantRow;
 
   if (resolvedParticipant.user_id === user.id) {
-    return NextResponse.json({ error: "The organizer can't remove themselves from the trip." }, { status: 403 });
+    return NextResponse.json({ error: "You can't remove yourself from the trip." }, { status: 403 });
   }
 
   if (resolvedParticipant.role === "organizer") {
     return NextResponse.json({ error: "The organizer can't be removed from the trip." }, { status: 403 });
+  }
+
+  if (membership.role === "planner" && resolvedParticipant.role !== "member") {
+    return NextResponse.json({ error: "Planners can only remove members from the trip." }, { status: 403 });
   }
 
   const { error: deleteError } = await adminSupabase

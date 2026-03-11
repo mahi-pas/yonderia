@@ -237,7 +237,11 @@ export default async function TripPage({ params, searchParams }: PageProps) {
     }
 
     if (inviteCode?.codeType === "join" || inviteCode?.codeType === "join_planner") {
-      redirect(`/trip/${tripId}/join?code=${encodeURIComponent(code)}`);
+      if (user) {
+        redirect(`/trip/${tripId}/join?code=${encodeURIComponent(code)}`);
+      }
+
+      redirect(`/trip/${tripId}/invite-landing?code=${encodeURIComponent(code)}`);
     }
 
     return <InviteEntryForm errorMessage="That invite code is invalid or no longer active." tripId={tripId} />;

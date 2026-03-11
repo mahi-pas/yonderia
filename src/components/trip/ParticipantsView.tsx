@@ -5,8 +5,10 @@ import { format, isValid, parseISO } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 import Modal from "@/components/ui/Modal";
 import TopToast from "@/components/ui/TopToast";
+import { createClient } from "@/lib/supabase/client";
 import type { TripParticipantRole } from "@/lib/types";
 
 type ParticipantRow = {
@@ -104,6 +106,26 @@ function shouldShowDisplayName(participant: ParticipantRow): boolean {
   return Boolean(displayName && displayName !== nickname);
 }
 
+function canKickParticipant(
+  currentUserId: string,
+  currentUserRole: TripParticipantRole,
+  participant: ParticipantRow,
+): boolean {
+  if (participant.userId === currentUserId) {
+    return false;
+  }
+
+  if (currentUserRole === "organizer") {
+    return participant.role !== "organizer";
+  }
+
+  if (currentUserRole === "planner") {
+    return participant.role === "member";
+  }
+
+  return false;
+}
+
 export default function ParticipantsView({
   currentUserId,
   currentUserRole,
@@ -112,6 +134,9 @@ export default function ParticipantsView({
 }: ParticipantsViewProps) {
   const router = useRouter();
   const [confirmKickParticipant, setConfirmKickParticipant] = useState<ParticipantRow | null>(null);
+  const [editNameParticipant, setEditNameParticipant] = useState<ParticipantRow | null>(null);
+  const [nicknameDraft, setNicknameDraft] = useState("");
+  const [nicknameError, setNicknameError] = useState<string | null>(null);
   const [menuParticipantId, setMenuParticipantId] = useState<string | null>(null);
   const [pendingParticipantId, setPendingParticipantId] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastState>(null);
@@ -135,6 +160,29 @@ export default function ParticipantsView({
     () => new Map(participants.map((participant) => [participant.participantId, participant])),
     [participants],
   );
+
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`participants-page:${tripId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          filter: `trip_id=eq.${tripId}`,
+          schema: "public",
+          table: "trip_participants",
+        },
+        () => {
+          router.refresh();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [router, tripId]);
 
   async function changeRole(participantId: string, role: Extract<TripParticipantRole, "member" | "planner">) {
     setMenuParticipantId(null);
@@ -216,6 +264,62 @@ export default function ParticipantsView({
     }
   }
 
+  async function saveNickname() {
+    if (!editNameParticipant) {
+      return;
+    }
+
+    const nextNickname = nicknameDraft.trim();
+
+    if (!nextNickname) {
+      setNicknameError("Enter a nickname to save.");
+      return;
+    }
+
+    if (nextNickname === editNameParticipant.nickname.trim()) {
+      setEditNameParticipant(null);
+      setNicknameDraft("");
+      setNicknameError(null);
+      return;
+    }
+
+    const previousNickname = editNameParticipant.nickname;
+    setPendingParticipantId(editNameParticipant.participantId);
+    setNicknameError(null);
+
+    try {
+      const response = await fetch("/api/participants/nickname", {
+        body: JSON.stringify({
+          nickname: nextNickname,
+          participantId: editNameParticipant.participantId,
+          tripId,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      });
+
+      const data = (await response.json().catch(() => null)) as { error?: string } | null;
+
+      if (!response.ok) {
+        throw new Error(data?.error ?? "We couldn't update that nickname.");
+      }
+
+      setToast({
+        message: `Updated ${previousNickname} to ${nextNickname}`,
+        tone: "success",
+      });
+      setEditNameParticipant(null);
+      setNicknameDraft("");
+      router.refresh();
+    } catch (error) {
+      setNicknameError(error instanceof Error ? error.message : "We couldn't update that nickname.");
+    } finally {
+      setPendingParticipantId(null);
+    }
+  }
+
   return (
     <>
       {toast ? (
@@ -234,8 +338,9 @@ export default function ParticipantsView({
         <ul className="mt-5 space-y-3">
           {participants.map((participant) => {
             const roleBadge = getRoleBadge(participant.role);
-            const showActions =
-              isOrganizer && participant.userId !== currentUserId && participant.role !== "organizer";
+            const canChangeRole = isOrganizer && participant.userId !== currentUserId && participant.role !== "organizer";
+            const canKick = canKickParticipant(currentUserId, currentUserRole, participant);
+            const showActions = canChangeRole || canKick;
             const isPending = pendingParticipantId === participant.participantId;
 
             return (
@@ -298,7 +403,7 @@ export default function ParticipantsView({
 
                       {menuParticipantId === participant.participantId ? (
                         <div className="absolute right-0 top-12 z-10 w-48 rounded-[1.25rem] border border-[#efd5c8] bg-white p-2 shadow-[0_18px_45px_rgba(90,40,20,0.18)]">
-                          {participant.role !== "planner" ? (
+                          {canChangeRole && participant.role !== "planner" ? (
                             <button
                               className="flex min-h-11 w-full items-center rounded-[1rem] px-3 text-left text-sm font-semibold text-[#34180f] transition hover:bg-[#fff4ec]"
                               type="button"
@@ -310,7 +415,7 @@ export default function ParticipantsView({
                             </button>
                           ) : null}
 
-                          {participant.role !== "member" ? (
+                          {canChangeRole && participant.role !== "member" ? (
                             <button
                               className="flex min-h-11 w-full items-center rounded-[1rem] px-3 text-left text-sm font-semibold text-[#34180f] transition hover:bg-[#fff4ec]"
                               type="button"
@@ -322,16 +427,33 @@ export default function ParticipantsView({
                             </button>
                           ) : null}
 
-                          <button
-                            className="flex min-h-11 w-full items-center rounded-[1rem] px-3 text-left text-sm font-semibold text-[#a33d24] transition hover:bg-[#fff1ea]"
-                            type="button"
-                            onClick={() => {
-                              setMenuParticipantId(null);
-                              setConfirmKickParticipant(participantMap.get(participant.participantId) ?? null);
-                            }}
-                          >
-                            Kick from Trip
-                          </button>
+                          {isOrganizer ? (
+                            <button
+                              className="flex min-h-11 w-full items-center rounded-[1rem] px-3 text-left text-sm font-semibold text-[#34180f] transition hover:bg-[#fff4ec]"
+                              type="button"
+                              onClick={() => {
+                                setMenuParticipantId(null);
+                                setEditNameParticipant(participantMap.get(participant.participantId) ?? null);
+                                setNicknameDraft(participant.nickname);
+                                setNicknameError(null);
+                              }}
+                            >
+                              Edit Name
+                            </button>
+                          ) : null}
+
+                          {canKick ? (
+                            <button
+                              className="flex min-h-11 w-full items-center rounded-[1rem] px-3 text-left text-sm font-semibold text-[#a33d24] transition hover:bg-[#fff1ea]"
+                              type="button"
+                              onClick={() => {
+                                setMenuParticipantId(null);
+                                setConfirmKickParticipant(participantMap.get(participant.participantId) ?? null);
+                              }}
+                            >
+                              Kick from Trip
+                            </button>
+                          ) : null}
                         </div>
                       ) : null}
                     </div>
@@ -346,7 +468,7 @@ export default function ParticipantsView({
       <Modal
         description={
           confirmKickParticipant
-            ? `Remove ${confirmKickParticipant.nickname} from this trip? They'll need a new invite to rejoin.`
+            ? `Remove ${confirmKickParticipant.nickname} from this trip? They'll lose access to the itinerary and all trip details.`
             : undefined
         }
         isOpen={Boolean(confirmKickParticipant)}
@@ -377,6 +499,58 @@ export default function ParticipantsView({
         <p className="text-sm leading-6 text-[#6f4a3b]">
           This will remove them from the participant list right away.
         </p>
+      </Modal>
+
+      <Modal
+        description={
+          editNameParticipant
+            ? `Change the trip nickname everyone sees for ${editNameParticipant.displayName ?? editNameParticipant.nickname}.`
+            : undefined
+        }
+        isOpen={Boolean(editNameParticipant)}
+        onClose={() => {
+          if (!pendingParticipantId) {
+            setEditNameParticipant(null);
+            setNicknameDraft("");
+            setNicknameError(null);
+          }
+        }}
+        panelClassName="sm:max-w-lg"
+        title="Edit nickname"
+        footer={
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <Button
+              disabled={Boolean(pendingParticipantId)}
+              variant="secondary"
+              onClick={() => {
+                setEditNameParticipant(null);
+                setNicknameDraft("");
+                setNicknameError(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button isLoading={Boolean(pendingParticipantId)} onClick={() => void saveNickname()}>
+              Save nickname
+            </Button>
+          </div>
+        }
+      >
+        <Input
+          disabled={Boolean(pendingParticipantId)}
+          error={nicknameError}
+          hint="This only changes how they're labeled on this trip."
+          label="Nickname"
+          maxLength={60}
+          placeholder="Road Runner"
+          value={nicknameDraft}
+          onChange={(event) => {
+            setNicknameDraft(event.target.value);
+            if (nicknameError) {
+              setNicknameError(null);
+            }
+          }}
+        />
       </Modal>
     </>
   );
