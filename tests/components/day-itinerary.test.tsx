@@ -3,11 +3,13 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ItineraryListItem } from "@/hooks/useItinerary";
 
-const { useItineraryMock } = vi.hoisted(() => ({
+const { groupItineraryItemsByDayMock, useItineraryMock } = vi.hoisted(() => ({
+  groupItineraryItemsByDayMock: vi.fn(() => new Map()),
   useItineraryMock: vi.fn(),
 }));
 
 vi.mock("@/hooks/useItinerary", () => ({
+  groupItineraryItemsByDay: groupItineraryItemsByDayMock,
   useItinerary: useItineraryMock,
 }));
 
@@ -70,7 +72,7 @@ describe("DayItinerary", () => {
       root.render(
         createElement(DayItinerary, {
           canManage: false,
-          initialItems: [firstDayItem],
+          items: [firstDayItem],
           tripEndDate: "2026-03-15",
           tripId: "trip-123",
           tripStartDate: "2026-03-14",

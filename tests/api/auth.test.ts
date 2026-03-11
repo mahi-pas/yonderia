@@ -12,6 +12,10 @@ vi.mock("@supabase/ssr", () => ({
   createServerClient: vi.fn(),
 }));
 
+vi.mock("@/lib/site-url", () => ({
+  getSiteUrl: vi.fn(async () => "http://localhost:3000"),
+}));
+
 vi.mock("next/server", () => ({
   NextResponse: {
     next: vi.fn(({ request }: { request: NextRequest }) => ({

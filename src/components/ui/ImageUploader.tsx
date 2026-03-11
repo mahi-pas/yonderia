@@ -189,7 +189,7 @@ export default function ImageUploader({
 
         <input
           ref={fileInputRef}
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp"
           capture="environment"
           className="sr-only"
           disabled={disabled}

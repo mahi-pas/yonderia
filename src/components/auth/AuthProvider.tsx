@@ -40,7 +40,6 @@ async function fetchProfile(
     .maybeSingle();
 
   if (error) {
-    console.error("Failed to load profile", error);
     return null;
   }
 
