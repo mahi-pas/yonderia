@@ -64,44 +64,48 @@ const MOCK_PIN_POSITIONS = [
   { left: "79%", top: "52%" },
 ] as const;
 
-function hasCoordinates(latitude: number | null, longitude: number | null): latitude is number {
+function hasCoordinates(latitude: number | null, longitude: number | null): boolean {
   return typeof latitude === "number" && Number.isFinite(latitude) && typeof longitude === "number" && Number.isFinite(longitude);
+}
+
+function validCoords(latitude: number | null, longitude: number | null): { lat: number; lng: number } | null {
+  if (typeof latitude === "number" && Number.isFinite(latitude) && typeof longitude === "number" && Number.isFinite(longitude)) {
+    return { lat: latitude, lng: longitude };
+  }
+  return null;
 }
 
 function buildMapPoints(item: ItineraryListItem): MapPoint[] {
   if (item.item_type === "commute") {
     const points: MapPoint[] = [];
 
-    if (hasCoordinates(item.latitude, item.longitude)) {
+    const originCoords = validCoords(item.latitude, item.longitude);
+    if (originCoords) {
       points.push({
         infoLabel: item.location_name ?? "Origin coming together",
         item,
         key: `${item.id}:origin`,
         kind: "origin",
-        position: {
-          lat: item.latitude,
-          lng: item.longitude,
-        },
+        position: originCoords,
       });
     }
 
-    if (hasCoordinates(item.destination_latitude, item.destination_longitude)) {
+    const destCoords = validCoords(item.destination_latitude, item.destination_longitude);
+    if (destCoords) {
       points.push({
         infoLabel: item.destination_name ?? "Destination coming together",
         item,
         key: `${item.id}:destination`,
         kind: "destination",
-        position: {
-          lat: item.destination_latitude,
-          lng: item.destination_longitude,
-        },
+        position: destCoords,
       });
     }
 
     return points;
   }
 
-  if (!hasCoordinates(item.latitude, item.longitude)) {
+  const coords = validCoords(item.latitude, item.longitude);
+  if (!coords) {
     return [];
   }
 
@@ -111,10 +115,7 @@ function buildMapPoints(item: ItineraryListItem): MapPoint[] {
       item,
       key: `${item.id}:single`,
       kind: "single",
-      position: {
-        lat: item.latitude,
-        lng: item.longitude,
-      },
+      position: coords,
     },
   ];
 }

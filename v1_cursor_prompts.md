@@ -723,3 +723,765 @@ After all fixes, run the complete test suite:
 
 All tests must pass. If any test fails due to the security fixes, update the test expectations if the old behavior was incorrect, or fix the implementation if the test was right.
 ```
+
+---
+
+# V2 Feature Prompts
+
+The sessions below add new features on top of the V1 foundation. Many can be worked on in parallel — see the **Parallelization Guide** at the bottom for which sessions can run simultaneously.
+
+---
+
+## Session 14: End Times for Events & Commutes
+
+```
+The itinerary_items table already has an end_time column, but the UI doesn't use it for events or commutes. Fix that:
+
+1. Update src/components/trip/AddEventModal.tsx:
+   - **Event tab**: Add an "End Time" date/time picker below the existing start time field. Make it optional. If set, validate that end_time is after start_time. Show a friendly error if not.
+   - **Commute tab**: Add an "Arrival Time" date/time picker below the existing departure time. Label it clearly — "Departure Time" for start_time and "Arrival Time" for end_time. Make it optional. If set, validate arrival is after departure.
+   - **Hotel tab**: No changes needed — hotels already have check-in (start_time) and check-out (end_time).
+
+2. Update src/components/trip/ItineraryCard.tsx:
+   - When end_time exists, display the time as a range: "2:00 PM – 5:00 PM" instead of just "2:00 PM".
+   - For commutes: show "Departs 2:00 PM → Arrives 5:00 PM" format.
+   - Use a dash (–) for events and an arrow (→) for commutes to visually distinguish them.
+
+3. Update src/components/trip/ItineraryDetail.tsx:
+   - Show end_time in the detail view. For events: "2:00 PM – 5:00 PM". For commutes: separate "Departure: 2:00 PM" and "Arrival: 5:00 PM" lines.
+   - If end_time is null, just show the start time like before.
+
+4. Update src/hooks/useItinerary.ts:
+   - When sorting items within a day, the sort logic should be: primary sort by start_time ascending, secondary sort by end_time ascending (items that end sooner appear first if they start at the same time). Hotels without check-in time still go at the end.
+
+5. Update the /api/trip/[tripId]/view endpoint to include end_time in its response so view-only users also see time ranges.
+
+No database migration needed — the column already exists.
+```
+
+**After this:** Create events and commutes with end times. Verify time ranges display correctly in cards and detail views. Verify sorting works when two events start at the same time.
+
+**Tests to write for this session:**
+
+```
+Write the following tests:
+
+tests/components/itinerary-card-endtime.test.tsx (Vitest):
+- Event with end_time displays "2:00 PM – 5:00 PM" format
+- Event without end_time displays just "2:00 PM"
+- Commute with end_time displays "Departs 2:00 PM → Arrives 5:00 PM"
+- Commute without end_time displays just the departure time
+
+e2e/end-times.spec.ts (Playwright):
+- Add Event modal has an "End Time" field on the Event tab
+- Add Event modal has an "Arrival Time" field on the Commute tab
+- Setting end_time before start_time shows a validation error
+- Creating an event with end_time shows the time range on the itinerary card
+- Creating a commute with arrival time shows the departure→arrival format
+- Itinerary detail view shows end time when present
+- Two events starting at the same time are sorted by end_time (shorter event first)
+- View-only page shows end times correctly
+
+Seed a trip with events that have and don't have end times for display tests.
+```
+
+---
+
+## Session 15: RSVP System (Going / Interested / Not Going)
+
+```
+Add an RSVP system so participants can indicate their attendance for each event. This helps organizers get headcounts.
+
+1. Database migration — create supabase/migrations/002_event_rsvps.sql:
+
+   CREATE TABLE event_rsvps (
+     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+     itinerary_item_id uuid REFERENCES itinerary_items(id) ON DELETE CASCADE NOT NULL,
+     user_id uuid REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+     status text NOT NULL CHECK (status IN ('going', 'interested', 'not_going')),
+     created_at timestamptz DEFAULT now(),
+     updated_at timestamptz DEFAULT now(),
+     UNIQUE(itinerary_item_id, user_id)
+   );
+
+   CREATE INDEX idx_event_rsvps_item ON event_rsvps(itinerary_item_id);
+   CREATE INDEX idx_event_rsvps_user ON event_rsvps(user_id);
+
+   RLS policies:
+   - SELECT: any trip participant can read RSVPs for items in their trip (join through itinerary_items → trip_participants)
+   - INSERT: any trip participant can create their own RSVP (user_id must match auth.uid())
+   - UPDATE: users can only update their own RSVP (user_id = auth.uid())
+   - DELETE: users can only delete their own RSVP
+
+   Add event_rsvps to the supabase_realtime publication.
+
+2. Update src/lib/types.ts:
+   - Add EventRsvp interface: { id, itinerary_item_id, user_id, status, created_at, updated_at }
+   - Add RsvpStatus type: 'going' | 'interested' | 'not_going'
+   - Add RsvpSummary type: { going: number, interested: number, not_going: number, userStatus: RsvpStatus | null }
+
+3. Create src/hooks/useEventRsvps.ts:
+   - Accepts an itinerary_item_id
+   - Fetches all RSVPs for that item
+   - Computes counts: { going, interested, not_going }
+   - Determines the current user's RSVP status (or null if they haven't responded)
+   - Provides a setRsvp(status) function that upserts the RSVP row
+   - Subscribes to Supabase Realtime on event_rsvps filtered by itinerary_item_id for live count updates
+   - Cleans up subscription on unmount
+
+4. Create src/components/trip/RsvpButtons.tsx:
+   - Three buttons in a row: "Going" (check icon), "Interested" (star icon), "Not Going" (X icon)
+   - The currently selected status button is highlighted with a distinct color (Going=green, Interested=amber, Not Going=muted)
+   - Clicking the same button again deselects it (deletes the RSVP)
+   - Below the buttons, show counts: "12 going · 5 interested"
+   - Don't show "not going" count prominently — just show it on hover/tap as a tooltip
+   - Optimistic UI: update the button state immediately, revert on error
+   - Only show for itinerary items where item_type = 'event' (not hotels or commutes)
+
+5. Wire RsvpButtons into ItineraryCard.tsx:
+   - Show a compact version on the card itself: just a small "✓ 12" going count badge
+   - Full RSVP buttons appear in the expanded ItineraryDetail view
+
+6. Create src/components/trip/RsvpList.tsx:
+   - Shows who's going/interested/not going as avatar rows grouped by status
+   - Accessible from the ItineraryDetail view via a "See who's going" link
+   - Opens as a bottom sheet on mobile, modal on desktop
+
+7. Update the /api/trip/[tripId]/view endpoint to include RSVP counts (but NOT individual RSVPs — view-only users just see aggregate counts, not who specifically).
+```
+
+**After this:** RSVP to events, verify counts update in real-time across browser tabs, verify the RSVP list shows correct groupings.
+
+**Tests to write for this session:**
+
+```
+Write the following tests:
+
+supabase/tests/002_rsvp_policies.sql (pgTAP):
+- Participant can create their own RSVP
+- Participant CANNOT create an RSVP with someone else's user_id
+- Participant can read all RSVPs for items in their trip
+- Participant can update only their own RSVP
+- Participant can delete only their own RSVP
+- Non-participant cannot read RSVPs for items in trips they're not in
+- RSVP is deleted when the itinerary item is deleted (CASCADE)
+- RSVP is deleted when the user is removed from the trip (test: kick user → their RSVPs are cleaned up)
+
+tests/hooks/use-event-rsvps.test.ts (Vitest):
+- Hook returns correct counts for going/interested/not_going
+- Hook returns current user's status
+- setRsvp('going') creates/updates the RSVP row
+- Calling setRsvp with the same status deletes the RSVP (toggle off)
+- Hook handles the case where user has no RSVP (status = null)
+
+e2e/rsvp.spec.ts (Playwright):
+- Event card shows a going count badge
+- Opening event detail shows the three RSVP buttons
+- Clicking "Going" highlights the button and increments the count
+- Clicking "Going" again deselects it and decrements the count
+- Switching from "Going" to "Interested" updates both counts
+- "See who's going" link opens the RSVP list with correct groupings
+- RSVP buttons do NOT appear for hotel or commute items
+- Real-time: User A RSVPs in one tab → count updates in User B's tab without refresh
+- View-only page shows aggregate RSVP counts but no RSVP buttons
+
+Seed a trip with events and multiple participants who have RSVPs for the display tests.
+```
+
+---
+
+## Session 16: Event Comments with GIF Support
+
+```
+Add a comments section to events so participants can discuss details. Include a GIF picker powered by the Tenor API.
+
+1. Database migration — create supabase/migrations/003_event_comments.sql:
+
+   CREATE TABLE event_comments (
+     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+     itinerary_item_id uuid REFERENCES itinerary_items(id) ON DELETE CASCADE NOT NULL,
+     user_id uuid REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+     content text,
+     gif_url text,
+     created_at timestamptz DEFAULT now(),
+     updated_at timestamptz DEFAULT now(),
+     CHECK (content IS NOT NULL OR gif_url IS NOT NULL)
+   );
+
+   CREATE INDEX idx_event_comments_item ON event_comments(itinerary_item_id);
+   CREATE INDEX idx_event_comments_created ON event_comments(created_at);
+
+   RLS policies:
+   - SELECT: any trip participant can read comments on items in their trip
+   - INSERT: any trip participant can create comments (user_id must match auth.uid())
+   - UPDATE: users can only update their own comments (user_id = auth.uid())
+   - DELETE: users can delete their own comments. Organizers can delete any comment in their trip.
+
+   Add event_comments to the supabase_realtime publication.
+
+2. Set up Tenor GIF API:
+   - Add TENOR_API_KEY to .env.local.example
+   - Create src/app/api/gifs/search/route.ts — GET endpoint:
+     - Accepts ?q= search term and optional ?pos= for pagination
+     - Calls Tenor API v2: https://tenor.googleapis.com/v2/search?q={q}&key={key}&limit=20&media_filter=gif,tinygif&pos={pos}
+     - Returns array of { id, url (tinygif for preview), fullUrl (gif for display), width, height }
+     - Requires authentication (check session)
+   - Create src/app/api/gifs/trending/route.ts — GET endpoint for trending GIFs (shown by default before user types a search)
+
+3. Create src/components/ui/GifPicker.tsx:
+   - Search input at the top with debounced search (300ms)
+   - Grid of GIF thumbnails (use tinygif format for fast loading) in a masonry or 2-column layout
+   - Infinite scroll pagination using the Tenor "next" cursor
+   - Before searching, show trending GIFs
+   - Clicking a GIF selects it, shows a preview with "Send" and "Cancel" buttons
+   - Powered by Tenor attribution badge at the bottom (required by Tenor ToS)
+   - Smooth loading states with skeleton placeholders
+
+4. Create src/components/trip/EventComments.tsx:
+   - Comment list sorted by created_at ascending (oldest first, like a chat)
+   - Each comment shows: user avatar (small, 32px), user nickname (for this trip), timestamp, and either text content or a GIF (rendered as an img with max-width constraints)
+   - Comments that have both text and a GIF show text above the GIF
+   - Users can delete their own comments (small trash icon on hover/long-press). Organizers see the trash icon on all comments.
+   - Input area at the bottom: text input with a GIF button (opens GifPicker as a popover on desktop, bottom sheet on mobile) and a send button
+   - Pressing Enter sends the comment (Shift+Enter for newline)
+   - Maximum comment length: 500 characters
+   - Show "No comments yet — start the conversation!" when empty
+
+5. Create src/hooks/useEventComments.ts:
+   - Fetches comments for an itinerary item (with user profile info via join)
+   - Subscribe to Supabase Realtime for live comment updates
+   - Provides addComment(content, gifUrl), deleteComment(commentId) functions
+   - Optimistic UI: new comments appear immediately, revert on error
+
+6. Wire EventComments into ItineraryDetail.tsx:
+   - Show below the event details in the detail/modal view
+   - Show a comment count on the ItineraryCard ("💬 3" badge next to the RSVP count)
+   - Only show for participants (NOT on view-only pages)
+
+7. Update src/lib/types.ts with EventComment interface.
+```
+
+**After this:** Comment on events, send GIFs, verify comments appear in real-time, verify organizers can delete any comment, test the GIF search and pagination.
+
+**Tests to write for this session:**
+
+```
+Write the following tests:
+
+supabase/tests/003_comment_policies.sql (pgTAP):
+- Participant can create a comment on an event in their trip
+- Participant CANNOT create a comment on an event in a trip they're not in
+- Participant can read all comments on events in their trip
+- Participant can delete their own comments
+- Participant CANNOT delete other people's comments
+- Organizer CAN delete any comment in their trip
+- Planner CANNOT delete other people's comments (only organizer can)
+- Comment is deleted when the itinerary item is deleted (CASCADE)
+- Comment requires at least content OR gif_url (CHECK constraint)
+
+tests/api/gifs-search.test.ts (Vitest):
+- GET /api/gifs/search?q=happy returns GIF results
+- GET /api/gifs/search without auth returns 401
+- GET /api/gifs/search without ?q= returns 400
+- GET /api/gifs/trending returns trending GIFs
+
+tests/hooks/use-event-comments.test.ts (Vitest):
+- Hook returns comments sorted by created_at ascending
+- addComment creates a new comment and updates the list
+- deleteComment removes the comment from the list
+- Hook joins user profile info (avatar, nickname) with each comment
+
+e2e/comments.spec.ts (Playwright):
+- Event detail shows the comments section
+- User can type and send a text comment
+- Comment appears in the list with avatar, name, and timestamp
+- User can open the GIF picker, search for a GIF, and send it
+- GIF renders correctly in the comment list
+- User can delete their own comment (trash icon → confirmation → removed)
+- Organizer can delete any comment
+- Member cannot delete other people's comments
+- Pressing Enter sends the comment
+- Pressing Shift+Enter creates a newline instead of sending
+- Comment count badge shows on the itinerary card
+- Real-time: User A comments → comment appears in User B's view without refresh
+- Comments section is NOT shown on the view-only page
+- Max character validation: typing 501 characters shows an error or disables send
+
+Seed a trip with events and some pre-existing comments (text and GIF) for display tests.
+```
+
+---
+
+## Session 17: Invite Landing Experience
+
+```
+Currently, when an unauthenticated user opens an invite link, they just see a generic login screen. Redesign this to show a warm, inviting landing page with trip information before asking them to sign in.
+
+1. Create src/app/api/invite/preview/route.ts — GET endpoint:
+   - Accepts ?code= query param
+   - Validates the code exists and is active
+   - Uses the service role client to bypass RLS
+   - Returns LIMITED trip info: trip name, trip image_url, start_date, end_date, location_name, and the organizer's display_name and avatar_url
+   - Does NOT return: participant list, itinerary, description, or any sensitive details
+   - Returns the code_type so the frontend knows if this is a join or view code
+   - Returns 404 if code is invalid or inactive
+
+2. Create src/app/trip/[tripId]/invite-landing/page.tsx — The new invite landing page:
+   - This page is shown to unauthenticated users who visit a trip link with a join/join_planner code
+   - Layout (mobile-first):
+     - Trip header image as a large background/hero (with dark gradient overlay)
+     - "You're invited!" headline in a warm display font
+     - Trip name in large text
+     - Trip dates formatted nicely (e.g., "Mar 14 – 18, 2026")
+     - Location name
+     - "Hosted by [organizer name]" with their avatar
+     - A prominent "Sign in with Google to join" button (same style as LoginButton but larger and more inviting)
+     - Below the button: subtle text "You'll be able to see the full itinerary, RSVP to events, and coordinate with the group."
+   - If code_type='view': change the headline to "You've been shared a trip!" and the button to "Sign in with Google to view" with different subtitle text: "Sign in to explore the full itinerary and map."
+   - If the code is invalid: show a friendly "This invite link is no longer valid" message with a link to the home page
+   - The page should feel celebratory and warm — consider subtle background animations (floating confetti particles, gentle gradient animation)
+
+3. Update src/proxy.ts (middleware):
+   - When an unauthenticated user visits /trip/[tripId]?code={code} with a join or join_planner code, redirect to /trip/[tripId]/invite-landing?code={code} instead of directly to the login page
+   - This gives them the chance to see what they're being invited to before signing in
+   - After they click "Sign in with Google", the OAuth redirectTo should point to /trip/[tripId]/join?code={code} so the normal join flow picks up after authentication
+
+4. Make sure the existing flow still works for authenticated users — if a logged-in user visits a trip link with a join code, skip the landing page and go straight to the join flow.
+```
+
+**After this:** Open an invite link in an incognito window. Verify you see the invite landing page with trip info. Sign in and verify the join flow completes normally.
+
+**Tests to write for this session:**
+
+```
+Write the following tests:
+
+tests/api/invite-preview.test.ts (Vitest):
+- GET /api/invite/preview?code={valid_join_code} returns trip name, image, dates, location, organizer info
+- GET /api/invite/preview?code={valid_view_code} returns trip info with code_type='view'
+- GET /api/invite/preview?code={invalid_code} returns 404
+- GET /api/invite/preview?code={revoked_code} returns 404
+- Response does NOT include participant list, itinerary, or description
+- Response includes organizer's display_name and avatar_url
+
+e2e/invite-landing.spec.ts (Playwright):
+- Unauthenticated user with join code sees the invite landing page (NOT the login page)
+- Landing page shows: "You're invited!", trip name, dates, location, organizer name
+- Landing page shows the trip header image
+- "Sign in with Google to join" button is present and prominent
+- Clicking sign-in redirects to Google OAuth, then back to the join flow
+- Unauthenticated user with view code sees "You've been shared a trip!" variant
+- Invalid code shows "This invite link is no longer valid" message
+- Authenticated user with join code skips the landing page and goes straight to join flow
+- On mobile (375px): layout is single column, image fills width, text is readable
+- Page loads fast even with a large trip image (image is properly optimized)
+
+Use seed helpers to create trips with invite codes. Use Playwright's unauthenticated context for the landing page tests.
+```
+
+---
+
+## Session 18: User Info & Name Management
+
+```
+Improve the ability for users to edit their trip-specific info (nickname, arrival, departure) and allow organizers to change anyone's nickname.
+
+1. Enhance the "Edit my info" button (src/components/trip/EditMyInfoButton.tsx):
+   - Make it more visible on the trip page — instead of a small button, show it as a card/banner near the top of the page (below the participants row) that says "Set your travel details" if arrival/departure are empty, or "Update your info" if they're already set.
+   - Show a summary of what they've set: "Arriving Fri 3pm at JFK · Leaving Sun 2pm from JFK"
+   - Tapping the card opens the NicknameModal (pre-filled with current data)
+
+2. Improve the NicknameModal (src/components/trip/NicknameModal.tsx):
+   - Current fields: nickname, arrival time, arrival location, departure time, departure location
+   - Improve the date/time picker UX: use a combined date+time input or a calendar picker, not just raw datetime-local inputs
+   - Add helpful placeholders: arrival location → "e.g., JFK Airport, Airbnb address"
+   - Add validation: departure must be after arrival
+   - The modal should be a bottom sheet on mobile, centered modal on desktop
+   - Add a "Clear" button next to each field to reset it
+
+3. Allow the organizer to change anyone's nickname:
+   - On the participants page (ParticipantsView.tsx), add an "Edit Name" option to the organizer's action dropdown for each participant
+   - Clicking "Edit Name" opens a small inline editor or modal with just a nickname text input
+   - Create src/app/api/participants/nickname/route.ts — POST endpoint:
+     - Accepts { tripId, participantId, nickname }
+     - Validates the current user is the organizer of the trip
+     - Updates the trip_participants row's nickname field
+     - Returns success
+   - Show a toast confirmation: "Updated [old nickname] to [new nickname]"
+
+4. Update the RLS policies if needed:
+   - The organizer should be able to UPDATE the nickname field on any participant's row
+   - Check the existing UPDATE policy on trip_participants — it may only allow users to update their own row. If so, add a new policy: "Organizers can update any participant's nickname"
+   - Be careful not to let organizers change other fields (like arrival/departure) that belong to the participant — scope the policy or handle this in the API route logic
+
+5. Wire the real-time hook: when the organizer changes someone's nickname, it should update immediately for everyone viewing the trip.
+```
+
+**After this:** Edit your own nickname and arrival/departure. As the organizer, change another participant's nickname from the participants page. Verify changes appear in real-time.
+
+**Tests to write for this session:**
+
+```
+Write the following tests:
+
+tests/api/participants-nickname.test.ts (Vitest):
+- Organizer can change any participant's nickname → returns success
+- Organizer cannot change their own nickname via this endpoint (they use the normal edit flow)
+- Planner cannot change anyone's nickname → returns 403
+- Member cannot change anyone's nickname → returns 403
+- Non-participant cannot change nicknames → returns 403
+- Empty nickname is rejected → returns 400
+
+e2e/edit-user-info.spec.ts (Playwright):
+- "Set your travel details" banner appears when arrival/departure are empty
+- Tapping the banner opens the NicknameModal
+- NicknameModal fields are pre-filled with current data
+- Saving nickname updates the participant's display in the participants row
+- Saving arrival/departure shows the summary in the trip info banner
+- Departure before arrival shows a validation error
+- "Clear" button resets a field to empty
+- Organizer sees "Edit Name" option in participant action dropdown
+- Organizer clicks "Edit Name" → edits nickname → saves → nickname updates in the list
+- Non-organizer does NOT see "Edit Name" option
+- Real-time: organizer changes nickname → updated immediately in other user's view
+```
+
+---
+
+## Session 19: Expanded Kick Permissions for Planners
+
+```
+Currently only organizers can kick people from a trip. Allow planners to also kick members (but not other planners or the organizer).
+
+1. Update the RLS DELETE policy on trip_participants:
+   - Current policy: only the organizer can delete other participants (and cannot delete themselves)
+   - New policy: organizers can delete any non-organizer participant. Planners can delete members only (cannot delete other planners or the organizer). Members cannot delete anyone.
+   - Create a new migration: supabase/migrations/004_planner_kick.sql
+   - Drop the old DELETE policy and create the new one:
+     - Organizer can DELETE where target role != 'organizer'
+     - Planner can DELETE where target role = 'member'
+     - The organizer still CANNOT delete themselves
+
+2. Update src/app/api/participants/kick/route.ts:
+   - Currently checks if the user is the organizer. Update to also allow planners.
+   - Add role-based validation:
+     - If requester is organizer: can kick anyone except themselves
+     - If requester is planner: can kick members only. If they try to kick another planner or the organizer, return 403 with a descriptive error message.
+     - If requester is member: return 403
+   - Keep the "cannot kick the organizer" guard
+
+3. Update src/components/trip/ParticipantsView.tsx:
+   - Currently only shows the action dropdown (with "Kick from Trip") for the organizer
+   - Now also show it for planners, but with restrictions:
+     - Planners see "Kick from Trip" only on member rows (not on other planners or the organizer)
+     - Planners do NOT see "Make Planner" / "Make Member" role change options (that's still organizer-only)
+   - Organizers still see the full action dropdown on everyone except themselves
+
+4. Update the confirmation dialog for kicks:
+   - When a planner kicks a member, the dialog should say: "Remove [name] from this trip? They'll lose access to the itinerary and all trip details."
+   - Same message for organizer kicks
+
+5. Update the pgTAP RLS tests to cover the new policies.
+```
+
+**After this:** Log in as a planner and verify you can kick members but not other planners. Log in as a member and verify you cannot kick anyone. Verify the organizer can still kick everyone except themselves.
+
+**Tests to write for this session:**
+
+```
+Write the following tests:
+
+supabase/tests/004_planner_kick_policies.sql (pgTAP):
+- Organizer can DELETE a member's participant row
+- Organizer can DELETE a planner's participant row
+- Organizer CANNOT DELETE their own participant row
+- Planner can DELETE a member's participant row
+- Planner CANNOT DELETE another planner's participant row
+- Planner CANNOT DELETE the organizer's participant row
+- Member CANNOT DELETE any participant row
+
+tests/api/participants-kick-v2.test.ts (Vitest):
+- Organizer kicks member → success
+- Organizer kicks planner → success
+- Organizer kicks self → 403
+- Planner kicks member → success
+- Planner kicks another planner → 403 with descriptive error
+- Planner kicks organizer → 403 with descriptive error
+- Member kicks anyone → 403
+
+e2e/planner-kick.spec.ts (Playwright):
+- Planner sees "Kick from Trip" option on member rows
+- Planner does NOT see "Kick from Trip" on other planner rows
+- Planner does NOT see "Kick from Trip" on the organizer row
+- Planner does NOT see role change options (Make Planner / Make Member)
+- Planner clicks "Kick" on a member → confirmation → member is removed
+- Organizer still sees full action dropdown on all non-self participants
+- Member sees no action dropdown at all
+```
+
+---
+
+## Session 20: Partiful-Inspired Theme Overhaul
+
+```
+Redesign the entire app's visual identity to feel more sleek, bold, and fun — inspired by Partiful's aesthetic. This is a global theming change that affects every page.
+
+1. Update src/app/globals.css with a new color palette:
+   - Move away from the current warm/muted earthy tones
+   - New direction: dark, rich backgrounds with vibrant accent colors
+   - Primary background: deep charcoal/near-black (#0a0a0f or similar dark shade)
+   - Card/surface background: slightly lighter dark (#14141f) with subtle transparency/glassmorphism
+   - Accent color: vibrant gradient — electric purple to hot pink (#8b5cf6 → #ec4899) or similar eye-catching combo
+   - Text: crisp white (#fafafa) for primary, muted gray (#a1a1aa) for secondary
+   - Success/Going: bright green (#22c55e)
+   - Warning: amber (#f59e0b)
+   - Define all colors as CSS custom properties for easy per-trip theming later (Session 21)
+
+2. Update fonts:
+   - Replace the current display/body fonts with something more modern and sleek
+   - Display font: something bold and distinctive — try "Space Grotesk", "Clash Display", "Satoshi", or "Cabinet Grotesk" (check Google Fonts availability). The font should feel tech-forward but still playful.
+   - Body font: clean geometric sans — "DM Sans", "Plus Jakarta Sans", or "General Sans"
+   - Update next/font/google imports in src/app/layout.tsx
+   - Ensure font variables are set on :root and used via Tailwind theme config
+
+3. Update component styling across the app:
+   - **Cards** (TripCard, ItineraryCard): dark surface with subtle border (1px border with low-opacity white or accent color), rounded-2xl, hover effect with slight glow/border-color change. Consider a subtle glassmorphism effect (backdrop-blur + semi-transparent background).
+   - **Buttons**: primary buttons use the accent gradient, with a hover glow effect. Secondary buttons are outlined with the accent color. Smooth transitions on hover.
+   - **Inputs/textareas**: dark background (#1a1a2e), lighter border, focus ring uses the accent gradient color
+   - **Modals/bottom sheets**: dark background with blur backdrop. Subtle top border glow.
+   - **Badges** (role badges, RSVP counts, type badges): pill-shaped with accent-colored backgrounds at low opacity, bright text
+   - **Avatar rings**: thin accent-colored ring around avatars. Organizer: gold ring. Planner: accent ring.
+   - **Navigation**: dark top bar with blur effect, subtle bottom border
+
+4. Add micro-animations:
+   - Button press: subtle scale-down (0.97) on click
+   - Card hover: slight translateY(-2px) and shadow increase
+   - Page transitions: fade-in on route change (use Next.js loading.tsx with a smooth skeleton)
+   - Modals: slide-up with spring easing for bottom sheets, fade+scale for centered modals
+   - Toast notifications: slide-in from top with a smooth spring
+   - Expand/collapse: smooth height transitions for day sections
+
+5. Update the home/landing page (src/app/page.tsx):
+   - Dark, dramatic hero with animated gradient background (slowly shifting colors)
+   - Large wordmark in the display font
+   - Tagline in lighter weight
+   - The Google sign-in button should be prominent with a glow effect
+   - Consider subtle particle effects or floating shapes in the background (keep it performant — use CSS animations, not heavy JS)
+
+6. Update the dashboard (src/app/dashboard/page.tsx):
+   - Trip cards on a dark grid
+   - "Create New Trip" card with a dashed border and accent glow on hover
+   - Section headers with subtle accent underlines
+
+7. Make sure EVERYTHING still works — this is a styling-only session. No logic changes. Run through every page and verify nothing is broken.
+```
+
+**After this:** Navigate through every page of the app and verify the new theme looks consistent and polished. Check both mobile (375px) and desktop viewports. Ensure text is readable, contrast ratios are accessible (WCAG AA minimum), and all interactive elements are clearly distinguishable.
+
+**Tests to write for this session:**
+
+```
+Write the following tests:
+
+e2e/theme-overhaul.spec.ts (Playwright):
+- Home page: verify dark background renders (check computed background-color is dark)
+- Home page: verify display font is loaded (check font-family)
+- Dashboard: trip cards have the new dark styling (border, background)
+- Trip page: hero image still renders correctly with dark overlay
+- All buttons are visible and have adequate contrast (spot-check 3-4 key buttons)
+- Modals render with dark background and blur backdrop
+- Mobile (375px): all pages render correctly without overflow or text truncation
+- Desktop (1280px): layout adapts correctly (multi-column grids, centered modals)
+- Navigation between pages has smooth transitions (no jarring white flash)
+- The theme works in both mobile and desktop Playwright projects
+
+These are primarily visual regression tests. For each page, take a screenshot and compare against the expected layout. Use Playwright's toHaveScreenshot() for visual regression if set up, or at minimum verify key CSS properties.
+```
+
+---
+
+## Session 21: Per-Trip Custom Themes
+
+```
+Allow trip organizers to customize the visual theme of their specific trip page. This includes custom backgrounds, fonts, and special background effects.
+
+1. Database migration — create supabase/migrations/005_trip_themes.sql:
+
+   ALTER TABLE trips ADD COLUMN theme jsonb DEFAULT '{}'::jsonb;
+
+   The theme JSON structure:
+   {
+     "background": {
+       "type": "gradient" | "image" | "solid",
+       "value": "<css-gradient-string>" | "<image-url>" | "<hex-color>",
+       "overlay_opacity": 0.0-1.0
+     },
+     "font": {
+       "display": "<google-font-name>",
+       "body": "<google-font-name>"
+     },
+     "accent_color": "<hex-color>",
+     "effect": "none" | "confetti" | "sparkles" | "snow" | "fireflies" | "aurora",
+     "card_style": "glass" | "solid" | "outline"
+   }
+
+   RLS: only the organizer can UPDATE the theme column. All participants can read it.
+
+2. Create src/components/trip/TripThemeProvider.tsx:
+   - Context provider that wraps the trip page
+   - Reads the trip's theme JSON
+   - Dynamically loads Google Fonts if custom fonts are specified (use the Web Fonts API or add <link> tags dynamically)
+   - Sets CSS custom properties on the trip page container to override the global theme:
+     --trip-bg, --trip-accent, --trip-font-display, --trip-font-body, --trip-card-style
+   - Children components use these CSS variables, falling back to the global theme defaults
+
+3. Create src/components/trip/BackgroundEffects.tsx:
+   - Renders the selected background effect as a fixed, pointer-events-none overlay on the trip page
+   - Effects (all using lightweight CSS/Canvas animations — keep performance in mind):
+     - "confetti": colorful confetti pieces falling slowly (CSS animation with random delays)
+     - "sparkles": small twinkling dots that fade in and out at random positions
+     - "snow": white particles drifting down gently
+     - "fireflies": warm yellow dots floating with organic movement paths
+     - "aurora": subtle color waves across the top of the page (CSS gradient animation)
+     - "none": no effect (default)
+   - All effects should be subtle and not distracting — they're ambient background decoration
+   - Must be performant on mobile: use CSS animations where possible, limit particle count, use will-change and transform for GPU acceleration
+   - Respect prefers-reduced-motion: disable all effects if the user has reduced motion enabled
+
+4. Create src/app/trip/[tripId]/customize/page.tsx — Theme editor page:
+   - Only accessible to the trip organizer. Redirect non-organizers to the trip page.
+   - Live preview: the page shows a mini preview of the trip page with the current theme applied
+   - Sections:
+     a. **Background**: three options — Gradient (color picker for start/end colors + direction), Image (upload custom background image to Supabase Storage), Solid Color (single color picker). Overlay opacity slider.
+     b. **Fonts**: dropdowns for display and body fonts. Offer a curated list of 15-20 Google Fonts that look good: "Space Grotesk", "Clash Display", "DM Sans", "Plus Jakarta Sans", "Playfair Display", "Libre Baskerville", "Sora", "Outfit", "Inter Tight", "Bricolage Grotesque", "Crimson Pro", "Oswald", "Raleway", "Work Sans", "Archivo". Preview the font name in its own font.
+     c. **Accent Color**: color picker for the accent/highlight color used for buttons, badges, and links
+     d. **Special Effect**: visual picker showing a small animated preview of each effect (confetti, sparkles, snow, fireflies, aurora, none)
+     e. **Card Style**: three options — Glass (glassmorphism), Solid (opaque dark), Outline (transparent with border)
+   - "Save" and "Reset to Default" buttons
+   - Save updates the trips.theme JSON column
+   - Add a link to the customize page from the trip edit page (/trip/[tripId]/edit) — "Customize Theme" button
+
+5. Update the trip page (/trip/[tripId]/page.tsx) to wrap content in TripThemeProvider and render BackgroundEffects.
+
+6. Update the view-only page to also apply the custom theme — view-only visitors should see the styled trip page. The theme data should be included in the /api/trip/[tripId]/view endpoint response.
+```
+
+**After this:** Customize a trip's theme — change the background, fonts, accent color, and add a sparkle effect. Verify the theme applies to the trip page for all participants and view-only visitors. Test on mobile and desktop.
+
+**Tests to write for this session:**
+
+```
+Write the following tests:
+
+tests/api/trip-theme.test.ts (Vitest):
+- Organizer can update the theme column with valid JSON
+- Non-organizer cannot update the theme column → returns 403
+- Invalid theme JSON structure is rejected
+- View endpoint includes the theme data
+
+e2e/trip-theme.spec.ts (Playwright):
+- Organizer can access /trip/{tripId}/customize
+- Non-organizer visiting /trip/{tripId}/customize is redirected to the trip page
+- Background section: selecting "Gradient" shows color pickers, selecting "Solid" shows single picker
+- Font section: changing display font updates the preview in real-time
+- Effect section: selecting "sparkles" shows animated sparkles in the preview
+- Card style section: selecting "glass" updates card appearance in preview
+- Saving the theme → trip page reflects the new background, fonts, accent, and effect
+- "Reset to Default" clears the theme and reverts to the global theme
+- View-only page also shows the custom theme
+- On mobile: theme editor is usable (scrollable, all inputs accessible)
+- prefers-reduced-motion: effects are disabled (set via Playwright's emulateMedia)
+- Trip page with no custom theme (empty JSON) uses the global defaults correctly
+- Custom font loads correctly (verify via computed font-family)
+
+Seed a trip with a pre-existing theme JSON for some tests. Use a trip with no theme for the default fallback tests.
+```
+
+---
+
+## Session 22: Integration Tests & Final V2 Review
+
+```
+Run a comprehensive integration test pass across all V2 features to make sure they work together correctly.
+
+1. Run ALL existing tests and fix any that broke due to V2 changes:
+   - npm run test:db (RLS policy tests — including the new 002, 003, 004 migrations)
+   - npm run test:unit (Vitest — all API and component tests)
+   - npm run test:e2e (Playwright — all E2E tests)
+
+2. Write cross-feature integration tests in e2e/v2-integration.spec.ts:
+   - Create a trip → customize its theme → invite a user → user sees the invite landing page with the custom theme background → user joins → RSVPs to an event → comments on the event with a GIF → all data appears correctly
+   - Organizer creates an event with an end time → participant RSVPs "going" → another participant comments → organizer changes the first participant's nickname → all changes reflected in real-time across two browser contexts
+   - Planner kicks a member → member's RSVPs and comments remain (they're not deleted on kick, just orphaned with "Former participant" display) → verify the member can no longer access the trip
+   - View-only visitor sees: trip with custom theme, events with end times displayed, RSVP counts, but NO comments, NO RSVP buttons, and NO editing capabilities
+
+3. Security review for V2 features:
+   - Verify the Tenor API key is only used server-side (in /api/gifs/* routes, not in client code)
+   - Verify RSVP and comment RLS policies work correctly by testing direct Supabase calls as different roles
+   - Verify the invite preview endpoint doesn't leak sensitive trip data
+   - Verify custom theme JSON is sanitized (no script injection in font names or background values)
+   - Check that BackgroundEffects doesn't cause performance issues on low-end mobile (test with Playwright CPU throttling)
+
+4. Clean up:
+   - Remove any console.log statements added during V2 development
+   - Ensure all new env vars (TENOR_API_KEY) are documented in .env.local.example
+   - Verify TypeScript strict mode passes with no errors
+   - Run the linter and fix any issues
+
+All tests must pass.
+```
+
+---
+
+# Parallelization Guide
+
+Here's which sessions can be worked on simultaneously without conflicts:
+
+```
+ROUND 1 — These are all independent and touch different parts of the codebase:
+┌──────────────────────────────────────────────────────────────────┐
+│  Session 14 (End Times)         — touches: event forms, cards   │
+│  Session 17 (Invite Landing)    — touches: join flow, new page  │
+│  Session 18 (User Info / Names) — touches: participants page    │
+│  Session 19 (Planner Kick)      — touches: kick API, RLS       │
+│  Session 20 (Theme Overhaul)    — touches: global CSS, layout   │
+└──────────────────────────────────────────────────────────────────┘
+
+⚠️  Session 20 (Theme Overhaul) changes global styles, so if you run
+it in parallel with others, expect some merge conflicts in CSS classes.
+Consider running Session 20 FIRST or LAST in Round 1 to minimize conflicts.
+
+ROUND 2 — These depend on Round 1 completions:
+┌──────────────────────────────────────────────────────────────────┐
+│  Session 15 (RSVP)              — after Session 14 (end times   │
+│                                    are in the event detail view  │
+│                                    where RSVPs also appear)     │
+│  Session 16 (Comments + GIFs)   — after Session 14 (same        │
+│                                    event detail view)           │
+│  Session 21 (Per-Trip Themes)   — after Session 20 (needs the   │
+│                                    new global theme as a base)  │
+└──────────────────────────────────────────────────────────────────┘
+
+⚠️  Sessions 15 and 16 both add UI to the event detail view.
+They CAN run in parallel but will likely have merge conflicts in
+ItineraryDetail.tsx. Safer to run them sequentially: 15 then 16.
+
+ROUND 3 — After everything else:
+┌──────────────────────────────────────────────────────────────────┐
+│  Session 22 (Integration Tests) — after ALL other sessions      │
+└──────────────────────────────────────────────────────────────────┘
+
+RECOMMENDED SEQUENCE (maximizing parallelism):
+
+  Batch 1:  14 + 17 + 18 + 19    (4 parallel sessions)
+  Batch 2:  20                    (solo — global CSS changes)
+  Batch 3:  15 + 21              (2 parallel sessions)
+  Batch 4:  16                    (solo — builds on 15's event detail)
+  Batch 5:  22                    (integration tests)
+
+ALTERNATIVE (most aggressive parallelism, higher merge conflict risk):
+
+  Batch 1:  14 + 17 + 18 + 19 + 20   (5 parallel — resolve CSS conflicts after)
+  Batch 2:  15 + 16 + 21              (3 parallel — resolve event detail conflicts after)
+  Batch 3:  22                         (integration tests)
+```
