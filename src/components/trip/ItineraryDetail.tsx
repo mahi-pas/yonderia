@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import type { ItineraryListItem } from "@/hooks/useItinerary";
+import type { TripParticipantRole } from "@/lib/types";
 import { formatDayLabel } from "@/lib/utils";
 import { formatItineraryItemTime, getItineraryBadge } from "./ItineraryCard";
 
@@ -9,6 +10,9 @@ type ItineraryDetailProps = {
   isOpen: boolean;
   item: ItineraryListItem | null;
   onClose: () => void;
+  onDelete?: (item: ItineraryListItem) => void;
+  onEdit?: (item: ItineraryListItem) => void;
+  userRole?: TripParticipantRole | null;
 };
 
 function DetailRow({ label, value }: { label: string; value: string | null }) {
@@ -32,11 +36,19 @@ function formatDetailDateTime(value: string | null): string | null {
   return format(new Date(value), "MMM d, yyyy h:mm a");
 }
 
-export default function ItineraryDetail({ isOpen, item, onClose }: ItineraryDetailProps) {
+export default function ItineraryDetail({
+  isOpen,
+  item,
+  onClose,
+  onDelete,
+  onEdit,
+  userRole = null,
+}: ItineraryDetailProps) {
   if (!item) {
     return null;
   }
 
+  const canManage = userRole === "organizer" || userRole === "planner";
   const badge = getItineraryBadge(item.item_type);
   const originLabel = item.location_name ?? "Location coming together";
   const destinationLabel = item.destination_name ?? "Destination coming together";
@@ -52,10 +64,30 @@ export default function ItineraryDetail({ isOpen, item, onClose }: ItineraryDeta
       panelClassName="sm:max-w-2xl"
       title={item.title}
       footer={
-        <div className="flex justify-end">
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button variant="secondary" onClick={onClose}>
             Close
           </Button>
+          {canManage ? (
+            <Button
+              variant="secondary"
+              onClick={() => {
+                onEdit?.(item);
+              }}
+            >
+              Edit
+            </Button>
+          ) : null}
+          {canManage ? (
+            <Button
+              className="border border-[#e2a69a] bg-[#c84f3d] text-white hover:bg-[#b84231] focus:ring-[#ffd4be]"
+              onClick={() => {
+                onDelete?.(item);
+              }}
+            >
+              Delete
+            </Button>
+          ) : null}
         </div>
       }
     >

@@ -19,6 +19,7 @@ type CurrentParticipant = Pick<
   | "departure_time"
   | "id"
   | "nickname"
+  | "role"
 >;
 
 type LiveTripOverviewProps = {
@@ -48,6 +49,7 @@ export default function LiveTripOverview({
     groupedByDay,
     isLoading: isItineraryLoading,
     itineraryItems,
+    removeLocalItem,
     upsertLocalItem,
   } = useItinerary({
     initialItems: initialItineraryItems,
@@ -101,11 +103,14 @@ export default function LiveTripOverview({
       <DayItinerary
         canManage={canManageItinerary}
         currentUserId={currentUserId}
+        currentUserRole={currentParticipant?.role ?? null}
         error={itineraryError}
         groupedByDay={groupedByDay}
         isLoading={isItineraryLoading}
         items={itineraryItems}
+        onDeleted={removeLocalItem}
         onCreated={upsertLocalItem}
+        onUpdated={upsertLocalItem}
         tripEndDate={tripEndDate}
         tripId={tripId}
         tripStartDate={tripStartDate}

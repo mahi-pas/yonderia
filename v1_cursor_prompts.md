@@ -786,6 +786,90 @@ Seed a trip with events that have and don't have end times for display tests.
 
 ---
 
+## Session 14B: Edit & Delete Event Details
+
+```
+Currently events can only be created (via AddEventModal) and viewed (via ItineraryDetail). Add the ability for organizers and planners to edit existing events and delete them.
+
+1. Make AddEventModal support editing:
+   - Add an optional `editItem` prop of type ItineraryListItem to AddEventModal.
+   - When `editItem` is provided, the modal is in "edit mode":
+     - Title changes from "Add Event" to "Edit Event" (or "Edit Hotel" / "Edit Commute" based on item_type)
+     - All form fields are pre-filled with the existing item's data (title, description, times, locations, image)
+     - The item type tabs (Event / Hotel / Commute) are hidden — you can't change an event into a hotel
+     - The "Save" button text changes to "Save Changes"
+     - On submit: UPDATE the existing itinerary_items row instead of INSERTing a new one
+   - Create an `onUpdated` callback prop (in addition to the existing `onCreated`). Call the appropriate one based on mode.
+
+2. Add edit and delete actions to ItineraryDetail.tsx:
+   - When the current user is an organizer or planner, show an "Edit" button and a "Delete" button in the modal footer (alongside the existing "Close" button)
+   - Members see only the "Close" button (no edit or delete)
+   - "Edit" button opens AddEventModal in edit mode (pass the current item as `editItem`)
+   - "Delete" button shows a confirmation dialog: "Delete [item title]? This action cannot be undone." with "Cancel" and "Delete" buttons. Delete button is red/destructive styled.
+   - On delete confirmation: DELETE the itinerary_items row via Supabase client, then close the detail modal
+   - Pass the user's role as a prop to ItineraryDetail so it knows whether to show edit/delete buttons
+
+3. Add an API route for deletion (optional but recommended for audit trail):
+   - src/app/api/itinerary/delete/route.ts — POST endpoint:
+     - Accepts { itemId, tripId }
+     - Validates the user is authenticated and is an organizer or planner for the trip
+     - Deletes the itinerary_items row
+     - Returns success
+   - Alternatively, the client can delete directly via Supabase since the RLS policies on itinerary_items already allow organizers and planners to DELETE. If going this route, make sure the RLS DELETE policy exists and is correct.
+
+4. Verify existing RLS policies on itinerary_items:
+   - Organizers and planners should be able to UPDATE and DELETE itinerary items
+   - Members should NOT be able to UPDATE or DELETE
+   - If the DELETE policy is missing, create a migration to add it
+
+5. Wire real-time updates:
+   - The useItinerary hook already handles UPDATE and DELETE events from Supabase Realtime, so edited/deleted items should update automatically for all participants viewing the trip
+   - Verify this works: edit an event in one browser tab, confirm it updates in another tab
+
+6. Also allow editing directly from DayItinerary:
+   - Add a small edit icon (pencil) on each ItineraryCard, visible only to organizers/planners
+   - Tapping the edit icon opens AddEventModal in edit mode (bypassing the detail view for a quicker edit flow)
+   - The edit icon should NOT interfere with the card's normal click behavior (opening the detail view). Use stopPropagation on the edit icon click.
+
+7. When an event is edited in one browser, the image in the card/detail should update if the image was changed. Make sure the ItineraryCard re-renders with the new image_url from the real-time update.
+```
+
+**After this:** Edit an existing event — change its title, time, location, and image. Delete an event and verify it disappears. Confirm real-time updates work across tabs. Verify members cannot see edit/delete buttons.
+
+**Tests to write for this session:**
+
+```
+Write the following tests:
+
+tests/components/edit-event.test.tsx (Vitest):
+- AddEventModal in edit mode pre-fills all fields from the existing item
+- AddEventModal in edit mode hides item type tabs
+- AddEventModal in edit mode shows "Save Changes" button instead of "Save"
+- Submitting in edit mode calls UPDATE instead of INSERT
+
+e2e/edit-event.spec.ts (Playwright):
+- Organizer opens event detail → sees "Edit" and "Delete" buttons
+- Planner opens event detail → sees "Edit" and "Delete" buttons
+- Member opens event detail → sees only "Close" button (no edit or delete)
+- Organizer clicks "Edit" → AddEventModal opens pre-filled with the event's data
+- Editing the title and saving → card updates with the new title
+- Editing the time and saving → card shows the updated time
+- Editing the image and saving → card shows the new image
+- Organizer clicks "Delete" → confirmation dialog appears
+- Confirming delete → event is removed from the day section
+- Canceling delete → event remains
+- Quick-edit via pencil icon on ItineraryCard: opens AddEventModal in edit mode
+- Pencil icon is NOT visible to members
+- Real-time: User A edits an event → change appears in User B's view without refresh
+- Real-time: User A deletes an event → event disappears from User B's view without refresh
+- Editing a commute: origin and destination fields are pre-filled correctly
+- Editing a hotel: check-in and check-out times are pre-filled correctly
+
+Seed a trip with events, hotels, and commutes for the edit/delete tests.
+```
+
+---
+
 ## Session 15: RSVP System (Going / Interested / Not Going)
 
 ```
@@ -1410,7 +1494,8 @@ Run a comprehensive integration test pass across all V2 features to make sure th
 
 2. Write cross-feature integration tests in e2e/v2-integration.spec.ts:
    - Create a trip → customize its theme → invite a user → user sees the invite landing page with the custom theme background → user joins → RSVPs to an event → comments on the event with a GIF → all data appears correctly
-   - Organizer creates an event with an end time → participant RSVPs "going" → another participant comments → organizer changes the first participant's nickname → all changes reflected in real-time across two browser contexts
+   - Organizer creates an event with an end time → participant RSVPs "going" → another participant comments → organizer edits the event title → organizer changes the first participant's nickname → all changes reflected in real-time across two browser contexts
+   - Organizer creates an event → participants RSVP and comment → organizer deletes the event → RSVPs and comments are cascade-deleted → event disappears from all views in real-time
    - Planner kicks a member → member's RSVPs and comments remain (they're not deleted on kick, just orphaned with "Former participant" display) → verify the member can no longer access the trip
    - View-only visitor sees: trip with custom theme, events with end times displayed, RSVP counts, but NO comments, NO RSVP buttons, and NO editing capabilities
 
@@ -1452,20 +1537,30 @@ Consider running Session 20 FIRST or LAST in Round 1 to minimize conflicts.
 
 ROUND 2 — These depend on Round 1 completions:
 ┌──────────────────────────────────────────────────────────────────┐
-│  Session 15 (RSVP)              — after Session 14 (end times   │
-│                                    are in the event detail view  │
+│  Session 14B (Edit/Delete Events) — after Session 14 (reuses    │
+│                                      AddEventModal in edit mode,│
+│                                      modifies ItineraryDetail)  │
+│  Session 21 (Per-Trip Themes)     — after Session 20 (needs the │
+│                                      new global theme as base)  │
+└──────────────────────────────────────────────────────────────────┘
+
+Session 14B can run in parallel with Session 21 since they touch
+completely different areas (events vs. theming).
+
+ROUND 3 — These depend on Round 2 completions:
+┌──────────────────────────────────────────────────────────────────┐
+│  Session 15 (RSVP)              — after Session 14B (edit/delete│
+│                                    changes ItineraryDetail.tsx   │
 │                                    where RSVPs also appear)     │
-│  Session 16 (Comments + GIFs)   — after Session 14 (same        │
+│  Session 16 (Comments + GIFs)   — after Session 14B (same       │
 │                                    event detail view)           │
-│  Session 21 (Per-Trip Themes)   — after Session 20 (needs the   │
-│                                    new global theme as a base)  │
 └──────────────────────────────────────────────────────────────────┘
 
 ⚠️  Sessions 15 and 16 both add UI to the event detail view.
 They CAN run in parallel but will likely have merge conflicts in
 ItineraryDetail.tsx. Safer to run them sequentially: 15 then 16.
 
-ROUND 3 — After everything else:
+ROUND 4 — After everything else:
 ┌──────────────────────────────────────────────────────────────────┐
 │  Session 22 (Integration Tests) — after ALL other sessions      │
 └──────────────────────────────────────────────────────────────────┘
@@ -1473,15 +1568,15 @@ ROUND 3 — After everything else:
 RECOMMENDED SEQUENCE (maximizing parallelism):
 
   Batch 1:  14 + 17 + 18 + 19    (4 parallel sessions)
-  Batch 2:  20                    (solo — global CSS changes)
-  Batch 3:  15 + 21              (2 parallel sessions)
+  Batch 2:  14B + 20              (2 parallel — events & theming)
+  Batch 3:  15 + 21              (2 parallel — RSVP & per-trip themes)
   Batch 4:  16                    (solo — builds on 15's event detail)
   Batch 5:  22                    (integration tests)
 
 ALTERNATIVE (most aggressive parallelism, higher merge conflict risk):
 
   Batch 1:  14 + 17 + 18 + 19 + 20   (5 parallel — resolve CSS conflicts after)
-  Batch 2:  15 + 16 + 21              (3 parallel — resolve event detail conflicts after)
+  Batch 2:  14B + 15 + 16 + 21        (4 parallel — resolve event detail conflicts after)
   Batch 3:  22                         (integration tests)
 ```
 

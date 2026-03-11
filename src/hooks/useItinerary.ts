@@ -273,6 +273,7 @@ export function useItinerary({ enabled = true, initialItems = [], tripId }: UseI
     groupedByDay,
     isLoading,
     itineraryItems,
+    removeLocalItem: removeItineraryItem,
     upsertLocalItem: upsertItineraryItem,
   };
 }

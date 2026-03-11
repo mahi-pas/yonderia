@@ -31,10 +31,12 @@ type ImageSuggestion = {
 type AddEventModalProps = {
   currentUserId: string;
   dayDate: string;
+  editItem?: ItineraryListItem | null;
   existingItems: ItineraryListItem[];
   isOpen: boolean;
   onClose: () => void;
   onCreated: (item: ItineraryListItem) => void;
+  onUpdated?: (item: ItineraryListItem) => void;
   tripId: string;
 };
 
@@ -98,6 +100,16 @@ function toIsoDateTime(value: string): string | null {
   return new Date(value).toISOString();
 }
 
+function toDateTimeInputValue(value: string | null): string {
+  if (!value) {
+    return "";
+  }
+
+  const parsed = new Date(value);
+  const timezoneOffsetMs = parsed.getTimezoneOffset() * 60_000;
+  return new Date(parsed.getTime() - timezoneOffsetMs).toISOString().slice(0, 16);
+}
+
 function getDatePart(value: string): string | null {
   if (!value) {
     return null;
@@ -123,6 +135,56 @@ function getNextSortOrder(items: ItineraryListItem[], dayDate: string): number {
   }
 
   return Math.max(...dayItems.map((item) => item.sort_order)) + 1;
+}
+
+function getItemTypeLabel(itemType: ItineraryItemType): string {
+  return ITEM_TYPES.find((type) => type.id === itemType)?.label ?? "Item";
+}
+
+function createFormStateFromItem(item: ItineraryListItem): FormState {
+  return {
+    commuteArrivalDateTime: item.item_type === "commute" ? toDateTimeInputValue(item.end_time) : "",
+    commuteDepartureDateTime: item.item_type === "commute" ? toDateTimeInputValue(item.start_time) : "",
+    commuteDestination:
+      item.item_type === "commute"
+        ? {
+            latitude: item.destination_latitude,
+            longitude: item.destination_longitude,
+            name: item.destination_name ?? "",
+          }
+        : createEmptyLocation(),
+    commuteOrigin:
+      item.item_type === "commute"
+        ? {
+            latitude: item.latitude,
+            longitude: item.longitude,
+            name: item.location_name ?? "",
+          }
+        : createEmptyLocation(),
+    dayDate: item.day_date,
+    description: item.description ?? "",
+    eventEndDateTime: item.item_type === "event" ? toDateTimeInputValue(item.end_time) : "",
+    eventLocation:
+      item.item_type === "event"
+        ? {
+            latitude: item.latitude,
+            longitude: item.longitude,
+            name: item.location_name ?? "",
+          }
+        : createEmptyLocation(),
+    eventStartDateTime: item.item_type === "event" ? toDateTimeInputValue(item.start_time) : "",
+    hotelCheckInDateTime: item.item_type === "hotel" ? toDateTimeInputValue(item.start_time) : "",
+    hotelCheckOutDateTime: item.item_type === "hotel" ? toDateTimeInputValue(item.end_time) : "",
+    hotelLocation:
+      item.item_type === "hotel"
+        ? {
+            latitude: item.latitude,
+            longitude: item.longitude,
+            name: item.location_name ?? "",
+          }
+        : createEmptyLocation(),
+    title: item.title,
+  };
 }
 
 function buildImageQuery(itemType: ItineraryItemType, formState: FormState): string {
@@ -154,10 +216,12 @@ function getActiveLocationLabel(itemType: ItineraryItemType, formState: FormStat
 export default function AddEventModal({
   currentUserId,
   dayDate,
+  editItem = null,
   existingItems,
   isOpen,
   onClose,
   onCreated,
+  onUpdated,
   tripId,
 }: AddEventModalProps) {
   const supabase = useMemo(() => createClient(), []);
@@ -165,6 +229,7 @@ export default function AddEventModal({
   const [customImage, setCustomImage] = useState<ImageState | null>(null);
   const [draftItemId, setDraftItemId] = useState<string>(() => crypto.randomUUID());
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [formState, setFormState] = useState<FormState>(() => createInitialFormState(dayDate));
   const [imageSuggestions, setImageSuggestions] = useState<ImageSuggestion[]>([]);
   const [isImageUploading, setIsImageUploading] = useState(false);
@@ -173,6 +238,8 @@ export default function AddEventModal({
   const [itemType, setItemType] = useState<ItineraryItemType>("event");
   const [selectedSuggestionUrl, setSelectedSuggestionUrl] = useState<string | null>(null);
   const [showCustomUploader, setShowCustomUploader] = useState(false);
+  const isEditMode = editItem !== null;
+  const itemTypeLabel = getItemTypeLabel(itemType);
 
   useEffect(() => {
     if (!isOpen) {
@@ -181,17 +248,18 @@ export default function AddEventModal({
 
     customImageRef.current = null;
     setCustomImage(null);
-    setDraftItemId(crypto.randomUUID());
+    setDraftItemId(editItem?.id ?? crypto.randomUUID());
     setErrorMessage(null);
-    setFormState(createInitialFormState(dayDate));
+    setExistingImageUrl(editItem?.image_url ?? null);
+    setFormState(editItem ? createFormStateFromItem(editItem) : createInitialFormState(dayDate));
     setImageSuggestions([]);
     setIsImageUploading(false);
     setIsSaving(false);
     setIsSearchingImages(false);
-    setItemType("event");
+    setItemType(editItem?.item_type ?? "event");
     setSelectedSuggestionUrl(null);
     setShowCustomUploader(false);
-  }, [dayDate, isOpen]);
+  }, [dayDate, editItem, isOpen]);
 
   useEffect(() => {
     if (!isOpen || showCustomUploader || customImageRef.current) {
@@ -225,7 +293,9 @@ export default function AddEventModal({
         setSelectedSuggestionUrl((current) =>
           current && nextSuggestions.some((result) => result.imageUrl === current)
             ? current
-            : (nextSuggestions[0]?.imageUrl ?? null),
+            : isEditMode
+              ? null
+              : (nextSuggestions[0]?.imageUrl ?? null),
         );
       } catch (error) {
         if (controller.signal.aborted) {
@@ -248,11 +318,14 @@ export default function AddEventModal({
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [formState, isOpen, itemType, showCustomUploader]);
+  }, [formState, isEditMode, isOpen, itemType, showCustomUploader]);
 
-  const selectedSuggestion =
-    imageSuggestions.find((result) => result.imageUrl === selectedSuggestionUrl) ?? imageSuggestions[0] ?? null;
-  const previewImageUrl = customImage?.publicUrl ?? selectedSuggestion?.imageUrl ?? null;
+  const selectedSuggestion = selectedSuggestionUrl
+    ? imageSuggestions.find((result) => result.imageUrl === selectedSuggestionUrl) ?? null
+    : isEditMode
+      ? null
+      : (imageSuggestions[0] ?? null);
+  const previewImageUrl = customImage?.publicUrl ?? selectedSuggestion?.imageUrl ?? existingImageUrl ?? null;
   const locationLabel = getActiveLocationLabel(itemType, formState);
 
   const handleSave = async () => {
@@ -333,7 +406,6 @@ export default function AddEventModal({
     }
 
     const nextItem = {
-      created_by: currentUserId,
       day_date: itemDayDate ?? formState.dayDate,
       description: description || null,
       destination_latitude: itemType === "commute" ? formState.commuteDestination.latitude : null,
@@ -346,8 +418,7 @@ export default function AddEventModal({
           : itemType === "hotel"
             ? hotelCheckOutTime
             : commuteArrivalTime,
-      id: draftItemId,
-      image_url: customImage?.publicUrl ?? selectedSuggestion?.imageUrl ?? null,
+      image_url: customImage?.publicUrl ?? selectedSuggestion?.imageUrl ?? existingImageUrl ?? null,
       item_type: itemType,
       latitude:
         itemType === "event"
@@ -367,22 +438,43 @@ export default function AddEventModal({
           : itemType === "hotel"
             ? formState.hotelLocation.longitude
             : formState.commuteOrigin.longitude,
-      sort_order: getNextSortOrder(existingItems, itemDayDate ?? formState.dayDate),
       start_time:
         itemType === "event" ? eventStartTime : itemType === "hotel" ? hotelCheckInTime : commuteDepartureTime,
       title,
-      trip_id: tripId,
     };
 
     try {
-      // @ts-expect-error Supabase infers `never` here from the handcrafted Database type.
-      const { error } = await supabase.from("itinerary_items").insert(nextItem);
+      if (isEditMode && editItem) {
+        // @ts-expect-error Supabase infers `never` here from the handcrafted Database type.
+        const { error } = await supabase.from("itinerary_items").update(nextItem).eq("id", editItem.id).eq("trip_id", tripId);
 
-      if (error) {
-        throw error;
+        if (error) {
+          throw error;
+        }
+
+        onUpdated?.({
+          ...editItem,
+          ...nextItem,
+        });
+      } else {
+        const createdItem = {
+          ...nextItem,
+          created_by: currentUserId,
+          id: draftItemId,
+          sort_order: getNextSortOrder(existingItems, itemDayDate ?? formState.dayDate),
+          trip_id: tripId,
+        };
+
+        // @ts-expect-error Supabase infers `never` here from the handcrafted Database type.
+        const { error } = await supabase.from("itinerary_items").insert(createdItem);
+
+        if (error) {
+          throw error;
+        }
+
+        onCreated(createdItem);
       }
 
-      onCreated(nextItem);
       onClose();
     } catch (error) {
       setErrorMessage(
@@ -395,7 +487,7 @@ export default function AddEventModal({
 
   return (
     <Modal
-      description={`Adding to ${formatDayLabel(formState.dayDate)}.`}
+      description={`${isEditMode ? "Editing" : "Adding to"} ${formatDayLabel(formState.dayDate)}.`}
       isOpen={isOpen}
       onClose={() => {
         if (!isSaving) {
@@ -403,7 +495,7 @@ export default function AddEventModal({
         }
       }}
       panelClassName="sm:max-w-4xl"
-      title="Add to itinerary"
+      title={`${isEditMode ? "Edit" : "Add"} ${itemTypeLabel}`}
       footer={
         <div className="space-y-3">
           {errorMessage ? (
@@ -422,35 +514,37 @@ export default function AddEventModal({
                 void handleSave();
               }}
             >
-              {isSaving ? "Saving..." : `Save ${ITEM_TYPES.find((type) => type.id === itemType)?.label ?? "item"}`}
+              {isSaving ? "Saving..." : isEditMode ? "Save Changes" : `Save ${itemTypeLabel}`}
             </Button>
           </div>
         </div>
       }
     >
       <div className="space-y-6 pb-10">
-        <div className="inline-flex rounded-full border border-[#e7c4b3] bg-white/80 p-1">
-          {ITEM_TYPES.map((type) => (
-            <button
-              key={type.id}
-              className={[
-                "min-h-11 rounded-full px-4 text-sm font-semibold transition",
-                itemType === type.id
-                  ? "bg-[#c76038] text-white shadow-[0_14px_32px_rgba(199,96,56,0.24)]"
-                  : "text-[#6a3d2d] hover:bg-[#fff1ea]",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              type="button"
-              onClick={() => {
-                setErrorMessage(null);
-                setItemType(type.id);
-              }}
-            >
-              {type.label}
-            </button>
-          ))}
-        </div>
+        {!isEditMode ? (
+          <div className="inline-flex rounded-full border border-[#e7c4b3] bg-white/80 p-1">
+            {ITEM_TYPES.map((type) => (
+              <button
+                key={type.id}
+                className={[
+                  "min-h-11 rounded-full px-4 text-sm font-semibold transition",
+                  itemType === type.id
+                    ? "bg-[#c76038] text-white shadow-[0_14px_32px_rgba(199,96,56,0.24)]"
+                    : "text-[#6a3d2d] hover:bg-[#fff1ea]",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                type="button"
+                onClick={() => {
+                  setErrorMessage(null);
+                  setItemType(type.id);
+                }}
+              >
+                {type.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-5">
@@ -682,6 +776,7 @@ export default function AddEventModal({
                   onClick={() => {
                     customImageRef.current = null;
                     setCustomImage(null);
+                    setExistingImageUrl(null);
                     setShowCustomUploader(true);
                   }}
                 >
@@ -709,6 +804,7 @@ export default function AddEventModal({
                               .join(" ")}
                             type="button"
                             onClick={() => {
+                              setExistingImageUrl(null);
                               setSelectedSuggestionUrl(suggestion.imageUrl);
                             }}
                           >

@@ -1,8 +1,12 @@
 "use client";
 
 import { eachDayOfInterval, format, parseISO } from "date-fns";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { groupItineraryItemsByDay, type ItineraryListItem } from "@/hooks/useItinerary";
+import { createClient } from "@/lib/supabase/client";
+import type { TripParticipantRole } from "@/lib/types";
+import Button from "@/components/ui/Button";
+import Modal from "@/components/ui/Modal";
 import AddEventModal from "./AddEventModal";
 import ItineraryCard from "./ItineraryCard";
 import ItineraryDetail from "./ItineraryDetail";
@@ -10,11 +14,14 @@ import ItineraryDetail from "./ItineraryDetail";
 type DayItineraryProps = {
   canManage: boolean;
   currentUserId?: string;
+  currentUserRole?: TripParticipantRole | null;
   error?: string | null;
   groupedByDay?: Map<string, ItineraryListItem[]>;
   isLoading?: boolean;
   items: ItineraryListItem[];
+  onDeleted?: (itemId: string) => void;
   onCreated?: (item: ItineraryListItem) => void;
+  onUpdated?: (item: ItineraryListItem) => void;
   tripEndDate: string;
   tripId: string;
   tripStartDate: string;
@@ -23,21 +30,91 @@ type DayItineraryProps = {
 export default function DayItinerary({
   canManage,
   currentUserId,
+  currentUserRole = null,
   error = null,
   groupedByDay,
   isLoading = false,
   items,
+  onDeleted,
   onCreated,
+  onUpdated,
   tripEndDate,
   tripId,
   tripStartDate,
 }: DayItineraryProps) {
+  const supabase = useMemo(() => (canManage ? createClient() : null), [canManage]);
   const [activeDayForAdd, setActiveDayForAdd] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [editingItem, setEditingItem] = useState<ItineraryListItem | null>(null);
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>(() => ({
     [tripStartDate]: true,
   }));
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ItineraryListItem | null>(null);
   const resolvedGroupedByDay = useMemo(() => groupedByDay ?? groupItineraryItemsByDay(items), [groupedByDay, items]);
+
+  useEffect(() => {
+    if (!selectedItem) {
+      return;
+    }
+
+    const latestItem = items.find((item) => item.id === selectedItem.id) ?? null;
+
+    if (!latestItem) {
+      setSelectedItem(null);
+      return;
+    }
+
+    if (latestItem !== selectedItem) {
+      setSelectedItem(latestItem);
+    }
+  }, [items, selectedItem]);
+
+  const itemPendingDelete = selectedItem;
+
+  async function handleDelete() {
+    if (!itemPendingDelete) {
+      return;
+    }
+
+    if (!supabase) {
+      setDeleteError("You don't have permission to delete itinerary items.");
+      return;
+    }
+
+    setDeleteError(null);
+    setIsDeleting(true);
+
+    try {
+      const { error: deleteItemError } = await supabase
+        .from("itinerary_items")
+        .delete()
+        .eq("id", itemPendingDelete.id)
+        .eq("trip_id", tripId);
+
+      if (deleteItemError) {
+        throw deleteItemError;
+      }
+
+      onDeleted?.(itemPendingDelete.id);
+      setIsDeleteDialogOpen(false);
+      setSelectedItem(null);
+    } catch (deleteError) {
+      setDeleteError(
+        deleteError instanceof Error ? deleteError.message : "We couldn't delete that itinerary item right now.",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
+  function handleOpenEdit(item: ItineraryListItem) {
+    setDeleteError(null);
+    setSelectedItem(null);
+    setActiveDayForAdd(null);
+    setEditingItem(item);
+  }
 
   const days = useMemo(
     () =>
@@ -124,11 +201,13 @@ export default function DayItinerary({
                     {dayItems.length > 0 ? (
                       dayItems.map((item) => (
                         <ItineraryCard
+                          canEdit={canManage}
                           key={item.id}
                           item={item}
                           onClick={() => {
                             setSelectedItem(item);
                           }}
+                          onEdit={handleOpenEdit}
                         />
                       ))
                     ) : (
@@ -156,18 +235,24 @@ export default function DayItinerary({
         })}
       </div>
 
-      {canManage && currentUserId && activeDayForAdd ? (
+      {canManage && currentUserId && (activeDayForAdd || editingItem) ? (
         <AddEventModal
           currentUserId={currentUserId}
-          dayDate={activeDayForAdd}
+          dayDate={editingItem?.day_date ?? activeDayForAdd ?? tripStartDate}
+          editItem={editingItem}
           existingItems={items}
-          isOpen={Boolean(activeDayForAdd)}
+          isOpen={Boolean(activeDayForAdd || editingItem)}
           tripId={tripId}
           onClose={() => {
             setActiveDayForAdd(null);
+            setEditingItem(null);
           }}
           onCreated={(item) => {
             onCreated?.(item);
+          }}
+          onUpdated={(item) => {
+            onUpdated?.(item);
+            setEditingItem(null);
           }}
         />
       ) : null}
@@ -178,7 +263,58 @@ export default function DayItinerary({
         onClose={() => {
           setSelectedItem(null);
         }}
+        onDelete={() => {
+          setDeleteError(null);
+          setIsDeleteDialogOpen(true);
+        }}
+        onEdit={handleOpenEdit}
+        userRole={currentUserRole}
       />
+      <Modal
+        description="This action cannot be undone."
+        isOpen={isDeleteDialogOpen && itemPendingDelete !== null}
+        title={itemPendingDelete ? `Delete ${itemPendingDelete.title}?` : "Delete item?"}
+        onClose={() => {
+          if (!isDeleting) {
+            setDeleteError(null);
+            setIsDeleteDialogOpen(false);
+          }
+        }}
+        footer={
+          <div className="space-y-3">
+            {deleteError ? (
+              <div className="rounded-[1.25rem] border border-[#efb9a3] bg-[#fff1ea] px-4 py-3 text-sm text-[#8b3f22]">
+                {deleteError}
+              </div>
+            ) : null}
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <Button
+                disabled={isDeleting}
+                variant="secondary"
+                onClick={() => {
+                  setDeleteError(null);
+                  setIsDeleteDialogOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="border border-[#e2a69a] bg-[#c84f3d] text-white hover:bg-[#b84231] focus:ring-[#ffd4be]"
+                isLoading={isDeleting}
+                onClick={() => {
+                  void handleDelete();
+                }}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        }
+      >
+        <p className="text-sm leading-6 text-[#563a2e]">
+          {itemPendingDelete ? `Delete ${itemPendingDelete.title}? This action cannot be undone.` : ""}
+        </p>
+      </Modal>
     </section>
   );
 }
