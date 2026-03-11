@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const results = await searchImages(query, request.nextUrl.origin);
+    const results = await searchImages(query);
     return NextResponse.json({ results });
   } catch (error) {
     return NextResponse.json(

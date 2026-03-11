@@ -22,6 +22,8 @@ type ImageState = {
 
 type ImageSuggestion = {
   imageUrl: string;
+  photographerName: string;
+  photographerUrl: string;
   sourceUrl: string;
   title: string;
 };
@@ -621,29 +623,54 @@ export default function AddEventModal({
                 ) : null}
 
                 {imageSuggestions.length > 0 ? (
-                  <div className="grid grid-cols-3 gap-2">
-                    {imageSuggestions.map((suggestion) => {
-                      const isSelected = suggestion.imageUrl === selectedSuggestion?.imageUrl;
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-3 gap-2">
+                      {imageSuggestions.map((suggestion) => {
+                        const isSelected = suggestion.imageUrl === selectedSuggestion?.imageUrl;
 
-                      return (
-                        <button
-                          key={suggestion.imageUrl}
-                          className={[
-                            "overflow-hidden rounded-[1rem] border bg-white transition",
-                            isSelected ? "border-[#c76038] ring-2 ring-[#ffd5c2]" : "border-[#ecd0c2] hover:border-[#d88d68]",
-                          ]
-                            .filter(Boolean)
-                            .join(" ")}
-                          type="button"
-                          onClick={() => {
-                            setSelectedSuggestionUrl(suggestion.imageUrl);
-                          }}
+                        return (
+                          <button
+                            key={suggestion.imageUrl}
+                            className={[
+                              "overflow-hidden rounded-[1rem] border bg-white transition",
+                              isSelected ? "border-[#c76038] ring-2 ring-[#ffd5c2]" : "border-[#ecd0c2] hover:border-[#d88d68]",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            type="button"
+                            onClick={() => {
+                              setSelectedSuggestionUrl(suggestion.imageUrl);
+                            }}
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img alt={suggestion.title} className="h-20 w-full object-cover" src={suggestion.imageUrl} />
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {selectedSuggestion ? (
+                      <p className="text-xs text-[#a08072]">
+                        Photo by{" "}
+                        <a
+                          className="underline hover:text-[#6b4131]"
+                          href={selectedSuggestion.photographerUrl}
+                          rel="noopener noreferrer"
+                          target="_blank"
                         >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img alt={suggestion.title} className="h-20 w-full object-cover" src={suggestion.imageUrl} />
-                        </button>
-                      );
-                    })}
+                          {selectedSuggestion.photographerName}
+                        </a>{" "}
+                        on{" "}
+                        <a
+                          className="underline hover:text-[#6b4131]"
+                          href="https://unsplash.com?utm_source=yonderia&utm_medium=referral"
+                          rel="noopener noreferrer"
+                          target="_blank"
+                        >
+                          Unsplash
+                        </a>
+                      </p>
+                    ) : null}
                   </div>
                 ) : null}
               </div>

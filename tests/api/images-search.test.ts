@@ -43,12 +43,16 @@ describe("GET /api/images/search", () => {
     const results = [
       {
         imageUrl: "https://example.com/eiffel-1.jpg",
-        sourceUrl: "https://example.com/eiffel-article",
+        photographerName: "Annie Spratt",
+        photographerUrl: "https://unsplash.com/@anniespratt?utm_source=yonderia&utm_medium=referral",
+        sourceUrl: "https://unsplash.com/photos/abc123?utm_source=yonderia&utm_medium=referral",
         title: "Eiffel Tower at sunset",
       },
       {
         imageUrl: "https://example.com/eiffel-2.jpg",
-        sourceUrl: "https://example.com/eiffel-guide",
+        photographerName: "John Doe",
+        photographerUrl: "https://unsplash.com/@johndoe?utm_source=yonderia&utm_medium=referral",
+        sourceUrl: "https://unsplash.com/photos/def456?utm_source=yonderia&utm_medium=referral",
         title: "Picnic by the Eiffel Tower",
       },
     ];
