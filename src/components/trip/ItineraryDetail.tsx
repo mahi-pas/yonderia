@@ -1,6 +1,7 @@
 import { format } from "date-fns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "@/components/ui/Modal";
+import { createClient } from "@/lib/supabase/client";
 import type { ItineraryListItem } from "@/hooks/useItinerary";
 import type { RsvpSummary, TripParticipantRole } from "@/lib/types";
 import { formatDayLabel } from "@/lib/utils";
@@ -55,6 +56,29 @@ export default function ItineraryDetail({
 }: ItineraryDetailProps) {
   const [showRsvpList, setShowRsvpList] = useState(false);
   const [activeTab, setActiveTab] = useState<DetailTab>("details");
+  const [creatorName, setCreatorName] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!item?.created_by) {
+      setCreatorName(null);
+      return;
+    }
+    let isMounted = true;
+    const supabase = createClient();
+    supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", item.created_by)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!isMounted) return;
+        const name = data?.display_name?.trim();
+        setCreatorName(name || "Someone");
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [item?.id, item?.created_by]);
 
   if (!item) {
     return null;
@@ -184,6 +208,9 @@ export default function ItineraryDetail({
 
         <div className="grid gap-2 sm:grid-cols-2">
           <DetailRow label="Day" value={formatDayLabel(item.day_date)} />
+          {item.created_by && creatorName !== null ? (
+            <DetailRow label="Created by" value={creatorName} />
+          ) : null}
           {item.item_type === "commute" ? (
             <>
               <DetailRow label="Departure" value={startTimeLabel} />

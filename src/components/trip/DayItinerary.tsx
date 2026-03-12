@@ -172,13 +172,12 @@ export default function DayItinerary({
                     {dayItems.length > 0 ? (
                       dayItems.map((item) => (
                         <ItineraryCard
-                          canEdit={canManage}
+                          canEdit={false}
                           commentCount={commentCountByItemId[item.id] ?? null}
                           currentUserId={currentUserId}
                           key={item.id}
                           item={item}
                           onClick={() => setSelectedItem(item)}
-                          onEdit={handleOpenEdit}
                           rsvpSummary={item.rsvpSummary ?? null}
                         />
                       ))

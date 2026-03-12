@@ -5,6 +5,7 @@ import type { ItineraryItem, RsvpSummary } from "@/lib/types";
 
 export type ItineraryListItem = Pick<
   ItineraryItem,
+  | "created_by"
   | "day_date"
   | "description"
   | "destination_latitude"
@@ -138,6 +139,7 @@ function toItineraryListItem(
   item: Partial<ItineraryItem> & Pick<ItineraryItem, "day_date" | "id" | "item_type" | "sort_order" | "title">,
 ): ItineraryListItem {
   return {
+    created_by: item.created_by ?? null,
     day_date: item.day_date,
     description: item.description ?? null,
     destination_latitude: item.destination_latitude ?? null,
@@ -201,7 +203,7 @@ export function useItinerary({ enabled = true, initialItems = [], tripId }: UseI
       const { data, error: itineraryError } = await supabase
         .from("itinerary_items")
         .select(
-          "id, item_type, title, description, image_url, day_date, start_time, end_time, location_name, latitude, longitude, destination_name, destination_latitude, destination_longitude, sort_order",
+          "id, item_type, title, description, image_url, day_date, start_time, end_time, location_name, latitude, longitude, destination_name, destination_latitude, destination_longitude, sort_order, created_by",
         )
         .eq("trip_id", tripId);
 

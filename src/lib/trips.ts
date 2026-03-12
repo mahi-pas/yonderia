@@ -39,6 +39,7 @@ export type TripPageTrip = Pick<
 
 export type TripPageItineraryItem = Pick<
   ItineraryItem,
+  | "created_by"
   | "day_date"
   | "description"
   | "destination_latitude"
@@ -258,7 +259,7 @@ export async function getTripPageData(
     supabase
       .from("itinerary_items")
       .select(
-        "id, item_type, title, description, image_url, day_date, start_time, end_time, location_name, latitude, longitude, destination_name, destination_latitude, destination_longitude, sort_order",
+        "id, item_type, title, description, image_url, day_date, start_time, end_time, location_name, latitude, longitude, destination_name, destination_latitude, destination_longitude, sort_order, created_by",
       )
       .eq("trip_id", tripId)
       .order("day_date", { ascending: true })
