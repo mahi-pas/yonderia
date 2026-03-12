@@ -179,7 +179,6 @@ export default function OnboardingModal({
               Choose photo
               <input
                 accept="image/*"
-                capture="user"
                 className="sr-only"
                 type="file"
                 onChange={(event) => {

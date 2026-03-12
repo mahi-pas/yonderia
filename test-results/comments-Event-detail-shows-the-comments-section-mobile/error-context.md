@@ -1,0 +1,114 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - main [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e7]:
+        - link "Edit trip" [ref=e11] [cursor=pointer]:
+          - /url: /trip/5c901911-62f9-4dff-8039-9d1c08020f59/edit
+          - img [ref=e12]
+        - generic [ref=e16]:
+          - paragraph [ref=e17]: Jul 1, 2026 - Jul 3, 2026
+          - heading "Comments E2E Trip" [level=1] [ref=e18]
+          - paragraph [ref=e19]: Tokyo, Japan
+      - generic [ref=e20]:
+        - paragraph [ref=e21]: About this trip
+        - generic [ref=e22]: Trip created by Playwright test helper.
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - paragraph [ref=e26]: Travelers
+            - heading "Who's in" [level=2] [ref=e27]
+          - paragraph [ref=e28]: 2 total
+        - button "O ♛ Organizer MM Mina Member +2 See all" [ref=e29]:
+          - generic [ref=e30]:
+            - link "O ♛ Organizer" [ref=e31] [cursor=pointer]:
+              - /url: /profile/bfedcd7d-8425-48fc-9e37-6ac3df0f9fd4
+              - generic [ref=e32]:
+                - generic [ref=e33]:
+                  - generic [ref=e35]: O
+                  - generic [ref=e36]: ♛
+                - paragraph [ref=e37]: Organizer
+            - link "MM Mina Member" [ref=e38] [cursor=pointer]:
+              - /url: /profile/f51023a2-7abf-4816-85f1-970e076c12f2
+              - generic [ref=e39]:
+                - generic [ref=e42]: MM
+                - paragraph [ref=e43]: Mina Member
+            - button "+2 See all" [ref=e44]:
+              - generic [ref=e45]: "+2"
+              - generic [ref=e46]: See all
+      - button "Your trip details Set your travel details Add your nickname, arrival, and departure details so the crew knows your plan. Set details" [ref=e47]:
+        - generic [ref=e48]:
+          - generic [ref=e49]:
+            - paragraph [ref=e50]: Your trip details
+            - heading "Set your travel details" [level=2] [ref=e51]
+            - paragraph [ref=e52]: Add your nickname, arrival, and departure details so the crew knows your plan.
+          - generic [ref=e53]: Set details
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - paragraph [ref=e57]: Map
+            - heading "Trip at a glance" [level=2] [ref=e58]
+            - paragraph [ref=e59]: 1 pin visible
+          - button "Full screen" [ref=e60]
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - button "All" [pressed] [ref=e64]
+            - button "Day 1" [ref=e65]
+            - button "Day 2" [ref=e66]
+            - button "Day 3" [ref=e67]
+          - button "Open Comments Test Event pin" [ref=e70]: 🎉
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - generic [ref=e73]:
+            - paragraph [ref=e74]: Itinerary
+            - heading "Daily plan" [level=2] [ref=e75]
+          - paragraph [ref=e76]: 1 items
+        - generic [ref=e77]:
+          - generic [ref=e78]:
+            - button "Day 1 — Wed, Jul 1 1 item" [ref=e79]:
+              - generic [ref=e80]:
+                - heading "Day 1 — Wed, Jul 1" [level=3] [ref=e81]
+                - paragraph [ref=e82]: 1 item
+              - generic [ref=e83]: ›
+            - generic [ref=e86]:
+              - generic [ref=e87]:
+                - button "🗓 Event Time TBD 0 Comments Test Event Tokyo" [ref=e88]:
+                  - generic [ref=e90]: 🗓
+                  - generic [ref=e91]:
+                    - generic [ref=e92]:
+                      - generic [ref=e93]:
+                        - generic [ref=e94]: 🗓
+                        - text: Event
+                      - generic [ref=e95]: Time TBD
+                      - generic "0 going" [ref=e97]:
+                        - generic [ref=e98]: ✓
+                        - text: "0"
+                    - heading "Comments Test Event" [level=3] [ref=e99]
+                    - paragraph [ref=e100]: Tokyo
+                  - generic [ref=e101]: ›
+                - button "Edit Comments Test Event" [ref=e102]: ✎
+              - button "Add Event" [ref=e103]
+          - generic [ref=e104]:
+            - button "Day 2 — Thu, Jul 2 Nothing added yet." [ref=e105]:
+              - generic [ref=e106]:
+                - heading "Day 2 — Thu, Jul 2" [level=3] [ref=e107]
+                - paragraph [ref=e108]: Nothing added yet.
+              - generic [ref=e109]: ›
+            - generic [ref=e110]:
+              - generic [ref=e111]: Your crew hasn't added anything to this day yet.
+              - button "Add Event" [ref=e112]
+          - generic [ref=e113]:
+            - button "Day 3 — Fri, Jul 3 Nothing added yet." [ref=e114]:
+              - generic [ref=e115]:
+                - heading "Day 3 — Fri, Jul 3" [level=3] [ref=e116]
+                - paragraph [ref=e117]: Nothing added yet.
+              - generic [ref=e118]: ›
+            - generic [ref=e119]:
+              - generic [ref=e120]: Your crew hasn't added anything to this day yet.
+              - button "Add Event" [ref=e121]
+  - button "Open Next.js Dev Tools" [ref=e127] [cursor=pointer]:
+    - img [ref=e128]
+  - alert [ref=e131]
+```

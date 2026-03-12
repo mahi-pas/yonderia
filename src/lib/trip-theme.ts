@@ -33,6 +33,16 @@ export function validateTripTheme(payload: unknown): { ok: true; theme: TripThem
     if (typeof value !== "string") {
       return { ok: false, error: "Theme background value must be a string." };
     }
+    const dangerous = /javascript:|data:(?!image\/)/i;
+    if (dangerous.test(value)) {
+      return { ok: false, error: "Theme background value contains disallowed content." };
+    }
+    if (type === "image") {
+      const trimmed = value.trim();
+      if (trimmed && !/^https:\/\//i.test(trimmed) && !/^data:image\//i.test(trimmed)) {
+        return { ok: false, error: "Theme background image value must be an https URL or data:image URI." };
+      }
+    }
     let overlay_opacity: number | undefined;
     if (Object.prototype.hasOwnProperty.call(bg, "overlay_opacity")) {
       const o = bg.overlay_opacity;

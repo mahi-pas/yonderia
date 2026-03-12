@@ -225,9 +225,9 @@ test.beforeAll(async ({ browser }) => {
 });
 
 test.afterAll(async () => {
-  await organizerAuth.context.close();
-  await memberAuth.context.close();
-  await otherMemberAuth.context.close();
+  if (organizerAuth?.context) await organizerAuth.context.close();
+  if (memberAuth?.context) await memberAuth.context.close();
+  if (otherMemberAuth?.context) await otherMemberAuth.context.close();
 });
 
 test("Event detail shows the comments section", async () => {

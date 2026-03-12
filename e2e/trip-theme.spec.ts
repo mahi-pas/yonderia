@@ -146,8 +146,8 @@ test.afterAll(async () => {
   if (!authPool) return;
   const adminClient = createAdminClient();
   try {
-    await authPool.organizer.context.close();
-    await authPool.member.context.close();
+    await authPool.organizer?.context?.close();
+    await authPool.member?.context?.close();
   } finally {
     await deleteUser(adminClient, authPool.member.user.id);
     await deleteUser(adminClient, authPool.organizer.user.id);

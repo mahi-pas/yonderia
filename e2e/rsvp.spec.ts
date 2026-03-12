@@ -206,9 +206,9 @@ test.beforeAll(async ({ baseURL, browser }) => {
 });
 
 test.afterAll(async () => {
-  await organizerAuth.context.close();
-  await memberAuth.context.close();
-  await userBAuth.context.close();
+  if (organizerAuth?.context) await organizerAuth.context.close();
+  if (memberAuth?.context) await memberAuth.context.close();
+  if (userBAuth?.context) await userBAuth.context.close();
 });
 
 test("Event card shows a going count badge", async () => {

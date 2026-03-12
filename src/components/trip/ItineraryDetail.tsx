@@ -132,7 +132,7 @@ export default function ItineraryDetail({
             currentUserId={currentUserId}
             itineraryItemId={item.id}
             itemType={item.item_type}
-            rsvpSummary={rsvpSummary}
+            summary={rsvpSummary}
             variant="full"
           />
           {currentUserId ? (

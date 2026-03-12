@@ -1,0 +1,208 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - main [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e7]:
+        - img "Paris Itinerary Test Trip header" [ref=e8]
+        - link "Edit trip" [ref=e11] [cursor=pointer]:
+          - /url: /trip/5b3c1379-3ec4-4866-9abf-6dce1b91b857/edit
+          - img [ref=e12]
+        - generic [ref=e16]:
+          - paragraph [ref=e17]: May 1, 2026 - May 3, 2026
+          - heading "Paris Itinerary Test Trip" [level=1] [ref=e18]
+          - paragraph [ref=e19]: Paris, France
+      - generic [ref=e20]:
+        - paragraph [ref=e21]: About this trip
+        - generic [ref=e22]: A three-day Paris getaway with museums, trains, and a cozy hotel.
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - paragraph [ref=e26]: Travelers
+            - heading "Who's in" [level=2] [ref=e27]
+          - paragraph [ref=e28]: 1 total
+        - button "O ♛ Organizer +1 See all" [ref=e29]:
+          - generic [ref=e30]:
+            - link "O ♛ Organizer" [ref=e31] [cursor=pointer]:
+              - /url: /profile/d5ac9a06-891c-4915-a31d-7bb53e3cb79e
+              - generic [ref=e32]:
+                - generic [ref=e33]:
+                  - generic [ref=e35]: O
+                  - generic [ref=e36]: ♛
+                - paragraph [ref=e37]: Organizer
+            - button "+1 See all" [ref=e38]:
+              - generic [ref=e39]: "+1"
+              - generic [ref=e40]: See all
+      - button "Your trip details Set your travel details Add your nickname, arrival, and departure details so the crew knows your plan. Set details" [ref=e41]:
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - paragraph [ref=e44]: Your trip details
+            - heading "Set your travel details" [level=2] [ref=e45]
+            - paragraph [ref=e46]: Add your nickname, arrival, and departure details so the crew knows your plan.
+          - generic [ref=e47]: Set details
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - paragraph [ref=e51]: Map
+            - heading "Trip at a glance" [level=2] [ref=e52]
+            - paragraph [ref=e53]: 7 pins visible
+          - button "Full screen" [ref=e54]
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - button "All" [pressed] [ref=e58]
+            - button "Day 1" [ref=e59]
+            - button "Day 2" [ref=e60]
+            - button "Day 3" [ref=e61]
+          - generic [ref=e64]:
+            - generic:
+              - button "Keyboard shortcuts"
+            - region "Map" [ref=e65]
+            - generic [ref=e66]:
+              - generic [ref=e97]:
+                - generic:
+                  - generic:
+                    - button "Coffee Run" [ref=e99] [cursor=pointer]
+                    - button "Museum Visit" [ref=e100] [cursor=pointer]
+                    - button "Hotel Check-in" [ref=e101] [cursor=pointer]
+                    - button "Versailles Train" [ref=e102] [cursor=pointer]
+                    - button "Versailles Train" [ref=e103] [cursor=pointer]
+                    - button "Palace Tour" [ref=e104] [cursor=pointer]
+                    - button "Farewell Brunch" [ref=e105] [cursor=pointer]
+              - iframe [ref=e106]:
+                
+              - button "Map camera controls" [ref=e108] [cursor=pointer]
+              - link "Open this area in Google Maps (opens a new window)" [ref=e110] [cursor=pointer]:
+                - /url: https://maps.google.com/maps?ll=48.83581,2.2407&z=9&t=m&hl=en-US&gl=US&mapclient=apiv3
+                - img "Google" [ref=e112]
+              - generic [ref=e113]:
+                - button "Keyboard shortcuts" [ref=e119] [cursor=pointer]
+                - generic [ref=e124]: Map data ©2026 Google
+                - link "Terms (opens in new tab)" [ref=e129] [cursor=pointer]:
+                  - /url: https://www.google.com/intl/en-US_US/help/terms_maps.html
+                  - text: Terms
+      - generic [ref=e130]:
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - paragraph [ref=e133]: Itinerary
+            - heading "Daily plan" [level=2] [ref=e134]
+          - paragraph [ref=e135]: 6 items
+        - generic [ref=e136]:
+          - generic [ref=e137]:
+            - button "Day 1 — Fri, May 1 3 items" [ref=e138]:
+              - generic [ref=e139]:
+                - heading "Day 1 — Fri, May 1" [level=3] [ref=e140]
+                - paragraph [ref=e141]: 3 items
+              - generic [ref=e142]: ›
+            - generic [ref=e145]:
+              - generic [ref=e146]:
+                - button "Coffee Run Event 5:00 AM – 5:45 AM 0 Coffee Run Cafe de Flore" [ref=e147]:
+                  - img "Coffee Run" [ref=e149]
+                  - generic [ref=e150]:
+                    - generic [ref=e151]:
+                      - generic [ref=e152]:
+                        - generic [ref=e153]: 🗓
+                        - text: Event
+                      - generic [ref=e154]: 5:00 AM – 5:45 AM
+                      - generic "0 going" [ref=e156]:
+                        - generic [ref=e157]: ✓
+                        - text: "0"
+                    - heading "Coffee Run" [level=3] [ref=e158]
+                    - paragraph [ref=e159]: Cafe de Flore
+                  - generic [ref=e160]: ›
+                - button "Edit Coffee Run" [ref=e161]: ✎
+              - generic [ref=e162]:
+                - button "Museum Visit Event 10:00 AM – 12:00 PM 0 Museum Visit Louvre Museum" [ref=e163]:
+                  - img "Museum Visit" [ref=e165]
+                  - generic [ref=e166]:
+                    - generic [ref=e167]:
+                      - generic [ref=e168]:
+                        - generic [ref=e169]: 🗓
+                        - text: Event
+                      - generic [ref=e170]: 10:00 AM – 12:00 PM
+                      - generic "0 going" [ref=e172]:
+                        - generic [ref=e173]: ✓
+                        - text: "0"
+                    - heading "Museum Visit" [level=3] [ref=e174]
+                    - paragraph [ref=e175]: Louvre Museum
+                  - generic [ref=e176]: ›
+                - button "Edit Museum Visit" [ref=e177]: ✎
+              - generic [ref=e178]:
+                - button "Hotel Check-in Hotel Check-in time TBD Hotel Check-in Hotel Regina" [ref=e179]:
+                  - img "Hotel Check-in" [ref=e181]
+                  - generic [ref=e182]:
+                    - generic [ref=e183]:
+                      - generic [ref=e184]:
+                        - generic [ref=e185]: 🛏
+                        - text: Hotel
+                      - generic [ref=e186]: Check-in time TBD
+                    - heading "Hotel Check-in" [level=3] [ref=e187]
+                    - paragraph [ref=e188]: Hotel Regina
+                  - generic [ref=e189]: ›
+                - button "Edit Hotel Check-in" [ref=e190]: ✎
+              - button "Add Event" [ref=e191]
+          - generic [ref=e192]:
+            - button "Day 2 — Sat, May 2 2 items" [ref=e193]:
+              - generic [ref=e194]:
+                - heading "Day 2 — Sat, May 2" [level=3] [ref=e195]
+                - paragraph [ref=e196]: 2 items
+              - generic [ref=e197]: ›
+            - generic [ref=e198]:
+              - generic [ref=e199]:
+                - button "Versailles Train Commute Departs 4:30 AM → Arrives 5:15 AM Versailles Train Gare Montparnasse to Versailles Chateau" [ref=e200]:
+                  - img "Versailles Train" [ref=e202]
+                  - generic [ref=e203]:
+                    - generic [ref=e204]:
+                      - generic [ref=e205]:
+                        - generic [ref=e206]: ✈
+                        - text: Commute
+                      - generic [ref=e207]: Departs 4:30 AM → Arrives 5:15 AM
+                    - heading "Versailles Train" [level=3] [ref=e208]
+                    - paragraph [ref=e209]: Gare Montparnasse to Versailles Chateau
+                  - generic [ref=e210]: ›
+                - button "Edit Versailles Train" [ref=e211]: ✎
+              - generic [ref=e212]:
+                - button "Palace Tour Event 7:00 AM – 9:00 AM 0 Palace Tour Palace of Versailles" [ref=e213]:
+                  - img "Palace Tour" [ref=e215]
+                  - generic [ref=e216]:
+                    - generic [ref=e217]:
+                      - generic [ref=e218]:
+                        - generic [ref=e219]: 🗓
+                        - text: Event
+                      - generic [ref=e220]: 7:00 AM – 9:00 AM
+                      - generic "0 going" [ref=e222]:
+                        - generic [ref=e223]: ✓
+                        - text: "0"
+                    - heading "Palace Tour" [level=3] [ref=e224]
+                    - paragraph [ref=e225]: Palace of Versailles
+                  - generic [ref=e226]: ›
+                - button "Edit Palace Tour" [ref=e227]: ✎
+              - button "Add Event" [ref=e228]
+          - generic [ref=e229]:
+            - button "Day 3 — Sun, May 3 1 item" [ref=e230]:
+              - generic [ref=e231]:
+                - heading "Day 3 — Sun, May 3" [level=3] [ref=e232]
+                - paragraph [ref=e233]: 1 item
+              - generic [ref=e234]: ›
+            - generic [ref=e235]:
+              - generic [ref=e236]:
+                - button "Farewell Brunch Event 6:00 AM – 7:15 AM 0 Farewell Brunch Le Marais" [ref=e237]:
+                  - img "Farewell Brunch" [ref=e239]
+                  - generic [ref=e240]:
+                    - generic [ref=e241]:
+                      - generic [ref=e242]:
+                        - generic [ref=e243]: 🗓
+                        - text: Event
+                      - generic [ref=e244]: 6:00 AM – 7:15 AM
+                      - generic "0 going" [ref=e246]:
+                        - generic [ref=e247]: ✓
+                        - text: "0"
+                    - heading "Farewell Brunch" [level=3] [ref=e248]
+                    - paragraph [ref=e249]: Le Marais
+                  - generic [ref=e250]: ›
+                - button "Edit Farewell Brunch" [ref=e251]: ✎
+              - button "Add Event" [ref=e252]
+  - button "Open Next.js Dev Tools" [ref=e258] [cursor=pointer]:
+    - img [ref=e259]
+  - alert [ref=e262]
+```

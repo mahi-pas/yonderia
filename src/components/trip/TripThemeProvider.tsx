@@ -71,7 +71,7 @@ export default function TripThemeProvider({ children, theme }: TripThemeProvider
       "--trip-font-display": displayFont,
       "--trip-font-body": bodyFont,
       "--trip-card-style": cardStyle,
-    } as React.CSSProperties;
+    } as React.CSSProperties & Record<string, string>;
   }, [theme]);
 
   useEffect(() => {

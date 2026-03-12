@@ -50,7 +50,7 @@ export async function PATCH(
 
   const { error } = await supabase
     .from("trips")
-    .update({ theme: result.theme })
+    .update({ theme: result.theme } as never)
     .eq("id", tripId);
 
   if (error) {

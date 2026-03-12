@@ -34,6 +34,7 @@ export default function RsvpGoingAvatars({
     const supabase = createClient();
     let isMounted = true;
 
+    type ProfileRow = { id: string; avatar_url: string | null; display_name: string | null };
     supabase
       .from("profiles")
       .select("id, avatar_url, display_name")
@@ -41,7 +42,7 @@ export default function RsvpGoingAvatars({
       .then(({ data, error }) => {
         if (!isMounted || error) return;
         const map = new Map<string, { avatar_url: string | null; display_name: string | null }>();
-        for (const row of data ?? []) {
+        for (const row of (data ?? []) as ProfileRow[]) {
           map.set(row.id, { avatar_url: row.avatar_url, display_name: row.display_name });
         }
         setProfiles(map);

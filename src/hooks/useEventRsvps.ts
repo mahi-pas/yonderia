@@ -91,7 +91,7 @@ export function useEventRsvps({
             user_id: currentUserId,
             status,
             updated_at: new Date().toISOString(),
-          },
+          } as never,
           { onConflict: "itinerary_item_id,user_id" },
         );
 

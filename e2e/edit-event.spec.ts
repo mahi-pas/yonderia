@@ -238,12 +238,12 @@ test.beforeAll(async ({ baseURL, browser }) => {
 });
 
 test.afterAll(async () => {
-  await organizerAuth.context.close();
-  await plannerAuth.context.close();
-  await memberAuth.context.close();
-  await adminClient.auth.admin.deleteUser(organizerAuth.user.id);
-  await adminClient.auth.admin.deleteUser(plannerAuth.user.id);
-  await adminClient.auth.admin.deleteUser(memberAuth.user.id);
+  if (organizerAuth?.context) await organizerAuth.context.close();
+  if (plannerAuth?.context) await plannerAuth.context.close();
+  if (memberAuth?.context) await memberAuth.context.close();
+  if (organizerAuth?.user?.id) await adminClient.auth.admin.deleteUser(organizerAuth.user.id);
+  if (plannerAuth?.user?.id) await adminClient.auth.admin.deleteUser(plannerAuth.user.id);
+  if (memberAuth?.user?.id) await adminClient.auth.admin.deleteUser(memberAuth.user.id);
 });
 
 async function expectRoleActions(options: {

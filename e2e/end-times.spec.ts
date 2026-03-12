@@ -272,8 +272,8 @@ test.beforeAll(async ({ baseURL, browser }) => {
 });
 
 test.afterAll(async () => {
-  await organizerAuth.context.close();
-  await deleteUser(adminClient, organizerAuth.user.id);
+  if (organizerAuth?.context) await organizerAuth.context.close();
+  if (organizerAuth?.user?.id) await deleteUser(adminClient, organizerAuth.user.id);
 });
 
 test("Add Event modal has full datetime fields on Event and Commute", async () => {

@@ -182,12 +182,10 @@ test.beforeAll(async ({ baseURL, browser }) => {
 });
 
 test.afterAll(async () => {
-  await organizerAuth.context.close();
-
-  const { error } = await adminClient.auth.admin.deleteUser(organizerAuth.user.id);
-
-  if (error) {
-    throw error;
+  if (organizerAuth?.context) await organizerAuth.context.close();
+  if (organizerAuth?.user?.id) {
+    const { error } = await adminClient.auth.admin.deleteUser(organizerAuth.user.id);
+    if (error) throw error;
   }
 });
 

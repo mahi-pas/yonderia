@@ -73,6 +73,7 @@ export default function RsvpList({
     const supabase = createClient();
     let isMounted = true;
 
+    type ProfileRow = { id: string; display_name: string | null; avatar_url: string | null };
     supabase
       .from("profiles")
       .select("id, display_name, avatar_url")
@@ -80,7 +81,7 @@ export default function RsvpList({
       .then(({ data, error }) => {
         if (!isMounted || error) return;
         const map = new Map<string, { display_name: string | null; avatar_url: string | null }>();
-        for (const row of data ?? []) {
+        for (const row of (data ?? []) as ProfileRow[]) {
           map.set(row.id, { display_name: row.display_name, avatar_url: row.avatar_url });
         }
         setProfiles(map);

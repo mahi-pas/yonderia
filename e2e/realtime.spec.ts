@@ -199,10 +199,10 @@ test.beforeAll(async ({ baseURL, browser }) => {
 });
 
 test.afterAll(async () => {
-  await organizerAuth.context.close();
-  await viewerAuth.context.close();
-  await deleteUser(viewerAuth.user.id);
-  await deleteUser(organizerAuth.user.id);
+  if (organizerAuth?.context) await organizerAuth.context.close();
+  if (viewerAuth?.context) await viewerAuth.context.close();
+  if (viewerAuth?.user?.id) await deleteUser(viewerAuth.user.id);
+  if (organizerAuth?.user?.id) await deleteUser(organizerAuth.user.id);
 });
 
 test("local Supabase config enables Realtime", async () => {

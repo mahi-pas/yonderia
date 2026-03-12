@@ -34,7 +34,8 @@ export function useEventCommentCounts({
     for (const id of itineraryItemIds) {
       next[id] = 0;
     }
-    for (const row of data ?? []) {
+    type CommentRow = { itinerary_item_id: string };
+    for (const row of (data ?? []) as CommentRow[]) {
       const id = row.itinerary_item_id;
       if (id) next[id] = (next[id] ?? 0) + 1;
     }

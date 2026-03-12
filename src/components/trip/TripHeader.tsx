@@ -23,11 +23,11 @@ export default function TripHeader({
 }: TripHeaderProps) {
   return (
     <section className="trip-card relative isolate overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
-      <div className="relative h-[250px] w-full sm:h-[300px] lg:h-[400px]">
+      <div className="relative h-[250px] w-full sm:h-[300px] lg:h-[400px] bg-[var(--surface)]">
         {imageUrl ? (
           <Image
             alt={`${name} header`}
-            className="object-cover"
+            className="object-contain"
             fill
             priority
             sizes="100vw"
@@ -36,8 +36,6 @@ export default function TripHeader({
         ) : (
           <div className="h-full w-full bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.15)_0%,var(--surface)_50%,transparent_70%),linear-gradient(180deg,var(--surface),var(--background))]" />
         )}
-
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,rgba(10,10,15,0.4)_50%,rgba(10,10,15,0.85)_100%)]" />
 
         {canEdit && tripId ? (
           <div className="absolute right-4 top-4 z-10 sm:right-6 sm:top-6">
@@ -58,19 +56,19 @@ export default function TripHeader({
             </Link>
           </div>
         ) : null}
+      </div>
 
-        <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7 lg:p-9">
-          <div className="max-w-3xl space-y-3 text-[#fafafa]">
-            <p className="text-xs font-semibold tracking-wide uppercase text-[var(--muted)]">
-              {formatTripDateRange(startDate, endDate)}
-            </p>
-            <h1 className="font-display text-4xl leading-[0.92] text-balance sm:text-5xl lg:text-6xl text-[#fafafa]">
-              {name}
-            </h1>
-            <p className="text-sm text-[#d4d4d8] sm:text-base">
-              {locationName || "Location coming together"}
-            </p>
-          </div>
+      <div className="p-5 sm:p-7 lg:p-9">
+        <div className="max-w-3xl space-y-3">
+          <p className="text-xs font-semibold tracking-wide uppercase text-[var(--muted)]">
+            {formatTripDateRange(startDate, endDate)}
+          </p>
+          <h1 className="font-display text-4xl leading-[0.92] text-balance sm:text-5xl lg:text-6xl text-[var(--foreground)]">
+            {name}
+          </h1>
+          <p className="text-sm text-[var(--muted)] sm:text-base">
+            {locationName || "Location coming together"}
+          </p>
         </div>
       </div>
     </section>

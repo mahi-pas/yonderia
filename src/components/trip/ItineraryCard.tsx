@@ -143,7 +143,7 @@ export default function ItineraryCard({
                 currentUserId={currentUserId}
                 itineraryItemId={item.id}
                 itemType={item.item_type}
-                rsvpSummary={rsvpSummary}
+                summary={rsvpSummary}
                 variant="compact"
               />
             ) : null}

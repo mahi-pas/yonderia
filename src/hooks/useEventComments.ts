@@ -47,15 +47,18 @@ export function useEventComments({
       .select("user_id, nickname")
       .eq("trip_id", tripId);
 
+    type ParticipantRow = { user_id: string; nickname: string | null };
     const nicknameByUser = new Map<string, string | null>();
-    for (const p of participantsData ?? []) {
+    for (const p of (participantsData ?? []) as ParticipantRow[]) {
       nicknameByUser.set(p.user_id, p.nickname ?? null);
     }
 
-    const userIds = [...new Set((commentsData ?? []).map((c) => c.user_id))];
+    type CommentRow = Pick<EventComment, "id" | "itinerary_item_id" | "user_id" | "content" | "gif_url" | "created_at" | "updated_at">;
+    const commentsRows = (commentsData ?? []) as CommentRow[];
+    const userIds = [...new Set(commentsRows.map((c) => c.user_id))];
     if (userIds.length === 0) {
       setComments(
-        (commentsData ?? []).map((c) => ({
+        commentsRows.map((c) => ({
           ...c,
           author: {
             display_name: null,
@@ -73,14 +76,15 @@ export function useEventComments({
       .select("id, display_name, avatar_url")
       .in("id", userIds);
 
+    type ProfileRow = { id: string; display_name: string | null; avatar_url: string | null };
     const profileByUser = new Map(
-      (profilesData ?? []).map((p) => [
+      ((profilesData ?? []) as ProfileRow[]).map((p) => [
         p.id,
         { display_name: p.display_name ?? null, avatar_url: p.avatar_url ?? null },
       ]),
     );
 
-    const withAuthor: EventCommentWithAuthor[] = (commentsData ?? []).map((c) => {
+    const withAuthor: EventCommentWithAuthor[] = commentsRows.map((c) => {
       const profile = profileByUser.get(c.user_id);
       return {
         ...c,
@@ -163,7 +167,7 @@ export function useEventComments({
           user_id: user.id,
           content: content || null,
           gif_url: gifUrl || null,
-        })
+        } as never)
         .select("id, itinerary_item_id, user_id, content, gif_url, created_at, updated_at")
         .single();
 
