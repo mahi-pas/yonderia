@@ -111,7 +111,8 @@ export default function OnboardingModal({
         }
 
         const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
-        avatarUrl = data.publicUrl;
+        const separator = data.publicUrl.includes("?") ? "&" : "?";
+        avatarUrl = `${data.publicUrl}${separator}v=${Date.now()}`;
       }
 
       const updates = {

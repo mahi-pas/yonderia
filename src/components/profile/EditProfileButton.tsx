@@ -151,7 +151,9 @@ export default function EditProfileButton({
             pathPrefix={`${userId}/avatar`}
             onChange={(value) => {
               if (value) {
-                setAvatarUrl(value.publicUrl);
+                // Append cache-busting param so mobile/browser caches show the new image
+                const separator = value.publicUrl.includes("?") ? "&" : "?";
+                setAvatarUrl(`${value.publicUrl}${separator}v=${Date.now()}`);
                 setErrorMessage(null);
               }
             }}
