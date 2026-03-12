@@ -232,7 +232,7 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
             />
 
             <label className="block space-y-2">
-              <span className="block text-sm font-semibold text-[#d4d4d8]">Description</span>
+              <span className="block text-sm font-semibold text-[var(--foreground)]">Description</span>
               <textarea
                 className={inputClassName("min-h-36 resize-none")}
                 disabled={isSubmitting}

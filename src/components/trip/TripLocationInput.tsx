@@ -18,6 +18,7 @@ type GoogleMapsAutocompleteInstance = {
 type TripLocationInputProps = {
   disabled?: boolean;
   label?: string;
+  placeholder?: string;
   value: LocationValue;
   onChange: (value: LocationValue) => void;
 };
@@ -25,6 +26,7 @@ type TripLocationInputProps = {
 export default function TripLocationInput({
   disabled = false,
   label = "Location",
+  placeholder = "Where are you headed?",
   onChange,
   value,
 }: TripLocationInputProps) {
@@ -92,7 +94,7 @@ export default function TripLocationInput({
           : "You can type any location manually if autocomplete is unavailable."
       }
       label={label}
-      placeholder="Where are you headed?"
+      placeholder={placeholder}
       spellCheck={false}
       value={value.name}
       onChange={(event) => {

@@ -19,7 +19,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 ) {
   return (
     <label className="block space-y-2">
-      {label ? <span className="block text-sm font-medium text-[#d4d4d8]">{label}</span> : null}
+      {label ? <span className="block text-sm font-medium text-[var(--foreground)]">{label}</span> : null}
       <input ref={ref} className={inputClassName(className)} {...props} />
       {error ? <span className="block text-sm text-[#f87171]">{error}</span> : null}
       {!error && hint ? <span className="block text-sm text-[var(--muted-foreground)]">{hint}</span> : null}

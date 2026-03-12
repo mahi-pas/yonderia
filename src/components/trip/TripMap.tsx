@@ -5,11 +5,17 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getItineraryItemDaySpan, type ItineraryListItem } from "@/hooks/useItinerary";
 import { loadGoogleMapsApi, type GoogleMapsWindow } from "@/lib/google-maps";
+import { createClient } from "@/lib/supabase/client";
+import Button from "@/components/ui/Button";
+import Modal from "@/components/ui/Modal";
+import AddEventModal from "./AddEventModal";
 import ItineraryDetail from "./ItineraryDetail";
 
 type TripMapProps = {
   currentUserId?: string | null;
   items: ItineraryListItem[];
+  onDeleted?: (itemId: string) => void;
+  onUpdated?: (item: ItineraryListItem) => void;
   tripEndDate: string;
   tripId?: string;
   tripStartDate: string;
@@ -210,6 +216,8 @@ function createMarkerIcon(googleApi: GoogleMapsWindow, itemType: ItineraryListIt
 export default function TripMap({
   currentUserId = null,
   items = [],
+  onDeleted,
+  onUpdated,
   tripEndDate,
   tripId,
   tripStartDate,
@@ -217,8 +225,14 @@ export default function TripMap({
 }: TripMapProps) {
   const searchParams = useSearchParams();
   const isMockMode = searchParams.get("mapMock") === "1";
+  const canManage = userRole === "organizer" || userRole === "planner";
+  const supabase = useMemo(() => (canManage && tripId ? createClient() : null), [canManage, tripId]);
   const [activeDay, setActiveDay] = useState<"all" | string>("all");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [editingItem, setEditingItem] = useState<ItineraryListItem | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [mapStatus, setMapStatus] = useState<"loading" | "ready" | "unavailable">(
     isMockMode ? "ready" : "loading",
   );
@@ -251,6 +265,7 @@ export default function TripMap({
   );
 
   const visiblePoints = useMemo(() => visibleItems.flatMap(buildMapPoints), [visibleItems]);
+  const itemPendingDelete = selectedItem;
 
   const commuteSegments = useMemo(
     () =>
@@ -285,6 +300,82 @@ export default function TripMap({
     markerEntriesRef.current = [];
     polylinesRef.current = [];
   }, []);
+
+  useEffect(() => {
+    if (!selectedItem) {
+      return;
+    }
+
+    const latestItem = items.find((item) => item.id === selectedItem.id) ?? null;
+
+    if (!latestItem) {
+      setSelectedItem(null);
+      return;
+    }
+
+    if (latestItem !== selectedItem) {
+      setSelectedItem(latestItem);
+    }
+  }, [items, selectedItem]);
+
+  useEffect(() => {
+    if (!editingItem) {
+      return;
+    }
+
+    const latestItem = items.find((item) => item.id === editingItem.id) ?? null;
+
+    if (!latestItem) {
+      setEditingItem(null);
+      return;
+    }
+
+    if (latestItem !== editingItem) {
+      setEditingItem(latestItem);
+    }
+  }, [editingItem, items]);
+
+  async function handleDelete() {
+    if (!itemPendingDelete) {
+      return;
+    }
+
+    if (!supabase || !tripId) {
+      setDeleteError("You don't have permission to delete itinerary items.");
+      return;
+    }
+
+    setDeleteError(null);
+    setIsDeleting(true);
+
+    try {
+      const { error: deleteItemError } = await supabase
+        .from("itinerary_items")
+        .delete()
+        .eq("id", itemPendingDelete.id)
+        .eq("trip_id", tripId);
+
+      if (deleteItemError) {
+        throw deleteItemError;
+      }
+
+      onDeleted?.(itemPendingDelete.id);
+      setIsDeleteDialogOpen(false);
+      setSelectedItem(null);
+    } catch (deleteError) {
+      setDeleteError(
+        deleteError instanceof Error ? deleteError.message : "We couldn't delete that itinerary item right now.",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
+  function handleOpenEdit(item: ItineraryListItem) {
+    setDeleteError(null);
+    setSelectedItem(null);
+    setEditingItem(item);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -670,9 +761,79 @@ export default function TripMap({
         onClose={() => {
           setSelectedItem(null);
         }}
+        onDelete={() => {
+          setDeleteError(null);
+          setIsDeleteDialogOpen(true);
+        }}
+        onEdit={handleOpenEdit}
         tripId={tripId}
         userRole={userRole}
       />
+      {canManage && currentUserId && tripId && editingItem ? (
+        <AddEventModal
+          currentUserId={currentUserId}
+          dayDate={editingItem.day_date}
+          editItem={editingItem}
+          existingItems={items}
+          isOpen={editingItem !== null}
+          tripId={tripId}
+          onClose={() => {
+            setEditingItem(null);
+          }}
+          onCreated={() => {
+            // The map only edits existing items.
+          }}
+          onUpdated={(item) => {
+            onUpdated?.(item);
+            setEditingItem(null);
+          }}
+        />
+      ) : null}
+      <Modal
+        description="This action cannot be undone."
+        isOpen={isDeleteDialogOpen && itemPendingDelete !== null}
+        title={itemPendingDelete ? `Delete ${itemPendingDelete.title}?` : "Delete item?"}
+        onClose={() => {
+          if (!isDeleting) {
+            setDeleteError(null);
+            setIsDeleteDialogOpen(false);
+          }
+        }}
+        footer={
+          <div className="space-y-3">
+            {deleteError ? (
+              <div className="rounded-xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
+                {deleteError}
+              </div>
+            ) : null}
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <Button
+                disabled={isDeleting}
+                variant="secondary"
+                onClick={() => {
+                  setDeleteError(null);
+                  setIsDeleteDialogOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="border border-[#ef4444]/30 bg-[#ef4444] text-white hover:bg-[#dc2626] focus:ring-[#8b5cf6]/30"
+                isLoading={isDeleting}
+                onClick={() => {
+                  void handleDelete();
+                }}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        }
+      >
+        <p className="text-sm leading-6 text-[#d4d4d8]">
+          {itemPendingDelete ? `Delete ${itemPendingDelete.title}? This action cannot be undone.` : ""}
+        </p>
+      </Modal>
     </section>
   );
 }

@@ -71,18 +71,19 @@ function createEmptyLocation(): LocationState {
 }
 
 function createInitialFormState(dayDate: string): FormState {
+  const datePart = dayDate || new Date().toISOString().slice(0, 10);
   return {
-    commuteArrivalDateTime: "",
-    commuteDepartureDateTime: "",
+    commuteArrivalDateTime: `${datePart}T10:00`,
+    commuteDepartureDateTime: `${datePart}T09:00`,
     commuteDestination: createEmptyLocation(),
     commuteOrigin: createEmptyLocation(),
     dayDate,
     description: "",
-    eventEndDateTime: "",
+    eventEndDateTime: `${datePart}T10:00`,
     eventLocation: createEmptyLocation(),
-    eventStartDateTime: "",
-    hotelCheckInDateTime: "",
-    hotelCheckOutDateTime: "",
+    eventStartDateTime: `${datePart}T09:00`,
+    hotelCheckInDateTime: `${datePart}T15:00`,
+    hotelCheckOutDateTime: `${datePart}T11:00`,
     hotelLocation: createEmptyLocation(),
     title: "",
   };
@@ -499,7 +500,7 @@ export default function AddEventModal({
       footer={
         <div className="space-y-3">
           {errorMessage ? (
-            <div className="rounded-2xl border border-[#7f1d1d] bg-[#450a0a] px-4 py-3 text-sm text-[#fca5a5]">
+            <div className="rounded-2xl border border-[var(--error)] bg-[var(--error)]/15 px-4 py-3 text-sm text-[var(--error)]">
               {errorMessage}
             </div>
           ) : null}
@@ -522,15 +523,15 @@ export default function AddEventModal({
     >
       <div className="space-y-6 pb-10">
         {!isEditMode ? (
-          <div className="inline-flex rounded-2xl border border-[#27272a] bg-[#18181b] p-1">
+          <div className="inline-flex rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] p-1">
             {ITEM_TYPES.map((type) => (
               <button
                 key={type.id}
                 className={[
                   "min-h-11 rounded-md px-4 text-sm font-semibold transition",
                   itemType === type.id
-                    ? "bg-[#ff6b6b] text-[#09090b]"
-                    : "border border-[#27272a] bg-[#18181b] text-[#a1a1aa] hover:bg-[#27272a] focus:outline-none focus:ring-2 focus:ring-[#ff6b6b]/30",
+                    ? "bg-[var(--accent)] text-white"
+                    : "border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-elevated)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30",
                 ]
                   .filter(Boolean)
                   .join(" ")}
@@ -570,7 +571,7 @@ export default function AddEventModal({
             />
 
             <label className="block space-y-2">
-              <span className="block text-sm font-medium text-[#d4d4d8]">Description</span>
+              <span className="block text-sm font-medium text-[var(--foreground)]">Description</span>
               <textarea
                 className={inputClassName("min-h-28 resize-none")}
                 disabled={isSaving}
@@ -710,6 +711,7 @@ export default function AddEventModal({
                 <TripLocationInput
                   disabled={isSaving}
                   label="Origin"
+                  placeholder="Where are you leaving from?"
                   value={formState.commuteOrigin}
                   onChange={(value) => {
                     setFormState((current) => ({
@@ -734,21 +736,21 @@ export default function AddEventModal({
             ) : null}
           </div>
 
-          <div className="space-y-4 rounded-2xl border border-[#27272a] bg-[#18181b] p-4">
+          <div className="space-y-4 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] p-4">
             <div className="space-y-1">
-              <p className="text-sm font-medium text-[#d4d4d8]">Image</p>
-              <p className="text-sm leading-6 text-[#a1a1aa]">
+              <p className="text-sm font-medium text-[var(--foreground)]">Image</p>
+              <p className="text-sm leading-6 text-[var(--muted)]">
                 Auto-suggested from your title{locationLabel ? ` and ${locationLabel}` : ""}.
               </p>
             </div>
 
             {previewImageUrl ? (
-              <div className="overflow-hidden rounded-2xl border border-[#27272a] bg-[#27272a]">
+              <div className="overflow-hidden rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-elevated)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img alt={formState.title || "Suggested itinerary image"} className="h-48 w-full object-cover" src={previewImageUrl} />
               </div>
             ) : (
-              <div className="flex h-48 items-center justify-center rounded-2xl border border-dashed border-[#3f3f46] bg-[#18181b] px-4 text-center text-sm leading-6 text-[#a1a1aa]">
+              <div className="flex h-48 items-center justify-center rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface)] px-4 text-center text-sm leading-6 text-[var(--muted)]">
                 Start with a title and we&apos;ll look for a matching image.
               </div>
             )}
@@ -784,7 +786,7 @@ export default function AddEventModal({
                 </Button>
 
                 {isSearchingImages ? (
-                  <p className="text-sm text-[#a1a1aa]">Finding image suggestions...</p>
+                  <p className="text-sm text-[var(--muted)]">Finding image suggestions...</p>
                 ) : null}
 
                 {imageSuggestions.length > 0 ? (
@@ -797,8 +799,8 @@ export default function AddEventModal({
                           <button
                             key={suggestion.imageUrl}
                             className={[
-                              "overflow-hidden rounded-md border bg-[#18181b] transition",
-                              isSelected ? "border-[#ff6b6b] ring-2 ring-[#ff6b6b]/30" : "border-[#27272a] hover:border-[#3f3f46]",
+                              "overflow-hidden rounded-md border bg-[var(--surface)] transition",
+                              isSelected ? "border-[var(--accent)] ring-2 ring-[var(--accent)]/30" : "border-[var(--border-strong)] hover:border-[var(--border)]",
                             ]
                               .filter(Boolean)
                               .join(" ")}
@@ -816,10 +818,10 @@ export default function AddEventModal({
                     </div>
 
                     {selectedSuggestion ? (
-                      <p className="text-xs text-[#71717a]">
+                      <p className="text-xs text-[var(--muted-foreground)]">
                         Photo by{" "}
                         <a
-                          className="underline hover:text-[#ff6b6b]"
+                          className="underline hover:text-[var(--accent)]"
                           href={selectedSuggestion.photographerUrl}
                           rel="noopener noreferrer"
                           target="_blank"
@@ -828,7 +830,7 @@ export default function AddEventModal({
                         </a>{" "}
                         on{" "}
                         <a
-                          className="underline hover:text-[#ff6b6b]"
+                          className="underline hover:text-[var(--accent)]"
                           href="https://unsplash.com?utm_source=yonderia&utm_medium=referral"
                           rel="noopener noreferrer"
                           target="_blank"

@@ -286,7 +286,7 @@ export default function CreateTripFlow({ currentUserId }: CreateTripFlowProps) {
           />
 
           <label className="block space-y-2">
-            <span className="block text-sm font-medium text-[#d4d4d8]">Description</span>
+            <span className="block text-sm font-medium text-[var(--foreground)]">Description</span>
             <textarea
               className={inputClassName("min-h-36 resize-none")}
               disabled={isSubmitting}
@@ -303,7 +303,7 @@ export default function CreateTripFlow({ currentUserId }: CreateTripFlowProps) {
           </label>
 
           {errorMessage ? (
-            <div className="rounded-xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
+            <div className="rounded-xl border border-[var(--error)] bg-[var(--error)]/15 px-4 py-3 text-sm text-[var(--error)]">
               {errorMessage}
             </div>
           ) : null}

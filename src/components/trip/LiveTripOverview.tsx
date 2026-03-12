@@ -110,6 +110,8 @@ export default function LiveTripOverview({
       <TripMap
         currentUserId={currentUserId}
         items={itineraryItems}
+        onDeleted={removeLocalItem}
+        onUpdated={upsertLocalItem}
         tripEndDate={tripEndDate}
         tripId={tripId}
         tripStartDate={tripStartDate}

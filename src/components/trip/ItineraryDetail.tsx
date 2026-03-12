@@ -61,6 +61,8 @@ export default function ItineraryDetail({
   }
 
   const canManage = userRole === "organizer" || userRole === "planner";
+  const canDelete = canManage && typeof onDelete === "function";
+  const canEdit = canManage && typeof onEdit === "function";
   const badge = getItineraryBadge(item.item_type);
   const originLabel = item.location_name ?? "Location coming together";
   const destinationLabel = item.destination_name ?? "Destination coming together";
@@ -80,7 +82,7 @@ export default function ItineraryDetail({
           <Button variant="secondary" onClick={onClose}>
             Close
           </Button>
-          {canManage ? (
+          {canEdit ? (
             <Button
               variant="secondary"
               onClick={() => {
@@ -90,7 +92,7 @@ export default function ItineraryDetail({
               Edit
             </Button>
           ) : null}
-          {canManage ? (
+          {canDelete ? (
             <Button
               className="border border-[#ef4444/30] bg-[#dc2626] text-white hover:bg-[#b91c1c] focus:ring-[#8b5cf6]/30"
               onClick={() => {

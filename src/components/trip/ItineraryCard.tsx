@@ -168,9 +168,10 @@ export default function ItineraryCard({
       {canEdit && onEdit ? (
         <button
           aria-label={`Edit ${item.title}`}
-          className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--muted)] shadow-sm transition hover:border-[#8b5cf6]/40 hover:bg-[var(--surface-elevated)] focus:outline-none focus:ring-4 focus:ring-[#8b5cf6]/20"
+          className="absolute right-3 top-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--muted)] shadow-sm transition hover:border-[#8b5cf6]/40 hover:bg-[var(--surface-elevated)] focus:outline-none focus:ring-4 focus:ring-[#8b5cf6]/20"
           type="button"
           onClick={(event) => {
+            event.preventDefault();
             event.stopPropagation();
             onEdit(item);
           }}
