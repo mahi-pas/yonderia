@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { deleteOldAvatarFiles } from "@/lib/avatars";
 import type { Database, Profile } from "@/lib/types";
 
 type OnboardingModalProps = {
@@ -109,6 +110,8 @@ export default function OnboardingModal({
         if (uploadError) {
           throw uploadError;
         }
+
+        await deleteOldAvatarFiles(supabase, user.id, filePath);
 
         const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
         const separator = data.publicUrl.includes("?") ? "&" : "?";

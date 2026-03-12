@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Modal from "@/components/ui/Modal";
 import ImageUploader from "@/components/ui/ImageUploader";
+import { deleteOldAvatarFiles } from "@/lib/avatars";
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/types";
 
@@ -155,6 +156,8 @@ export default function EditProfileButton({
                 const separator = value.publicUrl.includes("?") ? "&" : "?";
                 setAvatarUrl(`${value.publicUrl}${separator}v=${Date.now()}`);
                 setErrorMessage(null);
+                // Remove previous avatar files (e.g. avatar.png when new is avatar.jpg)
+                void deleteOldAvatarFiles(supabase, userId, value.path);
               }
             }}
             onUploadingChange={setIsUploading}
