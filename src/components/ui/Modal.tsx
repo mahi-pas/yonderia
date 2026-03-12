@@ -27,9 +27,12 @@ export default function Modal({
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const touchStartYRef = useRef<number | null>(null);
   const isDraggingRef = useRef(false);
+  const onCloseRef = useRef(onClose);
   const [isMobile, setIsMobile] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [sheetOffset, setSheetOffset] = useState(0);
+
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     const syncViewport = () => {
@@ -55,7 +58,7 @@ export default function Modal({
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onClose();
+        onCloseRef.current();
       }
     };
 
@@ -68,7 +71,7 @@ export default function Modal({
       setIsVisible(false);
       setSheetOffset(0);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   const resetSheetPosition = () => {
     touchStartYRef.current = null;
