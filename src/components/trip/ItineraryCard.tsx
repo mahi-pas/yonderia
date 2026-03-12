@@ -157,13 +157,6 @@ export default function ItineraryCard({
           <h3 className="mt-2 line-clamp-2 text-base font-semibold text-[#fafafa] sm:text-lg">{item.title}</h3>
           <p className="mt-1 line-clamp-1 text-sm text-[var(--muted)]">{locationLabel}</p>
         </div>
-
-        <span
-          aria-hidden="true"
-          className="shrink-0 text-lg text-[#8b5cf6] transition group-hover:translate-x-0.5"
-        >
-          ›
-        </span>
       </button>
       {canEdit && onEdit ? (
         <button
