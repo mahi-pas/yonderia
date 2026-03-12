@@ -181,20 +181,20 @@ export default function CreateTripFlow({ currentUserId }: CreateTripFlowProps) {
   return (
     <>
       <button
-        className="group flex min-h-[18rem] w-full flex-col justify-between rounded-[2rem] border border-dashed border-[#d6a58f] bg-[linear-gradient(180deg,rgba(255,246,239,0.92),rgba(255,238,227,0.96))] p-5 text-left shadow-[0_22px_55px_rgba(112,58,34,0.12)] transition hover:-translate-y-1 hover:border-[#c86f4a] hover:shadow-[0_30px_65px_rgba(112,58,34,0.18)]"
+        className="group flex min-h-[18rem] w-full flex-col justify-between rounded-2xl border border-dashed border-[var(--border-strong)] bg-[linear-gradient(180deg,rgba(20,20,31,0.92),rgba(10,10,15,0.96))] p-5 text-left shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] transition-all duration-300 hover:-translate-y-px hover:border-[#8b5cf6]/50 hover:shadow-[0_4px_32px_rgba(139,92,246,0.15),0_8px_32px_rgba(0,0,0,0.25)]"
         type="button"
         onClick={openModal}
       >
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#c76038] text-3xl text-white shadow-[0_18px_40px_rgba(199,96,56,0.28)] transition group-hover:scale-105">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[image:var(--accent-gradient)] text-3xl text-white shadow-[0_2px_20px_rgba(139,92,246,0.3)] transition">
           +
         </div>
 
         <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b56445]">
+          <p className="text-xs font-semibold tracking-wide uppercase gradient-text">
             Start planning
           </p>
-          <h3 className="font-display text-3xl leading-none text-[#34180f]">Create New Trip</h3>
-          <p className="text-sm leading-6 text-[#6f4a3b]">
+          <h3 className="font-display text-3xl leading-none text-[#fafafa]">Create New Trip</h3>
+          <p className="text-sm leading-6 text-[var(--muted)]">
             Pick the dates, drop in a dreamy cover image, and get invite links ready in one go.
           </p>
         </div>
@@ -286,7 +286,7 @@ export default function CreateTripFlow({ currentUserId }: CreateTripFlowProps) {
           />
 
           <label className="block space-y-2">
-            <span className="block text-sm font-semibold text-[#5a2b1c]">Description</span>
+            <span className="block text-sm font-medium text-[#d4d4d8]">Description</span>
             <textarea
               className={inputClassName("min-h-36 resize-none")}
               disabled={isSubmitting}
@@ -303,7 +303,7 @@ export default function CreateTripFlow({ currentUserId }: CreateTripFlowProps) {
           </label>
 
           {errorMessage ? (
-            <div className="rounded-[1.25rem] border border-[#efb9a3] bg-[#fff1ea] px-4 py-3 text-sm text-[#8b3f22]">
+            <div className="rounded-xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
               {errorMessage}
             </div>
           ) : null}

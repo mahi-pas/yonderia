@@ -9,6 +9,33 @@ export type Json =
 export type InviteCodeType = "join" | "join_planner" | "view";
 export type TripParticipantRole = "organizer" | "planner" | "member";
 export type ItineraryItemType = "event" | "hotel" | "commute";
+export type RsvpStatus = "going" | "interested" | "not_going";
+
+export interface EventRsvp {
+  id: string;
+  itinerary_item_id: string;
+  user_id: string;
+  status: RsvpStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EventComment {
+  id: string;
+  itinerary_item_id: string;
+  user_id: string;
+  content: string | null;
+  gif_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RsvpSummary {
+  going: number;
+  interested: number;
+  not_going: number;
+  userStatus: RsvpStatus | null;
+}
 
 export interface Profile {
   id: string;
@@ -17,6 +44,25 @@ export interface Profile {
   avatar_url: string | null;
   has_completed_onboarding: boolean;
   created_at: string;
+}
+
+export type TripThemeBackgroundType = "gradient" | "image" | "solid";
+export type TripThemeEffect = "none" | "confetti" | "sparkles" | "snow" | "fireflies" | "aurora";
+export type TripThemeCardStyle = "glass" | "solid" | "outline";
+
+export interface TripTheme {
+  background?: {
+    type: TripThemeBackgroundType;
+    value: string;
+    overlay_opacity?: number;
+  };
+  font?: {
+    display: string;
+    body: string;
+  };
+  accent_color?: string;
+  effect?: TripThemeEffect;
+  card_style?: TripThemeCardStyle;
 }
 
 export interface Trip {
@@ -32,6 +78,7 @@ export interface Trip {
   default_planner_permission: boolean;
   created_by: string | null;
   created_at: string;
+  theme?: TripTheme | null;
 }
 
 export interface InviteCode {
@@ -109,6 +156,24 @@ export interface Database {
         Row: ItineraryItem;
         Insert: Omit<ItineraryItem, "created_at"> & { created_at?: string };
         Update: Partial<ItineraryItem>;
+        Relationships: [];
+      };
+      event_rsvps: {
+        Row: EventRsvp;
+        Insert: Omit<EventRsvp, "created_at" | "updated_at"> & {
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<EventRsvp>;
+        Relationships: [];
+      };
+      event_comments: {
+        Row: EventComment;
+        Insert: Omit<EventComment, "created_at" | "updated_at"> & {
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<EventComment>;
         Relationships: [];
       };
     };

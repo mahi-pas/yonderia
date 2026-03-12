@@ -51,16 +51,16 @@ export default function ParticipantsRow({
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">
+          <p className="text-xs font-semibold tracking-wide uppercase text-[#8b5cf6]">
             Travelers
           </p>
-          <h2 className="mt-1 font-display text-3xl leading-none text-[#34180f]">Who&apos;s in</h2>
+          <h2 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Who&apos;s in</h2>
         </div>
-        <p className="text-sm text-[#7e5b4c]">{participants.length} total</p>
+        <p className="text-sm text-[var(--muted)]">{participants.length} total</p>
       </div>
 
       <div
-        className="touch-pan-x overflow-x-auto overscroll-x-contain rounded-[1.75rem] border border-[#f0d5c7] bg-white/75 px-4 py-4 shadow-sm [scrollbar-width:none] [-ms-overflow-style:none]"
+        className="trip-card touch-pan-x overflow-x-auto overscroll-x-contain rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 px-4 py-4 shadow-sm backdrop-blur-sm [scrollbar-width:none] [-ms-overflow-style:none]"
         role={showSeeAll ? "button" : undefined}
         style={{ WebkitOverflowScrolling: "touch" }}
         tabIndex={showSeeAll ? 0 : undefined}
@@ -82,7 +82,7 @@ export default function ParticipantsRow({
             const content = (
               <div className="w-[4.5rem] shrink-0 snap-start text-center">
                 <div className="relative mx-auto h-16 w-16">
-                  <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-[#f6c4a7] text-lg font-semibold text-[#5a2b1c] shadow-[0_12px_22px_rgba(116,58,31,0.14)]">
+                  <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--surface)] bg-[var(--surface-elevated)] text-lg font-semibold text-[#d4d4d8] shadow-[0_4px_16px_rgba(0,0,0,0.2)] ring-1 ring-[#8b5cf6]/20">
                     {participant.avatarUrl ? (
                       <Image
                         alt={participant.name}
@@ -96,12 +96,18 @@ export default function ParticipantsRow({
                     )}
                   </div>
                   {badge ? (
-                    <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-white bg-[#3c1f15] text-xs text-[#ffe8c7] shadow-sm">
+                    <div
+                      className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border text-xs shadow-sm ${
+                        participant.role === "organizer"
+                          ? "border-[var(--border)] bg-[var(--gold)] text-[var(--background)]"
+                          : "border-[var(--border)] bg-[#8b5cf6] text-white"
+                      }`}
+                    >
                       {badge}
                     </div>
                   ) : null}
                 </div>
-                <p className="mt-3 line-clamp-2 text-xs font-semibold leading-5 text-[#563023]">
+                <p className="mt-3 line-clamp-2 text-xs font-semibold leading-5 text-[#d4d4d8]">
                   {participant.name}
                 </p>
               </div>
@@ -127,17 +133,17 @@ export default function ParticipantsRow({
 
           {showSeeAll ? (
             <button
-              className="flex h-[92px] w-[92px] shrink-0 snap-start flex-col items-center justify-center rounded-[1.5rem] border border-[#e8c3b2] bg-[linear-gradient(180deg,#fff7f2,#ffefe4)] text-center shadow-sm transition hover:border-[#cc7b58] hover:bg-[#fff4ec]"
+              className="flex h-[92px] w-[92px] shrink-0 snap-start flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface)] text-center shadow-sm transition hover:bg-[var(--surface-elevated)]"
               type="button"
               onClick={(event) => {
                 event.stopPropagation();
                 router.push(`/trip/${tripId}/participants`);
               }}
             >
-              <span className="font-display text-3xl leading-none text-[#4d2619]">
+              <span className="font-display text-3xl leading-none text-[#8b5cf6]">
                 +{participants.length}
               </span>
-              <span className="mt-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[#9a6a57]">
+              <span className="mt-1 text-xs font-semibold tracking-wide uppercase text-[var(--muted)]">
                 See all
               </span>
             </button>

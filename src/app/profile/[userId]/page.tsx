@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import EditProfileButton from "@/components/profile/EditProfileButton";
 import TripCard from "@/components/trip/TripCard";
+import PageBackground from "@/components/ui/PageBackground";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile, Trip, TripParticipant } from "@/lib/types";
@@ -194,30 +195,31 @@ export default async function ProfilePage({ params }: PageProps) {
   const resolvedTripCount = tripCount ?? 0;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
-      <div className="mx-auto max-w-3xl space-y-5">
-        <header className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,250,246,0.95),rgba(255,245,237,0.92))] p-5 shadow-[0_24px_70px_rgba(104,45,20,0.12)] sm:p-6">
+    <main className="page-bg relative min-h-screen px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
+      <PageBackground />
+      <div className="relative z-10 mx-auto max-w-3xl space-y-5">
+        <header className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 backdrop-blur-sm sm:p-6">
           <div className="flex items-start gap-4">
             <Link
               aria-label={viewer ? "Back to dashboard" : "Back to home"}
-              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-[#ebc5b5] bg-white text-xl text-[#6b4131] shadow-sm transition hover:bg-[#fff3eb]"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-xl text-[var(--muted)] transition hover:bg-[var(--surface-elevated)]"
               href={viewer ? "/dashboard" : "/"}
             >
               ←
             </Link>
 
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Profile</p>
-              <h1 className="mt-2 text-balance font-display text-4xl leading-none text-[#34180f] sm:text-5xl">
+              <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Profile</p>
+              <h1 className="mt-2 text-balance font-display text-4xl leading-none text-[#fafafa] sm:text-5xl">
                 {displayName}
               </h1>
             </div>
           </div>
         </header>
 
-        <section className="rounded-[2rem] border border-[#efd5c8] bg-white/80 px-5 py-8 text-center shadow-sm sm:px-8 sm:py-10">
+        <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 px-5 py-8 text-center backdrop-blur-sm sm:px-8 sm:py-10">
           <div className="mx-auto flex max-w-xl flex-col items-center">
-            <div className="relative flex h-[120px] w-[120px] items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[#f6c4a7] text-3xl font-semibold text-[#5a2b1c] shadow-[0_24px_55px_rgba(116,58,31,0.18)] sm:h-[160px] sm:w-[160px] sm:text-5xl">
+            <div className="relative flex h-[120px] w-[120px] items-center justify-center overflow-hidden rounded-full border-4 border-[var(--surface)] bg-[var(--surface-elevated)] text-3xl font-semibold text-[#8b5cf6] ring-2 ring-[#8b5cf6]/20 sm:h-[160px] sm:w-[160px] sm:text-5xl">
               {profile.avatar_url ? (
                 <Image
                   alt={displayName}
@@ -231,14 +233,14 @@ export default async function ProfilePage({ params }: PageProps) {
               )}
             </div>
 
-            <h2 className="mt-5 font-display text-4xl leading-none text-[#34180f] sm:text-5xl">
+            <h2 className="mt-5 font-display text-4xl leading-none text-[#fafafa] sm:text-5xl">
               {displayName}
             </h2>
 
-            <div className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-[#efddcf] bg-[#fff7f2] px-4 py-2 text-sm font-semibold text-[#6f4a3b] shadow-sm">
+            <div className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold text-[#d4d4d8]">
               <svg
                 aria-hidden="true"
-                className="h-4 w-4 text-[#b56445]"
+                className="h-4 w-4 text-[#8b5cf6]"
                 fill="none"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
@@ -269,10 +271,10 @@ export default async function ProfilePage({ params }: PageProps) {
         </section>
 
         {viewer && sharedTrips.length > 0 ? (
-          <section className="rounded-[2rem] border border-[#efd5c8] bg-white/80 p-5 shadow-sm sm:p-6">
+          <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 backdrop-blur-sm sm:p-6">
             <div className="space-y-2 text-center sm:text-left">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Shared trips</p>
-              <h2 className="font-display text-3xl leading-none text-[#34180f]">Trips you share</h2>
+              <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Shared trips</p>
+              <h2 className="font-display text-3xl leading-none text-[#fafafa]">Trips you share</h2>
             </div>
 
             <div className="mt-5 space-y-4">

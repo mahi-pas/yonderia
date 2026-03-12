@@ -70,7 +70,7 @@ export default function LoginButton({
     <div className={["w-full max-w-sm", containerClassName].filter(Boolean).join(" ")}>
       <button
         className={[
-          "group inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full bg-[#c76038] px-5 py-4 text-base font-semibold text-white shadow-[0_18px_45px_rgba(199,96,56,0.33)] transition hover:-translate-y-0.5 hover:bg-[#b55531] focus:outline-none focus:ring-4 focus:ring-[#ffd4be] disabled:cursor-not-allowed disabled:opacity-70",
+          "btn-press group inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full bg-[image:var(--accent-gradient)] px-5 py-4 text-base font-semibold text-white shadow-[0_2px_24px_rgba(139,92,246,0.3)] transition hover:brightness-110 hover:shadow-[0_4px_32px_rgba(139,92,246,0.4)] focus:outline-none focus:ring-4 focus:ring-[#8b5cf6]/30 disabled:cursor-not-allowed disabled:opacity-70",
           buttonClassName,
         ]
           .filter(Boolean)
@@ -81,14 +81,14 @@ export default function LoginButton({
           void handleLogin();
         }}
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-base text-[#c76038] shadow-sm">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-base text-white shadow-sm">
           G
         </span>
         <span>{isSubmitting ? "Opening Google..." : buttonLabel}</span>
       </button>
 
       {errorMessage ? (
-        <p className="mt-3 text-center text-sm text-[#8b3f22]">{errorMessage}</p>
+        <p className="mt-3 text-center text-sm text-[#fca5a5]">{errorMessage}</p>
       ) : null}
     </div>
   );

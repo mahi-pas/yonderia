@@ -82,20 +82,20 @@ function getRoleBadge(role: TripParticipantRole): {
 } {
   if (role === "organizer") {
     return {
-      className: "border-[#4d2619] bg-[#4d2619] text-[#ffe8c7]",
+      className: "border-[#f59e0b]/30 bg-[#f59e0b]/10 text-[#fbbf24]",
       label: "♛ Organizer",
     };
   }
 
   if (role === "planner") {
     return {
-      className: "border-[#2d518f] bg-[#eaf1ff] text-[#2d518f]",
+      className: "border-[#8b5cf6]/30 bg-[#8b5cf6]/10 text-[#a78bfa]",
       label: "★ Planner",
     };
   }
 
   return {
-    className: "border-[#dcc1b5] bg-[#fff9f5] text-[#7b5648]",
+    className: "border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--muted)]",
     label: "Member",
   };
 }
@@ -326,13 +326,13 @@ export default function ParticipantsView({
         <TopToast message={toast.message} tone={toast.tone} />
       ) : null}
 
-      <section className="rounded-[2rem] border border-[#efd5c8] bg-white/80 p-4 shadow-sm sm:p-5">
+      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 backdrop-blur-sm p-4 shadow-sm sm:p-5">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">People</p>
-            <h2 className="mt-1 font-display text-3xl leading-none text-[#34180f]">Your crew</h2>
+            <p className="text-xs font-semibold uppercase tracking-wide gradient-text">People</p>
+            <h2 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Your crew</h2>
           </div>
-          <p className="text-sm text-[#7e5b4c]">{participants.length} total</p>
+          <p className="text-sm text-[var(--muted)]">{participants.length} total</p>
         </div>
 
         <ul className="mt-5 space-y-3">
@@ -346,7 +346,7 @@ export default function ParticipantsView({
             return (
               <li
                 key={participant.participantId}
-                className="relative rounded-[1.6rem] border border-[#f0d5c7] bg-[linear-gradient(180deg,#fffdfb,#fff5ef)] p-4 shadow-sm"
+                className="relative rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-4 shadow-sm"
               >
                 <div className="flex items-start gap-3">
                   <Link
@@ -354,7 +354,7 @@ export default function ParticipantsView({
                     className="inline-flex min-h-11 min-w-11 shrink-0 rounded-full"
                     href={`/profile/${participant.userId}`}
                   >
-                    <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-[#f6c4a7] text-base font-semibold text-[#5a2b1c] shadow-[0_12px_22px_rgba(116,58,31,0.14)]">
+                    <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--surface)] bg-[var(--surface-elevated)] ring-1 ring-[#8b5cf6]/20 text-base font-semibold text-[#d4d4d8] shadow-[0_4px_16px_rgba(0,0,0,0.2)]">
                       {participant.avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -370,7 +370,7 @@ export default function ParticipantsView({
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-base font-semibold text-[#34180f]">{participant.nickname}</p>
+                      <p className="text-base font-semibold text-[#fafafa]">{participant.nickname}</p>
                       <span
                         className={`inline-flex min-h-8 items-center rounded-full border px-3 text-xs font-semibold ${roleBadge.className}`}
                       >
@@ -379,17 +379,17 @@ export default function ParticipantsView({
                     </div>
 
                     {shouldShowDisplayName(participant) ? (
-                      <p className="mt-1 text-sm text-[#8a6759]">{participant.displayName}</p>
+                      <p className="mt-1 text-sm text-[var(--muted)]">{participant.displayName}</p>
                     ) : null}
 
-                    <p className="mt-2 text-sm leading-6 text-[#6f4a3b]">{formatTravelSummary(participant)}</p>
+                    <p className="mt-2 text-sm leading-6 text-[var(--muted-foreground)]">{formatTravelSummary(participant)}</p>
                   </div>
 
                   {showActions ? (
                     <div className="relative shrink-0">
                       <button
                         aria-label={`Open actions for ${participant.nickname}`}
-                        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-[#ebc5b5] bg-white text-xl text-[#6b4131] transition hover:bg-[#fff3eb] disabled:opacity-60"
+                        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-xl text-[var(--muted)] transition hover:bg-[var(--surface-elevated)] disabled:opacity-60"
                         disabled={isPending}
                         type="button"
                         onClick={() => {
@@ -402,10 +402,10 @@ export default function ParticipantsView({
                       </button>
 
                       {menuParticipantId === participant.participantId ? (
-                        <div className="absolute right-0 top-12 z-10 w-48 rounded-[1.25rem] border border-[#efd5c8] bg-white p-2 shadow-[0_18px_45px_rgba(90,40,20,0.18)]">
+                        <div className="absolute right-0 top-12 z-10 w-48 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] backdrop-blur-xl p-2 shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
                           {canChangeRole && participant.role !== "planner" ? (
                             <button
-                              className="flex min-h-11 w-full items-center rounded-[1rem] px-3 text-left text-sm font-semibold text-[#34180f] transition hover:bg-[#fff4ec]"
+                              className="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-sm font-semibold text-[#fafafa] transition hover:bg-[var(--surface-elevated)]"
                               type="button"
                               onClick={() => {
                                 void changeRole(participant.participantId, "planner");
@@ -417,7 +417,7 @@ export default function ParticipantsView({
 
                           {canChangeRole && participant.role !== "member" ? (
                             <button
-                              className="flex min-h-11 w-full items-center rounded-[1rem] px-3 text-left text-sm font-semibold text-[#34180f] transition hover:bg-[#fff4ec]"
+                              className="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-sm font-semibold text-[#fafafa] transition hover:bg-[var(--surface-elevated)]"
                               type="button"
                               onClick={() => {
                                 void changeRole(participant.participantId, "member");
@@ -429,7 +429,7 @@ export default function ParticipantsView({
 
                           {isOrganizer ? (
                             <button
-                              className="flex min-h-11 w-full items-center rounded-[1rem] px-3 text-left text-sm font-semibold text-[#34180f] transition hover:bg-[#fff4ec]"
+                              className="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-sm font-semibold text-[#fafafa] transition hover:bg-[var(--surface-elevated)]"
                               type="button"
                               onClick={() => {
                                 setMenuParticipantId(null);
@@ -444,7 +444,7 @@ export default function ParticipantsView({
 
                           {canKick ? (
                             <button
-                              className="flex min-h-11 w-full items-center rounded-[1rem] px-3 text-left text-sm font-semibold text-[#a33d24] transition hover:bg-[#fff1ea]"
+                              className="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-sm font-semibold text-[#fca5a5] transition hover:bg-[var(--surface-elevated)]"
                               type="button"
                               onClick={() => {
                                 setMenuParticipantId(null);
@@ -496,7 +496,7 @@ export default function ParticipantsView({
           </div>
         }
       >
-        <p className="text-sm leading-6 text-[#6f4a3b]">
+        <p className="text-sm leading-6 text-[var(--muted-foreground)]">
           This will remove them from the participant list right away.
         </p>
       </Modal>

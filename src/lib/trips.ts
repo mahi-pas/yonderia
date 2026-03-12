@@ -1,7 +1,15 @@
 import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database, ItineraryItem, InviteCodeType, Profile, Trip, TripParticipant } from "@/lib/types";
+import type {
+  Database,
+  ItineraryItem,
+  InviteCodeType,
+  Profile,
+  RsvpSummary,
+  Trip,
+  TripParticipant,
+} from "@/lib/types";
 
 export type TripPageParticipant = {
   avatarUrl: string | null;
@@ -25,7 +33,7 @@ export type ParticipantMembership = Pick<
 
 export type TripPageTrip = Pick<
   Trip,
-  "description" | "end_date" | "id" | "image_url" | "location_name" | "name" | "start_date"
+  "description" | "end_date" | "id" | "image_url" | "location_name" | "name" | "start_date" | "theme"
 >;
 
 export type TripPageItineraryItem = Pick<
@@ -45,7 +53,7 @@ export type TripPageItineraryItem = Pick<
   | "sort_order"
   | "start_time"
   | "title"
->;
+> & { rsvpSummary?: RsvpSummary };
 
 export type TripPageData = {
   itineraryItems: TripPageItineraryItem[];
@@ -237,7 +245,7 @@ export async function getTripPageData(
   ] = await Promise.all([
     supabase
       .from("trips")
-      .select("id, name, description, image_url, location_name, start_date, end_date")
+      .select("id, name, description, image_url, location_name, start_date, end_date, theme")
       .eq("id", tripId)
       .maybeSingle(),
     supabase
@@ -316,8 +324,42 @@ export async function getTripPageData(
       role: participant.role,
     }));
 
+  const itineraryItemIds = itineraryItems.map((i) => i.id);
+  const rsvpCountsByItem = new Map<string, RsvpSummary>();
+
+  if (itineraryItemIds.length > 0) {
+    const { data: rsvpRows } = await supabase
+      .from("event_rsvps")
+      .select("itinerary_item_id, status")
+      .in("itinerary_item_id", itineraryItemIds);
+
+    const rows = (rsvpRows ?? []) as { itinerary_item_id: string; status: string }[];
+    for (const id of itineraryItemIds) {
+      let going = 0;
+      let interested = 0;
+      let not_going = 0;
+      for (const r of rows) {
+        if (r.itinerary_item_id !== id) continue;
+        if (r.status === "going") going++;
+        else if (r.status === "interested") interested++;
+        else if (r.status === "not_going") not_going++;
+      }
+      rsvpCountsByItem.set(id, {
+        going,
+        interested,
+        not_going,
+        userStatus: null,
+      });
+    }
+  }
+
+  const itineraryItemsWithRsvp = itineraryItems.map((item) => {
+    const rsvpSummary = rsvpCountsByItem.get(item.id);
+    return { ...item, rsvpSummary };
+  });
+
   return {
-    itineraryItems,
+    itineraryItems: itineraryItemsWithRsvp,
     participants,
     trip: tripData as TripPageTrip,
   };

@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import DayItinerary from "@/components/trip/DayItinerary";
 import EditMyInfoButton from "@/components/trip/EditMyInfoButton";
 import ParticipantsRow from "@/components/trip/ParticipantsRow";
 import TripMap from "@/components/trip/TripMap";
+import { useEventCommentCounts } from "@/hooks/useEventCommentCounts";
 import { useItinerary, type ItineraryListItem } from "@/hooks/useItinerary";
 import { useParticipants, type ParticipantListItem } from "@/hooks/useParticipants";
 import { createClient } from "@/lib/supabase/client";
@@ -55,6 +56,13 @@ export default function LiveTripOverview({
     initialItems: initialItineraryItems,
     tripId,
   });
+  const itineraryItemIds = useMemo(
+    () => itineraryItems.map((i) => i.id),
+    [itineraryItems],
+  );
+  const commentCountByItemId = useEventCommentCounts({
+    itineraryItemIds,
+  });
   const { participants } = useParticipants({
     initialParticipants,
     tripId,
@@ -99,9 +107,17 @@ export default function LiveTripOverview({
           tripId={tripId}
         />
       ) : null}
-      <TripMap items={itineraryItems} tripEndDate={tripEndDate} tripStartDate={tripStartDate} />
+      <TripMap
+        currentUserId={currentUserId}
+        items={itineraryItems}
+        tripEndDate={tripEndDate}
+        tripId={tripId}
+        tripStartDate={tripStartDate}
+        userRole={currentParticipant?.role ?? null}
+      />
       <DayItinerary
         canManage={canManageItinerary}
+        commentCountByItemId={commentCountByItemId}
         currentUserId={currentUserId}
         currentUserRole={currentParticipant?.role ?? null}
         error={itineraryError}

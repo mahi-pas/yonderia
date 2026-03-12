@@ -3,15 +3,17 @@
 import { eachDayOfInterval, format, parseISO } from "date-fns";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ItineraryListItem } from "@/hooks/useItinerary";
+import { getItineraryItemDaySpan, type ItineraryListItem } from "@/hooks/useItinerary";
 import { loadGoogleMapsApi, type GoogleMapsWindow } from "@/lib/google-maps";
 import ItineraryDetail from "./ItineraryDetail";
-import { formatItineraryItemTime } from "./ItineraryCard";
 
 type TripMapProps = {
+  currentUserId?: string | null;
   items: ItineraryListItem[];
   tripEndDate: string;
+  tripId?: string;
   tripStartDate: string;
+  userRole?: import("@/lib/types").TripParticipantRole | null;
 };
 
 type DayOption = {
@@ -44,15 +46,21 @@ const DEFAULT_CENTER = { lat: 39.5, lng: -98.35 };
 const ITEM_STYLES = {
   commute: {
     color: "#6c5ce7",
-    label: "CM",
+    emoji: "🚀",
+    label: "🚀",
+    pinColor: "#c4bbfa",
   },
   event: {
     color: "#c76038",
-    label: "EV",
+    emoji: "🎉",
+    label: "🎉",
+    pinColor: "#f0b89e",
   },
   hotel: {
     color: "#4f7ccf",
-    label: "HT",
+    emoji: "🏨",
+    label: "🏨",
+    pinColor: "#a8c4f0",
   },
 } as const;
 const MOCK_PIN_POSITIONS = [
@@ -120,12 +128,6 @@ function buildMapPoints(item: ItineraryListItem): MapPoint[] {
   ];
 }
 
-function getPointLocationLabel(point: MapPoint): string {
-  return point.item.item_type === "commute" && point.kind !== "single"
-    ? `${point.kind === "origin" ? "Origin" : "Destination"}: ${point.infoLabel}`
-    : point.infoLabel;
-}
-
 function fitMapToPoints(map: GoogleMapInstance, googleApi: GoogleMapsWindow, points: MapPoint[]) {
   const bounds = new googleApi.maps.LatLngBounds();
 
@@ -146,75 +148,76 @@ function fitMapToPoints(map: GoogleMapInstance, googleApi: GoogleMapsWindow, poi
   }
 }
 
+const markerIconCache = new Map<string, { anchor: unknown; scaledSize: unknown; url: string }>();
+
 function createMarkerIcon(googleApi: GoogleMapsWindow, itemType: ItineraryListItem["item_type"]) {
-  const style = ITEM_STYLES[itemType];
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="56" viewBox="0 0 44 56" fill="none">
-      <path d="M22 1C10.4 1 1 10.2 1 21.7C1 36.3 19 51.7 22 55C25 51.7 43 36.3 43 21.7C43 10.2 33.6 1 22 1Z" fill="${style.color}" />
-      <circle cx="22" cy="22" r="13" fill="white" />
-      <text x="22" y="26" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="${style.color}">${style.label}</text>
-    </svg>
-  `;
-
-  return {
-    anchor: new googleApi.maps.Point(22, 56),
-    scaledSize: new googleApi.maps.Size(44, 56),
-    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-  };
-}
-
-function buildInfoWindowContent(point: MapPoint, onViewDetails: () => void) {
-  const style = ITEM_STYLES[point.item.item_type];
-  const root = document.createElement("div");
-  root.className = "w-[220px] p-1 text-[#34180f]";
-
-  const stack = document.createElement("div");
-  stack.className = "space-y-3";
-
-  if (point.item.image_url) {
-    const image = document.createElement("img");
-    image.alt = point.item.title;
-    image.className = "h-24 w-full rounded-[1rem] object-cover";
-    image.src = point.item.image_url;
-    stack.appendChild(image);
-  } else {
-    const placeholder = document.createElement("div");
-    placeholder.className = "flex h-24 w-full items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#ffe0d1,#ffd1b9)] text-sm font-semibold uppercase tracking-[0.18em] text-[#8b3f22]";
-    placeholder.textContent = style.label;
-    stack.appendChild(placeholder);
+  const cached = markerIconCache.get(itemType);
+  if (cached) {
+    return { ...cached, anchor: new googleApi.maps.Point(24, 60), scaledSize: new googleApi.maps.Size(48, 60) };
   }
 
-  const title = document.createElement("h3");
-  title.className = "text-base font-semibold text-[#34180f]";
-  title.textContent = point.item.title;
-  stack.appendChild(title);
+  const style = ITEM_STYLES[itemType];
+  const w = 48;
+  const h = 60;
+  const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 2;
 
-  const time = document.createElement("p");
-  time.className = "text-sm text-[#7a5749]";
-  time.textContent = formatItineraryItemTime(point.item);
-  stack.appendChild(time);
+  const canvas = document.createElement("canvas");
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  const ctx = canvas.getContext("2d");
 
-  const location = document.createElement("p");
-  location.className = "text-sm leading-6 text-[#6f4a3b]";
-  location.textContent = getPointLocationLabel(point);
-  stack.appendChild(location);
+  if (!ctx) {
+    const fallback = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="60"><path d="M24 2C12 2 2 11.8 2 23.5C2 38.5 21 54 24 57C27 54 46 38.5 46 23.5C46 11.8 36 2 24 2Z" fill="${style.color}"/></svg>`)}`;
+    return { anchor: new googleApi.maps.Point(24, 60), scaledSize: new googleApi.maps.Size(w, h), url: fallback };
+  }
 
-  const button = document.createElement("button");
-  button.className = "inline-flex min-h-11 items-center justify-center rounded-full bg-[#c76038] px-4 text-sm font-semibold text-white transition hover:bg-[#b55531]";
-  button.textContent = "View details";
-  button.type = "button";
-  button.addEventListener("click", onViewDetails);
-  stack.appendChild(button);
+  ctx.scale(dpr, dpr);
 
-  root.appendChild(stack);
-  return root;
+  ctx.shadowColor = "rgba(0,0,0,0.35)";
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetY = 2;
+
+  ctx.beginPath();
+  ctx.moveTo(24, 2);
+  ctx.bezierCurveTo(12, 2, 2, 11.8, 2, 23.5);
+  ctx.bezierCurveTo(2, 38.5, 21, 54, 24, 57);
+  ctx.bezierCurveTo(27, 54, 46, 38.5, 46, 23.5);
+  ctx.bezierCurveTo(46, 11.8, 36, 2, 24, 2);
+  ctx.closePath();
+  ctx.fillStyle = style.color;
+  ctx.fill();
+
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+
+  ctx.beginPath();
+  ctx.arc(24, 23, 14, 0, Math.PI * 2);
+  ctx.fillStyle = "white";
+  ctx.fill();
+
+  ctx.font = "20px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(style.emoji, 24, 24);
+
+  const url = canvas.toDataURL();
+  markerIconCache.set(itemType, { anchor: null, scaledSize: null, url });
+
+  return { anchor: new googleApi.maps.Point(24, 60), scaledSize: new googleApi.maps.Size(w, h), url };
 }
 
-export default function TripMap({ items = [], tripEndDate, tripStartDate }: TripMapProps) {
+export default function TripMap({
+  currentUserId = null,
+  items = [],
+  tripEndDate,
+  tripId,
+  tripStartDate,
+  userRole = null,
+}: TripMapProps) {
   const searchParams = useSearchParams();
   const isMockMode = searchParams.get("mapMock") === "1";
   const [activeDay, setActiveDay] = useState<"all" | string>("all");
-  const [activePointKey, setActivePointKey] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [mapStatus, setMapStatus] = useState<"loading" | "ready" | "unavailable">(
     isMockMode ? "ready" : "loading",
@@ -223,7 +226,6 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<GoogleMapInstance | null>(null);
   const googleApiRef = useRef<GoogleMapsWindow | null>(null);
-  const infoWindowRef = useRef<InstanceType<GoogleMapsWindow["maps"]["InfoWindow"]> | null>(null);
   const markerEntriesRef = useRef<MarkerEntry[]>([]);
   const polylinesRef = useRef<Array<{ setMap: (map: unknown) => void }>>([]);
 
@@ -241,7 +243,10 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
   );
 
   const visibleItems = useMemo(
-    () => (activeDay === "all" ? items : items.filter((item) => item.day_date === activeDay)),
+    () =>
+      activeDay === "all"
+        ? items
+        : items.filter((item) => getItineraryItemDaySpan(item).includes(activeDay)),
     [activeDay, items],
   );
 
@@ -268,11 +273,6 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
         })),
     [visibleItems],
   );
-  const selectedPoint = useMemo(
-    () => visiblePoints.find((point) => point.key === activePointKey) ?? null,
-    [activePointKey, visiblePoints],
-  );
-
   const clearMapArtifacts = useCallback(() => {
     for (const markerEntry of markerEntriesRef.current) {
       markerEntry.marker.setMap(null);
@@ -320,13 +320,6 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
           });
         }
 
-        if (!infoWindowRef.current) {
-          infoWindowRef.current = new googleApi.maps.InfoWindow();
-          infoWindowRef.current.addListener("closeclick", () => {
-            setActivePointKey(null);
-          });
-        }
-
         setMapStatus("ready");
       } catch {
         if (!cancelled) {
@@ -340,7 +333,6 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
     return () => {
       cancelled = true;
       clearMapArtifacts();
-      infoWindowRef.current?.close();
     };
   }, [clearMapArtifacts, isMockMode]);
 
@@ -356,7 +348,6 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
     const googleApi = googleApiRef.current;
     const map = mapRef.current;
     clearMapArtifacts();
-    infoWindowRef.current?.close();
 
     polylinesRef.current = commuteSegments.map(
       (segment) =>
@@ -379,7 +370,7 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
       });
 
       marker.addListener("click", () => {
-        setActivePointKey(point.key);
+        setSelectedItem(point.item);
       });
 
       return {
@@ -399,35 +390,6 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
       clearMapArtifacts();
     };
   }, [clearMapArtifacts, commuteSegments, isMockMode, mapStatus, visiblePoints]);
-
-  useEffect(() => {
-    if (isMockMode) {
-      return;
-    }
-
-    if (!activePointKey || !infoWindowRef.current || !mapRef.current) {
-      infoWindowRef.current?.close();
-      return;
-    }
-
-    const markerEntry = markerEntriesRef.current.find((entry) => entry.point.key === activePointKey);
-
-    if (!markerEntry) {
-      infoWindowRef.current.close();
-      return;
-    }
-
-    infoWindowRef.current.setContent(
-      buildInfoWindowContent(markerEntry.point, () => {
-        setSelectedItem(markerEntry.point.item);
-      }),
-    );
-    infoWindowRef.current.open({
-      anchor: markerEntry.marker,
-      map: mapRef.current,
-      shouldFocus: false,
-    });
-  }, [activePointKey, isMockMode]);
 
   useEffect(() => {
     if (!isFullscreen) {
@@ -475,21 +437,21 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
 
   return (
     <section
-      className="rounded-[1.75rem] border border-[#efd5c8] bg-white/75 p-5 shadow-sm"
+      className="trip-card rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 backdrop-blur-sm p-5 shadow-sm"
       data-testid="trip-map-section"
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Map</p>
-          <h2 className="mt-1 font-display text-3xl leading-none text-[#34180f]">Trip at a glance</h2>
-          <p className="mt-2 text-sm text-[#7e5b4c]">
+          <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Map</p>
+          <h2 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Trip at a glance</h2>
+          <p className="mt-2 text-sm text-[var(--muted)]">
             {visiblePoints.length} pin{visiblePoints.length === 1 ? "" : "s"} visible
           </p>
         </div>
 
         {mapStatus === "ready" ? (
           <button
-            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#ddb39f] bg-white/90 px-4 text-sm font-semibold text-[#5a2b1c] shadow-sm transition hover:border-[#c67b5a] hover:bg-[#fff3ec] sm:hidden"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] px-4 text-sm font-semibold text-[var(--muted)] shadow-sm transition hover:bg-[var(--surface-elevated)] sm:hidden"
             type="button"
             onClick={() => {
               setIsFullscreen(true);
@@ -503,7 +465,7 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
       <div
         className={[
           isFullscreen
-            ? "fixed inset-0 z-50 flex flex-col bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] p-4 pt-[calc(env(safe-area-inset-top)+1rem)]"
+            ? "fixed inset-0 z-50 flex flex-col bg-[radial-gradient(ellipse_at_top,var(--surface)_0%,var(--background)_50%)] p-4 pt-[calc(env(safe-area-inset-top)+1rem)]"
             : "mt-4",
         ]
           .filter(Boolean)
@@ -513,7 +475,7 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
         <div
           className={[
             isFullscreen
-              ? "flex h-full flex-col rounded-[2rem] border border-white/70 bg-[rgba(255,249,245,0.98)] p-4 shadow-[0_28px_90px_rgba(90,40,20,0.24)]"
+              ? "flex h-full flex-col rounded-2xl border border-[var(--border)] bg-[var(--surface)]/95 p-4 shadow-[0_8px_40px_rgba(0,0,0,0.3)]"
               : "",
           ]
             .filter(Boolean)
@@ -522,13 +484,13 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
           {isFullscreen ? (
             <div className="flex items-center justify-between gap-4 pb-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Map</p>
-                <h3 className="mt-1 font-display text-3xl leading-none text-[#34180f]">Trip at a glance</h3>
+                <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Map</p>
+                <h3 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Trip at a glance</h3>
               </div>
 
               <button
                 aria-label="Close full screen map"
-                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#ebc5b5] bg-white text-xl text-[#6b4131] transition hover:bg-[#fff3eb]"
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-xl text-[var(--muted)] transition hover:bg-[var(--surface-elevated)]"
                 type="button"
                 onClick={() => {
                   setIsFullscreen(false);
@@ -545,8 +507,8 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
               className={[
                 "inline-flex min-h-11 shrink-0 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
                 activeDay === "all"
-                  ? "bg-[#c76038] text-white shadow-[0_18px_45px_rgba(199,96,56,0.28)]"
-                  : "border border-[#e6b9a3] bg-white/80 text-[#6b4131] hover:bg-[#fff2ea]",
+                  ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_16px_rgba(139,92,246,0.25)]"
+                  : "border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-elevated)]",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -568,8 +530,8 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
                   className={[
                     "inline-flex min-h-11 shrink-0 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
                     isActive
-                      ? "bg-[#c76038] text-white shadow-[0_18px_45px_rgba(199,96,56,0.28)]"
-                      : "border border-[#e6b9a3] bg-white/80 text-[#6b4131] hover:bg-[#fff2ea]",
+                      ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_16px_rgba(139,92,246,0.25)]"
+                      : "border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-elevated)]",
                   ]
                     .filter(Boolean)
                     .join(" ")}
@@ -586,7 +548,7 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
           </div>
 
           {mapStatus === "unavailable" ? (
-            <div className="mt-4 rounded-[1.5rem] border border-[#efb9a3] bg-[#fff1ea] px-5 py-4 text-sm leading-6 text-[#8b3f22]">
+            <div className="mt-4 rounded-2xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-5 py-4 text-sm leading-6 text-[#fca5a5]">
               Google Maps is unavailable right now. Add a valid `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` to use the trip
               map.
             </div>
@@ -594,7 +556,7 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
 
           <div
             className={[
-              "relative mt-4 overflow-hidden rounded-[1.75rem] border border-[#efd5c8] bg-[#f6e5dc]",
+              "relative mt-4 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]",
               isFullscreen ? "min-h-0 flex-1" : "h-[250px] sm:h-[400px]",
             ]
               .filter(Boolean)
@@ -603,7 +565,7 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
           >
             {isMockMode ? (
               <div
-                className="absolute inset-0 bg-[linear-gradient(180deg,#f8eadf,#efe1d7)]"
+                className="absolute inset-0 bg-[linear-gradient(180deg,var(--surface),var(--surface-elevated))]"
                 data-testid="trip-map-mock"
               >
                 {commuteSegments.map((segment, index) => {
@@ -658,7 +620,7 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
                     <button
                       key={point.key}
                       aria-label={`Open ${point.item.title} pin`}
-                      className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white text-xs font-bold text-white shadow-[0_12px_24px_rgba(78,41,22,0.18)]"
+                      className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-[var(--surface)] text-lg shadow-[0_12px_24px_rgba(0,0,0,0.3)]"
                       data-day={point.item.day_date}
                       data-item-id={point.item.id}
                       data-item-type={point.item.item_type}
@@ -671,62 +633,13 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
                       }}
                       type="button"
                       onClick={() => {
-                        setActivePointKey(point.key);
+                        setSelectedItem(point.item);
                       }}
                     >
-                      {style.label}
+                      {style.emoji}
                     </button>
                   );
                 })}
-
-                {selectedPoint ? (
-                  <div
-                    className="absolute bottom-3 left-3 right-3 rounded-[1.25rem] border border-[#e7c7b8] bg-white/95 p-3 shadow-[0_20px_40px_rgba(91,44,24,0.16)]"
-                    data-testid="trip-map-info-window"
-                  >
-                    <div className="space-y-3">
-                      {selectedPoint.item.image_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          alt={selectedPoint.item.title}
-                          className="h-24 w-full rounded-[1rem] object-cover"
-                          src={selectedPoint.item.image_url}
-                        />
-                      ) : (
-                        <div className="flex h-24 items-center justify-center rounded-[1rem] bg-[linear-gradient(135deg,#ffe0d1,#ffd1b9)] text-sm font-semibold uppercase tracking-[0.18em] text-[#8b3f22]">
-                          {ITEM_STYLES[selectedPoint.item.item_type].label}
-                        </div>
-                      )}
-
-                      <div>
-                        <h3 className="text-base font-semibold text-[#34180f]">{selectedPoint.item.title}</h3>
-                        <p className="mt-1 text-sm text-[#7a5749]">{formatItineraryItemTime(selectedPoint.item)}</p>
-                        <p className="mt-1 text-sm leading-6 text-[#6f4a3b]">{getPointLocationLabel(selectedPoint)}</p>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <button
-                          className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#c76038] px-4 text-sm font-semibold text-white transition hover:bg-[#b55531]"
-                          type="button"
-                          onClick={() => {
-                            setSelectedItem(selectedPoint.item);
-                          }}
-                        >
-                          View details
-                        </button>
-                        <button
-                          className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#ddb39f] bg-white/90 px-4 text-sm font-semibold text-[#5a2b1c] shadow-sm transition hover:border-[#c67b5a] hover:bg-[#fff3ec]"
-                          type="button"
-                          onClick={() => {
-                            setActivePointKey(null);
-                          }}
-                        >
-                          Close
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
               </div>
             ) : null}
 
@@ -736,13 +649,13 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
             />
 
             {mapStatus === "loading" ? (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[#fff7f2]/75 px-6 text-center text-sm text-[#7f5d50]">
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[var(--surface)]/75 px-6 text-center text-sm text-[var(--muted-foreground)]">
                 Loading the map...
               </div>
             ) : null}
 
             {mapStatus === "ready" && visiblePoints.length === 0 ? (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[#fff7f2]/75 px-6 text-center text-sm leading-6 text-[#7f5d50]">
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[var(--surface)]/75 px-6 text-center text-sm leading-6 text-[var(--muted-foreground)]">
                 No mapped stops match this filter yet.
               </div>
             ) : null}
@@ -751,11 +664,14 @@ export default function TripMap({ items = [], tripEndDate, tripStartDate }: Trip
       </div>
 
       <ItineraryDetail
+        currentUserId={currentUserId}
         isOpen={selectedItem !== null}
         item={selectedItem}
         onClose={() => {
           setSelectedItem(null);
         }}
+        tripId={tripId}
+        userRole={userRole}
       />
     </section>
   );

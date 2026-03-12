@@ -13,7 +13,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const BASE_CLASSES =
-  "inline-flex min-h-11 items-center justify-center rounded-full font-semibold transition focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-60";
+  "btn-press inline-flex min-h-11 items-center justify-center rounded-full font-semibold transition-all duration-200 focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-60";
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
   md: "px-4 py-3 text-sm",
@@ -22,10 +22,10 @@ const SIZE_CLASSES: Record<ButtonSize, string> = {
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    "bg-[#c76038] text-white shadow-[0_18px_45px_rgba(199,96,56,0.28)] hover:bg-[#b55531] focus:ring-[#ffd4be]",
+    "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_20px_rgba(139,92,246,0.3)] hover:shadow-[0_4px_28px_rgba(139,92,246,0.4)] hover:brightness-110 focus:ring-[#8b5cf6]/30",
   secondary:
-    "border border-[#ddb39f] bg-white/90 text-[#5a2b1c] shadow-sm hover:border-[#c67b5a] hover:bg-[#fff3ec] focus:ring-[#ffe0d1]",
-  ghost: "bg-transparent text-[#6a3d2d] hover:bg-[#fff1ea] focus:ring-[#ffe0d1]",
+    "border border-[var(--border-strong)] bg-[var(--surface)] text-[#d4d4d8] shadow-sm hover:border-[#8b5cf6]/40 hover:bg-[var(--surface-elevated)] focus:ring-[#8b5cf6]/20",
+  ghost: "bg-transparent text-[#d4d4d8] hover:bg-[var(--surface)] focus:ring-[#8b5cf6]/20",
 };
 
 export default function Button({

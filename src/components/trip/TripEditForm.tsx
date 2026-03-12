@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Button from "@/components/ui/Button";
 import ImageUploader from "@/components/ui/ImageUploader";
 import Input, { inputClassName } from "@/components/ui/Input";
@@ -149,17 +150,23 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
   };
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] px-4 py-5 pb-24 sm:px-6 sm:py-7 sm:pb-7 lg:px-10">
+    <main className="page-bg min-h-screen px-4 py-5 pb-24 sm:px-6 sm:py-7 sm:pb-7 lg:px-10">
       <div className="mx-auto max-w-4xl">
-        <section className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,250,246,0.95),rgba(255,245,237,0.92))] p-5 shadow-[0_28px_90px_rgba(104,45,20,0.12)] sm:p-7">
+        <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 backdrop-blur-sm sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Edit trip</p>
-              <h1 className="font-display text-4xl leading-none text-[#34180f] sm:text-5xl">Update the plan</h1>
-              <p className="max-w-2xl text-sm leading-6 text-[#6f4a3b] sm:text-base">
+              <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Edit trip</p>
+              <h1 className="font-display text-4xl leading-none text-[#fafafa] sm:text-5xl">Update the plan</h1>
+              <p className="max-w-2xl text-sm leading-6 text-[var(--muted)] sm:text-base">
                 Change the trip details, swap the header image, and keep everyone aligned on the latest version.
               </p>
             </div>
+            <Link
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-4 py-3 text-sm font-semibold text-[#d4d4d8] transition hover:border-[#8b5cf6]/40 hover:bg-[var(--surface)] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
+              href={`/trip/${tripId}/customize`}
+            >
+              Customize Theme
+            </Link>
           </div>
 
           <div className="mt-8 space-y-6">
@@ -225,7 +232,7 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
             />
 
             <label className="block space-y-2">
-              <span className="block text-sm font-semibold text-[#5a2b1c]">Description</span>
+              <span className="block text-sm font-semibold text-[#d4d4d8]">Description</span>
               <textarea
                 className={inputClassName("min-h-36 resize-none")}
                 disabled={isSubmitting}
@@ -242,12 +249,12 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
             </label>
 
             {errorMessage ? (
-              <div className="rounded-[1.25rem] border border-[#efb9a3] bg-[#fff1ea] px-4 py-3 text-sm text-[#8b3f22]">
+              <div className="rounded-2xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
                 {errorMessage}
               </div>
             ) : null}
 
-            <div className="sticky bottom-3 z-10 -mx-1 flex flex-col-reverse gap-3 rounded-[1.5rem] border border-white/80 bg-[rgba(255,249,245,0.96)] p-3 shadow-[0_16px_35px_rgba(90,40,20,0.12)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:pt-2 sm:shadow-none">
+            <div className="sticky bottom-3 z-10 -mx-1 flex flex-col-reverse gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/95 p-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:pt-2">
               <Button
                 disabled={isSubmitting}
                 className="w-full sm:w-auto"

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import LoginButton from "@/components/auth/LoginButton";
+import PageBackground from "@/components/ui/PageBackground";
 import { getInvitePreview } from "@/lib/trips";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -62,11 +63,11 @@ function OrganizerAvatar({
   const fallbackLabel = (displayName?.trim()?.charAt(0) || "H").toUpperCase();
 
   return (
-    <div className="relative h-12 w-12 overflow-hidden rounded-full border border-white/35 bg-white/20 shadow-[0_10px_30px_rgba(23,8,4,0.18)]">
+    <div className="relative h-12 w-12 overflow-hidden rounded-full border border-[#8b5cf6]/25 bg-[#8b5cf6]/15 shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
       {avatarUrl ? (
         <Image alt={`${displayName || "Host"} avatar`} className="object-cover" fill sizes="48px" src={avatarUrl} />
       ) : (
-        <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,rgba(255,236,224,0.92),rgba(255,198,169,0.75))] text-base font-semibold text-[#6d2f1d]">
+        <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,rgba(139,92,246,0.35),rgba(236,72,153,0.25))] text-base font-semibold text-[#8b5cf6]">
           {fallbackLabel}
         </div>
       )}
@@ -76,19 +77,19 @@ function OrganizerAvatar({
 
 function InvalidInviteState() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,#ffe0ce_0%,#fff4ed_40%,#fff9f5_100%)] px-4 py-8 sm:px-6 sm:py-10">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.7),transparent_24%),radial-gradient(circle_at_80%_15%,rgba(255,220,202,0.55),transparent_22%),radial-gradient(circle_at_50%_100%,rgba(214,124,88,0.12),transparent_32%)]" />
-      <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-lg items-center">
-        <section className="w-full rounded-[2rem] border border-white/75 bg-white/80 p-7 text-center shadow-[0_30px_90px_rgba(115,52,26,0.16)] backdrop-blur sm:p-9">
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#b56445]">Invite link</p>
-          <h1 className="mt-4 font-display text-4xl leading-none text-[#34180f]">
+    <main className="page-bg relative min-h-screen overflow-hidden px-4 py-8 sm:px-6 sm:py-10">
+      <PageBackground />
+      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-lg items-center">
+        <section className="w-full rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-7 text-center backdrop-blur-sm sm:p-9">
+          <p className="gradient-text text-xs font-semibold tracking-wide uppercase">Invite link</p>
+          <h1 className="mt-4 font-display text-4xl leading-none text-[#fafafa]">
             This invite link is no longer valid
           </h1>
-          <p className="mt-4 text-sm leading-6 text-[#6f4a3b]">
+          <p className="mt-4 text-sm leading-6 text-[#d4d4d8]">
             It may have expired or been turned off by the organizer. You can ask them for a fresh link.
           </p>
           <Link
-            className="mt-7 inline-flex min-h-12 items-center justify-center rounded-full bg-[#c76038] px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(199,96,56,0.28)] transition hover:bg-[#b55531]"
+            className="mt-7 inline-flex min-h-12 items-center justify-center rounded-full bg-[image:var(--accent-gradient)] px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
             href="/"
           >
             Back to home
@@ -134,38 +135,37 @@ export default async function TripInviteLandingPage({ params, searchParams }: Pa
 
   return (
     <>
-      <main className="relative min-h-screen overflow-hidden bg-[#25110d] px-3 py-3 sm:px-5 sm:py-5">
+      <main className="page-bg relative min-h-screen overflow-hidden px-3 py-3 sm:px-5 sm:py-5">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
-            className="absolute -left-12 top-20 h-40 w-40 rounded-full bg-[#ffbf9b]/20 blur-3xl"
-            style={{ animation: "inviteFloat 13s ease-in-out infinite" }}
+            className="absolute -left-12 top-20 h-52 w-52 rounded-full blur-[80px]"
+            style={{ background: "rgba(124, 58, 237, 0.12)", animation: "inviteFloat 13s ease-in-out infinite" }}
           />
           <div
-            className="absolute right-0 top-8 h-52 w-52 rounded-full bg-[#ffd7c2]/14 blur-3xl"
-            style={{ animation: "inviteFloat 17s ease-in-out infinite reverse" }}
+            className="absolute right-0 top-8 h-60 w-60 rounded-full blur-[100px]"
+            style={{ background: "rgba(99, 102, 241, 0.1)", animation: "inviteFloat 17s ease-in-out infinite reverse" }}
           />
           <div
-            className="absolute bottom-6 left-1/4 h-48 w-48 rounded-full bg-[#ff8d63]/14 blur-3xl"
-            style={{ animation: "inviteFloat 15s ease-in-out infinite" }}
+            className="absolute bottom-6 left-1/4 h-56 w-56 rounded-full blur-[90px]"
+            style={{ background: "rgba(124, 58, 237, 0.08)", animation: "inviteFloat 15s ease-in-out infinite" }}
           />
-          {[...Array(14)].map((_, index) => (
+          {[...Array(16)].map((_, index) => (
             <span
-              key={`confetti-${index}`}
-              className="absolute block rounded-full bg-white/55"
+              key={`streak-${index}`}
+              className="absolute block w-px"
               style={{
-                animation: `inviteConfetti ${10 + (index % 5) * 1.5}s linear infinite`,
-                animationDelay: `${index * 0.6}s`,
-                height: `${6 + (index % 3) * 4}px`,
-                left: `${5 + index * 6.5}%`,
-                opacity: 0.45,
-                top: `${10 + (index % 4) * 18}%`,
-                width: `${6 + ((index + 1) % 3) * 4}px`,
+                animation: `streak-fall ${8 + (index % 6) * 1.6}s linear infinite`,
+                animationDelay: `${index * 0.5}s`,
+                height: `${50 + (index % 4) * 30}px`,
+                left: `${4 + index * 5.8}%`,
+                background: `linear-gradient(180deg, transparent, rgba(139, 92, 246, ${0.18 + (index % 3) * 0.1}), transparent)`,
+                boxShadow: `0 0 ${3 + (index % 3) * 2}px rgba(139, 92, 246, ${0.06 + (index % 3) * 0.04})`,
               }}
             />
           ))}
         </div>
 
-        <section className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-6xl overflow-hidden rounded-[2rem] border border-white/10 bg-[#2c1712] shadow-[0_35px_100px_rgba(0,0,0,0.35)] sm:min-h-[calc(100vh-2.5rem)] sm:rounded-[2.5rem]">
+        <section className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-6xl overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_8px_40px_rgba(0,0,0,0.25)] sm:min-h-[calc(100vh-2.5rem)] sm:rounded-2xl">
           <div className="absolute inset-0">
             {preview.trip.image_url ? (
               <Image
@@ -177,27 +177,27 @@ export default async function TripInviteLandingPage({ params, searchParams }: Pa
                 src={preview.trip.image_url}
               />
             ) : (
-              <div className="h-full w-full bg-[radial-gradient(circle_at_top_left,#ffd9c5_0%,rgba(255,217,197,0.24)_22%,transparent_38%),radial-gradient(circle_at_80%_15%,rgba(255,190,150,0.28),transparent_24%),linear-gradient(135deg,#d57449,#7a3522_58%,#351612_100%)]" />
+              <div className="h-full w-full bg-[radial-gradient(circle_at_top_left,var(--surface)_0%,rgba(24,24,27,0.24)_22%,transparent_38%),radial-gradient(circle_at_80%_15%,rgba(10,10,15,0.28),transparent_24%),linear-gradient(135deg,var(--border),var(--surface)_58%,var(--background)_100%)]" />
             )}
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,8,6,0.2)_0%,rgba(20,8,6,0.34)_28%,rgba(20,8,6,0.7)_62%,rgba(20,8,6,0.92)_100%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,232,220,0.14),transparent_28%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,10,15,0.2)_0%,rgba(10,10,15,0.34)_28%,rgba(10,10,15,0.7)_62%,rgba(10,10,15,0.92)_100%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(124,58,237,0.18),transparent_28%)]" />
           </div>
 
           <div className="relative flex w-full flex-col justify-end p-5 sm:p-8 lg:p-10">
-            <div className="max-w-2xl rounded-[1.8rem] border border-white/14 bg-[linear-gradient(180deg,rgba(53,23,16,0.38),rgba(20,8,6,0.62))] p-5 text-white shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-md sm:p-7">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/72">Yonderia invite</p>
-              <h1 className="mt-4 font-display text-[clamp(2.9rem,12vw,5.2rem)] leading-[0.9] text-[#fff5ee]">
+            <div className="max-w-2xl rounded-2xl border border-[var(--border)] bg-[linear-gradient(180deg,rgba(20,20,31,0.5),rgba(10,10,15,0.7))] p-5 text-white shadow-[0_8px_40px_rgba(0,0,0,0.25)] backdrop-blur-md sm:p-7">
+              <p className="gradient-text text-xs font-semibold tracking-wide uppercase opacity-90">Yonderia invite</p>
+              <h1 className="mt-4 font-display text-[clamp(2.9rem,12vw,5.2rem)] leading-[0.9] text-[#fafafa]">
                 {headline}
               </h1>
-              <h2 className="mt-4 text-[clamp(2rem,8vw,3.5rem)] font-semibold leading-tight text-balance text-white">
+              <h2 className="mt-4 text-[clamp(2rem,8vw,3.5rem)] font-semibold leading-tight text-balance text-[#fafafa]">
                 {preview.trip.name}
               </h2>
 
-              <div className="mt-6 flex flex-wrap gap-3 text-sm text-white/90">
-                <div className="rounded-full border border-white/16 bg-white/10 px-4 py-2">
+              <div className="mt-6 flex flex-wrap gap-3 text-sm text-[#d4d4d8]">
+                <div className="rounded-full border border-[#8b5cf6]/20 bg-[#8b5cf6]/10 px-4 py-2">
                   {formatInviteDateRange(preview.trip.start_date, preview.trip.end_date)}
                 </div>
-                <div className="rounded-full border border-white/16 bg-white/10 px-4 py-2">
+                <div className="rounded-full border border-[#8b5cf6]/20 bg-[#8b5cf6]/10 px-4 py-2">
                   {preview.trip.location_name || "Location coming together"}
                 </div>
               </div>
@@ -208,19 +208,19 @@ export default async function TripInviteLandingPage({ params, searchParams }: Pa
                   displayName={preview.organizer.displayName}
                 />
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-white/60">Hosted by</p>
-                  <p className="text-base font-semibold text-white">{organizerName}</p>
+                  <p className="text-xs uppercase tracking-wide text-[var(--muted)]">Hosted by</p>
+                  <p className="text-base font-semibold text-[#fafafa]">{organizerName}</p>
                 </div>
               </div>
 
               <div className="mt-8 max-w-xl">
                 <LoginButton
-                  buttonClassName="min-h-14 bg-[#f07d51] px-6 py-4 text-lg shadow-[0_22px_60px_rgba(240,125,81,0.4)] hover:bg-[#e36f43] focus:ring-[#ffd8c8]"
+                  buttonClassName="min-h-14 bg-[image:var(--accent-gradient)] px-6 py-4 text-lg text-white hover:brightness-110 focus:ring-[#8b5cf6]/20"
                   buttonLabel={buttonLabel}
                   containerClassName="max-w-none"
                   redirectTo={redirectPath}
                 />
-                <p className="mt-4 text-sm leading-6 text-white/76">{subtitle}</p>
+                <p className="mt-4 text-sm leading-6 text-[#d4d4d8]">{subtitle}</p>
               </div>
             </div>
           </div>
@@ -231,13 +231,6 @@ export default async function TripInviteLandingPage({ params, searchParams }: Pa
         @keyframes inviteFloat {
           0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
           50% { transform: translate3d(0, -18px, 0) scale(1.04); }
-        }
-
-        @keyframes inviteConfetti {
-          0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
-          10% { opacity: 0.55; }
-          50% { transform: translate3d(12px, 28px, 0) rotate(120deg); opacity: 0.45; }
-          100% { transform: translate3d(-10px, 64px, 0) rotate(220deg); opacity: 0; }
         }
       `}</style>
     </>

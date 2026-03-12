@@ -219,7 +219,7 @@ test("Map renders on the trip page with pins for all itinerary items and day fil
   }
 });
 
-test('Clicking a pin shows an info window with image, title, time, location and "View details" opens the itinerary modal', async () => {
+test('Clicking a pin opens the itinerary detail modal', async () => {
   let seeded: SeededMapTrip | null = null;
 
   try {
@@ -231,19 +231,14 @@ test('Clicking a pin shows an info window with image, title, time, location and 
     const map = getMap(page);
     await map.getByRole("button", { name: "Open Sunset Cruise pin" }).click();
 
-    const infoWindow = map.getByTestId("trip-map-info-window");
-    await expect(infoWindow).toBeVisible();
-    await expect(infoWindow.locator('img[alt="Sunset Cruise"]')).toBeVisible();
-    await expect(infoWindow.getByText("Sunset Cruise")).toBeVisible();
-    await expect(infoWindow.getByText(formatItineraryItemTime(seeded.eventItem))).toBeVisible();
-    await expect(infoWindow.getByText("Seine River Dock")).toBeVisible();
-
-    await infoWindow.getByRole("button", { name: "View details" }).click();
-
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
+    await expect(dialog.getByText("Sunset Cruise")).toBeVisible();
     await expect(dialog.getByText("Golden-hour cruise past the best city views.")).toBeVisible();
     await expect(dialog.locator('img[alt="Sunset Cruise"]')).toBeVisible();
+    await expect(dialog.getByText(formatItineraryItemTime(seeded.eventItem))).toBeVisible();
+    await expect(dialog.getByText("Seine River Dock")).toBeVisible();
+
     await dialog.getByRole("button", { name: "Close", exact: true }).click();
     await expect(dialog).toHaveCount(0);
 
@@ -283,6 +278,54 @@ test('Clicking "Day 1" hides pins from other days and clicking "All" restores th
   }
 });
 
+test("A multi-day item stays visible on every covered day filter", async () => {
+  let seeded: SeededMapTrip | null = null;
+
+  try {
+    seeded = await seedMapTrip(organizerAuth.user.id);
+
+    const multiDayEvent: ItineraryListItem = {
+      day_date: "2026-05-01",
+      description: "A festival that runs all weekend.",
+      destination_latitude: null,
+      destination_longitude: null,
+      destination_name: null,
+      end_time: "2026-05-03T10:00:00.000Z",
+      id: randomUUID(),
+      image_url: "https://example.com/weekend-festival.jpg",
+      item_type: "event",
+      latitude: 48.8566,
+      location_name: "Champ de Mars",
+      longitude: 2.3522,
+      sort_order: 4,
+      start_time: "2026-05-01T20:00:00.000Z",
+      title: "Weekend Festival",
+    };
+
+    await insertItineraryItem(seeded.tripId, organizerAuth.user.id, multiDayEvent);
+
+    const page = await organizerAuth.context.newPage();
+    await page.goto(buildTripUrl(seeded.tripId));
+
+    const map = getMap(page);
+
+    await map.getByRole("button", { name: "Day 1", exact: true }).click();
+    await expect(map.getByRole("button", { name: "Open Weekend Festival pin" })).toHaveCount(1);
+
+    await map.getByRole("button", { name: "Day 2", exact: true }).click();
+    await expect(map.getByRole("button", { name: "Open Weekend Festival pin" })).toHaveCount(1);
+
+    await map.getByRole("button", { name: "Day 3", exact: true }).click();
+    await expect(map.getByRole("button", { name: "Open Weekend Festival pin" })).toHaveCount(1);
+
+    await page.close();
+  } finally {
+    if (seeded) {
+      await adminClient.from("trips").delete().eq("id", seeded.tripId);
+    }
+  }
+});
+
 test("Commute items show two pins connected by a line", async () => {
   let seeded: SeededMapTrip | null = null;
 
@@ -304,7 +347,7 @@ test("Commute items show two pins connected by a line", async () => {
   }
 });
 
-test("Map on the view-only page renders pins, info windows work, and edit capabilities stay hidden", async () => {
+test("Map on the view-only page renders pins, clicking a pin opens the detail modal, and edit capabilities stay hidden", async () => {
   let seeded: SeededMapTrip | null = null;
 
   try {
@@ -317,13 +360,11 @@ test("Map on the view-only page renders pins, info windows work, and edit capabi
     await expect(map.getByTestId("trip-map-pin")).toHaveCount(4);
     await map.getByRole("button", { name: "Open Hotel Check-in pin" }).click();
 
-    const infoWindow = map.getByTestId("trip-map-info-window");
-    await expect(infoWindow.getByText("Hotel Check-in")).toBeVisible();
-    await expect(infoWindow.getByText(formatItineraryItemTime(seeded.hotelItem))).toBeVisible();
-    await expect(infoWindow.getByText("Hotel du Louvre")).toBeVisible();
-
-    await infoWindow.getByRole("button", { name: "View details" }).click();
-    await expect(page.getByRole("dialog")).toBeVisible();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText("Hotel Check-in")).toBeVisible();
+    await expect(dialog.getByText(formatItineraryItemTime(seeded.hotelItem))).toBeVisible();
+    await expect(dialog.getByText("Hotel du Louvre")).toBeVisible();
     await expect(page.getByRole("button", { name: "Add Event" })).toHaveCount(0);
     await expect(page.getByText("You're viewing this trip as a guest. Have an invite code?")).toBeVisible();
 

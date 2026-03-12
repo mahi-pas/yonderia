@@ -1,3 +1,5 @@
+drop policy if exists "organizers can update non organizer participant nicknames" on public.trip_participants;
+
 create policy "organizers can update non organizer participant nicknames"
   on public.trip_participants
   for update

@@ -225,21 +225,21 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
   const currentUserDisplayName = profileMap.get(user.id)?.display_name ?? null;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
+    <main className="page-bg min-h-screen px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
       <div className="mx-auto max-w-5xl space-y-5">
-        <header className="rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,250,246,0.95),rgba(255,245,237,0.92))] p-5 shadow-[0_24px_70px_rgba(104,45,20,0.12)] sm:p-6">
+        <header className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 backdrop-blur-sm sm:p-6">
           <div className="flex items-start gap-4">
             <Link
               aria-label="Back to trip"
-              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-[#ebc5b5] bg-white text-xl text-[#6b4131] shadow-sm transition hover:bg-[#fff3eb]"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-xl text-[var(--muted)] transition hover:bg-[var(--surface-elevated)]"
               href={`/trip/${tripId}`}
             >
               ←
             </Link>
 
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Participants</p>
-              <h1 className="mt-2 text-balance font-display text-4xl leading-none text-[#34180f] sm:text-5xl">
+              <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Participants</p>
+              <h1 className="mt-2 text-balance font-display text-4xl leading-none text-[#fafafa] sm:text-5xl">
                 {resolvedTrip.name}
               </h1>
             </div>
@@ -251,8 +251,8 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
               className={[
                 "inline-flex min-h-11 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
                 activeTab === "people"
-                  ? "bg-[#c76038] text-white shadow-[0_18px_45px_rgba(199,96,56,0.28)]"
-                  : "border border-[#e6b9a3] bg-white/80 text-[#6b4131] hover:bg-[#fff2ea]",
+                  ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_4px_20px_rgba(139,92,246,0.25)]"
+                  : "border border-[var(--border-strong)] bg-[var(--surface)]/80 text-[#d4d4d8] hover:bg-[var(--surface-elevated)]",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -267,8 +267,8 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
                 className={[
                   "inline-flex min-h-11 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
                   activeTab === "invites"
-                    ? "bg-[#c76038] text-white shadow-[0_18px_45px_rgba(199,96,56,0.28)]"
-                    : "border border-[#e6b9a3] bg-white/80 text-[#6b4131] hover:bg-[#fff2ea]",
+                    ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_4px_20px_rgba(139,92,246,0.25)]"
+                    : "border border-[var(--border-strong)] bg-[var(--surface)]/80 text-[#d4d4d8] hover:bg-[var(--surface-elevated)]",
                 ]
                   .filter(Boolean)
                   .join(" ")}

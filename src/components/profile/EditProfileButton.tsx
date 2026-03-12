@@ -116,8 +116,8 @@ export default function EditProfileButton({
         }
       >
         <div className="space-y-6">
-          <div className="flex items-center gap-4 rounded-[1.6rem] border border-[#f0d5c7] bg-[linear-gradient(180deg,#fffdfb,#fff5ef)] p-4 shadow-sm">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[1.5rem] bg-[linear-gradient(135deg,#ffd4be,#f4a77f)] text-2xl font-semibold text-[#5a2b1c] shadow-inner">
+          <div className="flex items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] text-2xl font-semibold text-[#8b5cf6]">
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img alt={previewLabel} className="h-full w-full object-cover" src={avatarUrl} />
@@ -127,8 +127,8 @@ export default function EditProfileButton({
             </div>
 
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-[#5a2b1c]">Preview</p>
-              <p className="mt-1 text-sm leading-6 text-[#7c5a4c]">
+              <p className="gradient-text text-sm font-medium uppercase tracking-wide">Preview</p>
+              <p className="mt-1 text-sm leading-6 text-[#d4d4d8]">
                 This is how your profile photo and name show up around the app.
               </p>
             </div>
@@ -159,7 +159,7 @@ export default function EditProfileButton({
           />
 
           {errorMessage ? (
-            <div className="rounded-[1.25rem] border border-[#efb9a3] bg-[#fff1ea] px-4 py-3 text-sm text-[#8b3f22]">
+            <div className="rounded-2xl border border-[#ef4444/30] bg-[#450a0a/90] px-4 py-3 text-sm text-[#fca5a5]">
               {errorMessage}
             </div>
           ) : null}

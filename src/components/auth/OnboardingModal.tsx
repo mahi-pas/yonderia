@@ -143,17 +143,18 @@ export default function OnboardingModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-stone-950/40 backdrop-blur-sm sm:items-center sm:justify-center sm:p-6">
-      <div className="flex h-[100dvh] w-full flex-col rounded-t-[2rem] border border-white/70 bg-[rgba(255,249,245,0.98)] p-5 shadow-[0_24px_80px_rgba(99,46,25,0.22)] sm:h-auto sm:max-w-lg sm:rounded-[2rem] sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-end bg-black/70 backdrop-blur-md sm:items-center sm:justify-center sm:p-6">
+      <div className="relative flex h-[100dvh] w-full flex-col rounded-t-2xl border border-[var(--border-strong)] bg-[rgba(20,20,31,0.98)] p-5 shadow-[0_8px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:h-auto sm:max-w-lg sm:rounded-2xl sm:p-8">
+        <div className="absolute inset-x-0 top-0 h-px bg-[image:var(--accent-gradient)] opacity-40" />
         <div className="space-y-2">
-          <div className="mx-auto mb-4 h-1.5 w-14 rounded-full bg-[#e9c6b6] sm:hidden" />
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">
+          <div className="mx-auto mb-4 h-1.5 w-14 rounded-full bg-[var(--border-strong)] sm:hidden" />
+          <p className="text-xs font-semibold uppercase tracking-wide gradient-text">
             First things first
           </p>
-          <h2 className="font-display text-3xl leading-none text-[#34180f] sm:text-4xl">
+          <h2 className="font-display text-3xl leading-none text-[#fafafa] sm:text-4xl">
             Make your profile feel like you
           </h2>
-          <p className="text-sm leading-6 text-[#6f4a3b]">
+          <p className="text-sm leading-6 text-[var(--muted)]">
             This shows up across every trip, so set your name and a photo once and you are
             good to go.
           </p>
@@ -161,7 +162,7 @@ export default function OnboardingModal({
 
         <div className="mt-6 flex-1 space-y-5 overflow-y-auto pb-6">
           <div className="flex items-center gap-4">
-            <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-[1.75rem] bg-[linear-gradient(135deg,#ffd4be,#f4a77f)] text-2xl font-semibold text-[#5a2b1c] shadow-inner">
+            <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-[linear-gradient(135deg,var(--surface-elevated),var(--surface))] text-2xl font-semibold shadow-inner">
               {previewUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -170,11 +171,11 @@ export default function OnboardingModal({
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <span>{(displayName.trim() || user.email || "Y").charAt(0).toUpperCase()}</span>
+                <span className="gradient-text">{(displayName.trim() || user.email || "Y").charAt(0).toUpperCase()}</span>
               )}
             </div>
 
-            <label className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-[#d4a189] bg-white px-4 py-3 text-sm font-semibold text-[#5a2b1c] shadow-sm transition hover:border-[#b56445] hover:bg-[#fff4ec]">
+            <label className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm font-semibold text-[#d4d4d8] shadow-sm transition hover:border-[#8b5cf6]/50 hover:bg-[var(--surface-elevated)]">
               Choose photo
               <input
                 accept="image/*"
@@ -189,9 +190,9 @@ export default function OnboardingModal({
           </div>
 
           <label className="block">
-            <span className="mb-2 block text-sm font-semibold text-[#5a2b1c]">Display name</span>
+            <span className="mb-2 block text-sm font-medium text-[#d4d4d8]">Display name</span>
             <input
-              className="min-h-12 w-full rounded-[1.25rem] border border-[#e7c4b3] bg-white px-4 py-3 text-base text-[#34180f] outline-none transition placeholder:text-[#b78872] focus:border-[#b56445] focus:ring-2 focus:ring-[#ffd2bd]"
+              className="min-h-12 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-base text-[#fafafa] outline-none transition placeholder:text-[var(--muted-foreground)] focus:border-[#8b5cf6] focus:ring-2 focus:ring-[#8b5cf6]/20"
               maxLength={80}
               placeholder="What should people call you?"
               type="text"
@@ -203,15 +204,15 @@ export default function OnboardingModal({
           </label>
 
           {errorMessage ? (
-            <div className="rounded-[1.25rem] border border-[#efb9a3] bg-[#fff1ea] px-4 py-3 text-sm text-[#8b3f22]">
+            <div className="rounded-2xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
               {errorMessage}
             </div>
           ) : null}
         </div>
 
-        <div className="mt-7 flex justify-end border-t border-[#f2d3c6] pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:border-0 sm:pt-0 sm:pb-0">
+        <div className="mt-7 flex justify-end border-t border-[var(--border)] pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:border-0 sm:pt-0 sm:pb-0">
           <button
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#c85f37] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_32px_rgba(200,95,55,0.32)] transition hover:bg-[#b95430] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[image:var(--accent-gradient)] px-5 py-3 text-sm font-semibold text-white shadow-[0_2px_20px_rgba(139,92,246,0.3)] transition hover:brightness-110 hover:shadow-[0_4px_32px_rgba(139,92,246,0.4)] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
             disabled={isSaving}
             type="button"
             onClick={() => {

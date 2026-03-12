@@ -124,16 +124,16 @@ export default function JoinTripFlow({
   if (isAutoValidating && !participantId) {
     return (
       <>
-        <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
-          <div className="mx-auto max-w-lg rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,250,246,0.95),rgba(255,245,237,0.92))] p-6 shadow-[0_28px_90px_rgba(104,45,20,0.12)] sm:p-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Join trip</p>
-            <h1 className="mt-3 font-display text-4xl leading-none text-[#34180f]">Checking your invite</h1>
-            <p className="mt-3 text-sm leading-6 text-[#6f4a3b]">
+        <main className="page-bg min-h-screen px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
+          <div className="mx-auto max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+            <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Join trip</p>
+            <h1 className="mt-3 font-display text-4xl leading-none text-[#fafafa]">Checking your invite</h1>
+            <p className="mt-3 text-sm leading-6 text-[#d4d4d8]">
               We&apos;re validating your code and getting your spot ready.
             </p>
 
-            <div className="mt-8 flex items-center gap-3 rounded-[1.5rem] border border-[#efd5c8] bg-white/80 px-4 py-4 text-sm text-[#6f4a3b]">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#e2b4a2] border-t-[#c76038]" />
+            <div className="mt-8 flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 px-4 py-4 text-sm text-[#d4d4d8] backdrop-blur-sm">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[#8b5cf6]" />
               <span>Validating invite code...</span>
             </div>
           </div>
@@ -153,11 +153,11 @@ export default function JoinTripFlow({
 
   return (
     <>
-      <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
-        <div className="mx-auto max-w-lg rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,250,246,0.95),rgba(255,245,237,0.92))] p-6 shadow-[0_28px_90px_rgba(104,45,20,0.12)] sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Trip access</p>
-          <h1 className="mt-3 font-display text-4xl leading-none text-[#34180f]">Join this trip</h1>
-          <p className="mt-3 text-sm leading-6 text-[#6f4a3b]">
+      <main className="page-bg min-h-screen px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
+        <div className="mx-auto max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+          <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Trip access</p>
+          <h1 className="mt-3 font-display text-4xl leading-none text-[#fafafa]">Join this trip</h1>
+          <p className="mt-3 text-sm leading-6 text-[#d4d4d8]">
             Drop in a join code and we&apos;ll bring you straight to the plan.
           </p>
 
@@ -182,12 +182,12 @@ export default function JoinTripFlow({
             />
 
             {errorMessage ? (
-              <div className="rounded-[1.25rem] border border-[#efb9a3] bg-[#fff1ea] px-4 py-3 text-sm text-[#8b3f22]">
+              <div className="rounded-2xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
                 {errorMessage}
               </div>
             ) : null}
 
-            <div className="sticky bottom-3 z-10 -mx-1 rounded-[1.5rem] border border-white/80 bg-[rgba(255,249,245,0.96)] p-3 shadow-[0_16px_35px_rgba(90,40,20,0.12)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
+              <div className="sticky bottom-3 z-10 -mx-1 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/95 p-3 shadow-[0_4px_24px_rgba(0,0,0,0.3)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
               <Button
                 className="w-full"
                 disabled={!normalizedCode}

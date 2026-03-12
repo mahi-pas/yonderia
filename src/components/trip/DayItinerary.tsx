@@ -13,6 +13,7 @@ import ItineraryDetail from "./ItineraryDetail";
 
 type DayItineraryProps = {
   canManage: boolean;
+  commentCountByItemId?: Record<string, number>;
   currentUserId?: string;
   currentUserRole?: TripParticipantRole | null;
   error?: string | null;
@@ -29,6 +30,7 @@ type DayItineraryProps = {
 
 export default function DayItinerary({
   canManage,
+  commentCountByItemId = {},
   currentUserId,
   currentUserRole = null,
   error = null,
@@ -133,14 +135,14 @@ export default function DayItinerary({
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Itinerary</p>
-          <h2 className="mt-1 font-display text-3xl leading-none text-[#34180f]">Daily plan</h2>
+          <p className="text-xs font-semibold tracking-wide uppercase gradient-text">Itinerary</p>
+          <h2 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Daily plan</h2>
         </div>
-        <p className="text-sm text-[#7e5b4c]">{items.length} items</p>
+        <p className="text-sm text-[var(--muted)]">{items.length} items</p>
       </div>
 
       {error ? (
-        <div className="rounded-[1.25rem] border border-[#efb9a3] bg-[#fff1ea] px-4 py-3 text-sm text-[#8b3f22]">
+        <div className="rounded-xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
           {error}
         </div>
       ) : null}
@@ -153,10 +155,10 @@ export default function DayItinerary({
           return (
             <div
               key={day.dayDate}
-              className="overflow-hidden rounded-[1.75rem] border border-[#efd5c8] bg-white/80 shadow-sm"
+              className="trip-card overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 shadow-sm backdrop-blur-sm"
             >
               <button
-                className="flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-[#fff7f2]"
+                className="flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-[var(--surface-elevated)]"
                 type="button"
                 onClick={() => {
                   setExpandedDays((current) => ({
@@ -166,10 +168,10 @@ export default function DayItinerary({
                 }}
               >
                 <div>
-                  <h3 className="text-lg font-semibold text-[#34180f]">
+                  <h3 className="text-lg font-semibold text-[#fafafa]">
                     {`Day ${day.index + 1} — ${day.label}`}
                   </h3>
-                  <p className="mt-1 text-sm text-[#8a6455]">
+                  <p className="mt-1 text-sm text-[var(--muted)]">
                     {dayItems.length === 0
                       ? "Nothing added yet."
                       : `${dayItems.length} item${dayItems.length === 1 ? "" : "s"}`}
@@ -178,7 +180,7 @@ export default function DayItinerary({
                 <span
                   aria-hidden="true"
                   className={[
-                    "text-xl text-[#a85c3d] transition-transform duration-300",
+                    "text-xl text-[#8b5cf6] transition-transform duration-300",
                     isExpanded ? "rotate-90" : "",
                   ]
                     .filter(Boolean)
@@ -190,35 +192,38 @@ export default function DayItinerary({
 
               <div
                 className={[
-                  "grid transition-[grid-template-rows,opacity] duration-300 ease-out",
+                  "expand-collapse grid",
                   isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
                 ]
                   .filter(Boolean)
                   .join(" ")}
               >
                 <div className="overflow-hidden">
-                  <div className="space-y-3 border-t border-[#f3ddd2] px-4 py-4 sm:px-5">
+                  <div className="space-y-3 border-t border-[var(--border)] px-4 py-4 sm:px-5">
                     {dayItems.length > 0 ? (
                       dayItems.map((item) => (
                         <ItineraryCard
                           canEdit={canManage}
+                          commentCount={commentCountByItemId[item.id] ?? null}
+                          currentUserId={currentUserId}
                           key={item.id}
                           item={item}
                           onClick={() => {
                             setSelectedItem(item);
                           }}
                           onEdit={handleOpenEdit}
+                          rsvpSummary={item.rsvpSummary ?? null}
                         />
                       ))
                     ) : (
-                      <div className="rounded-[1.5rem] border border-dashed border-[#dfb7a4] bg-[linear-gradient(180deg,#fff8f4,#fff2ea)] px-5 py-8 text-center text-sm leading-6 text-[#7f5d50]">
+                      <div className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface-elevated)] px-5 py-8 text-center text-sm leading-6 text-[var(--muted)]">
                         {isLoading ? "Loading the plan..." : "Your crew hasn't added anything to this day yet."}
                       </div>
                     )}
 
                     {canManage && currentUserId ? (
                       <button
-                        className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#d88d68] bg-[#fff4ec] px-4 text-sm font-semibold text-[#9a4d2f] transition hover:bg-[#ffe9dd]"
+                        className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-4 text-sm font-semibold text-[#d4d4d8] transition hover:bg-[var(--surface-elevated)]"
                         type="button"
                         onClick={() => {
                           setActiveDayForAdd(day.dayDate);
@@ -258,6 +263,7 @@ export default function DayItinerary({
       ) : null}
 
       <ItineraryDetail
+        currentUserId={currentUserId}
         isOpen={selectedItem !== null}
         item={selectedItem}
         onClose={() => {
@@ -268,6 +274,8 @@ export default function DayItinerary({
           setIsDeleteDialogOpen(true);
         }}
         onEdit={handleOpenEdit}
+        rsvpSummary={selectedItem?.rsvpSummary ?? null}
+        tripId={tripId}
         userRole={currentUserRole}
       />
       <Modal
@@ -283,7 +291,7 @@ export default function DayItinerary({
         footer={
           <div className="space-y-3">
             {deleteError ? (
-              <div className="rounded-[1.25rem] border border-[#efb9a3] bg-[#fff1ea] px-4 py-3 text-sm text-[#8b3f22]">
+              <div className="rounded-xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
                 {deleteError}
               </div>
             ) : null}
@@ -299,7 +307,7 @@ export default function DayItinerary({
                 Cancel
               </Button>
               <Button
-                className="border border-[#e2a69a] bg-[#c84f3d] text-white hover:bg-[#b84231] focus:ring-[#ffd4be]"
+                className="border border-[#ef4444]/30 bg-[#ef4444] text-white hover:bg-[#dc2626] focus:ring-[#8b5cf6]/30"
                 isLoading={isDeleting}
                 onClick={() => {
                   void handleDelete();
@@ -311,7 +319,7 @@ export default function DayItinerary({
           </div>
         }
       >
-        <p className="text-sm leading-6 text-[#563a2e]">
+        <p className="text-sm leading-6 text-[#d4d4d8]">
           {itemPendingDelete ? `Delete ${itemPendingDelete.title}? This action cannot be undone.` : ""}
         </p>
       </Modal>

@@ -1,7 +1,7 @@
 import { eachDayOfInterval, format, parseISO } from "date-fns";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { ItineraryItem } from "@/lib/types";
+import type { ItineraryItem, RsvpSummary } from "@/lib/types";
 
 export type ItineraryListItem = Pick<
   ItineraryItem,
@@ -20,7 +20,7 @@ export type ItineraryListItem = Pick<
   | "sort_order"
   | "start_time"
   | "title"
->;
+> & { rsvpSummary?: RsvpSummary };
 
 type UseItineraryOptions = {
   enabled?: boolean;

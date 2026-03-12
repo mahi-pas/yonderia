@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import CreateTripFlow from "@/components/trip/CreateTripFlow";
 import TripCard from "@/components/trip/TripCard";
+import PageBackground from "@/components/ui/PageBackground";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile, Trip, TripParticipant } from "@/lib/types";
 
@@ -145,17 +146,20 @@ export default async function DashboardPage() {
   const trips = await getDashboardTrips(user.id);
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
-      <div className="mx-auto max-w-7xl">
-        <section className="rounded-[2.25rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,250,246,0.95),rgba(255,245,237,0.92))] p-5 shadow-[0_28px_90px_rgba(104,45,20,0.12)] sm:p-7 lg:p-8">
+    <main className="page-bg relative min-h-screen px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
+      <PageBackground />
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 shadow-[0_4px_40px_rgba(0,0,0,0.3)] backdrop-blur-sm sm:p-7 lg:p-8">
+          <div className="absolute inset-x-0 top-0 h-px bg-[image:var(--accent-gradient)] opacity-20 rounded-t-2xl" />
+
           <div className="max-w-2xl space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">
+            <p className="text-xs font-semibold tracking-wide uppercase gradient-text">
               Dashboard
             </p>
-            <h1 className="font-display text-5xl leading-[0.95] text-[#34180f] sm:text-6xl">
+            <h1 className="font-display text-5xl leading-[0.95] text-[#fafafa] sm:text-6xl">
               Your trips live here
             </h1>
-            <p className="max-w-xl text-sm leading-6 text-[#6f4a3b] sm:text-base">
+            <p className="max-w-xl text-sm leading-6 text-[var(--muted)] sm:text-base">
               Jump back into the plans already in motion or spin up a fresh trip and head straight
               to invite links for your crew.
             </p>
@@ -178,7 +182,7 @@ export default async function DashboardPage() {
           </div>
 
           {trips.length === 0 ? (
-            <div className="mt-6 rounded-[1.75rem] border border-[#f0d3c5] bg-white/70 px-5 py-4 text-sm leading-6 text-[#6f4a3b]">
+            <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] px-5 py-4 text-sm leading-6 text-[var(--muted)]">
               No trips yet. Start with one warm little plan, then invite everyone in.
             </div>
           ) : null}

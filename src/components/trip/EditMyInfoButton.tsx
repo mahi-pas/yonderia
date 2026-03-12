@@ -65,24 +65,24 @@ export default function EditMyInfoButton({
   return (
     <>
       <button
-        className="group w-full rounded-[1.85rem] border border-[#f0c8b7] bg-[linear-gradient(180deg,#fff8f3,#fff1e7)] p-5 text-left shadow-[0_18px_40px_rgba(120,58,30,0.10)] transition hover:border-[#d98e6d] hover:shadow-[0_20px_45px_rgba(120,58,30,0.14)] focus:outline-none focus:ring-4 focus:ring-[#ffe0d1]"
+        className="group w-full rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 text-left shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.2)] backdrop-blur-sm transition hover:border-[#8b5cf6]/30 hover:shadow-[0_2px_8px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.3)] focus:outline-none focus:ring-4 focus:ring-[#8b5cf6]/30"
         type="button"
         onClick={() => setIsOpen(true)}
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">
+            <p className="gradient-text text-xs font-semibold uppercase tracking-wide">
               Your trip details
             </p>
-            <h2 className="font-display text-3xl leading-none text-[#34180f]">
+            <h2 className="font-display text-3xl leading-none text-[#fafafa]">
               {hasTravelDetails ? "Update your info" : "Set your travel details"}
             </h2>
-            <p className="text-sm leading-6 text-[#6f4a3b]">
+            <p className="text-sm leading-6 text-[#d4d4d8]">
               {summary || "Add your nickname, arrival, and departure details so the crew knows your plan."}
             </p>
           </div>
 
-          <span className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#ddb39f] bg-white/90 px-4 py-2 text-sm font-semibold text-[#5a2b1c] shadow-sm transition group-hover:border-[#c67b5a] group-hover:bg-[#fff7f1]">
+          <span className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--border)] bg-[var(--background)]/50 px-4 py-2 text-sm font-semibold text-[#d4d4d8] shadow-sm transition group-hover:border-[#8b5cf6] group-hover:text-[#8b5cf6]">
             {hasTravelDetails ? "Update info" : "Set details"}
           </span>
         </div>

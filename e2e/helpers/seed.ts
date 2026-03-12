@@ -6,6 +6,7 @@ import type {
   InviteCodeType,
   ItineraryItem,
   ItineraryItemType,
+  RsvpStatus,
   Trip,
   TripParticipant,
   TripParticipantRole,
@@ -198,4 +199,41 @@ export async function createTestItineraryItem(
   }
 
   return data;
+}
+
+export async function insertEventRsvp(
+  itineraryItemId: string,
+  userId: string,
+  status: RsvpStatus,
+): Promise<void> {
+  const supabase = createServiceRoleClient();
+  const { error } = await supabase.from("event_rsvps").insert({
+    itinerary_item_id: itineraryItemId,
+    user_id: userId,
+    status,
+  });
+  if (error) {
+    throw error;
+  }
+}
+
+export async function insertEventComment(
+  itineraryItemId: string,
+  userId: string,
+  options: { content?: string | null; gifUrl?: string | null },
+): Promise<void> {
+  const supabase = createServiceRoleClient();
+  const { content = null, gifUrl = null } = options;
+  if (content === null && gifUrl === null) {
+    throw new Error("Event comment must have content or gifUrl");
+  }
+  const { error } = await supabase.from("event_comments").insert({
+    itinerary_item_id: itineraryItemId,
+    user_id: userId,
+    content,
+    gif_url: gifUrl,
+  });
+  if (error) {
+    throw error;
+  }
 }

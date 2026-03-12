@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import BackgroundEffects from "@/components/trip/BackgroundEffects";
 import DayItinerary from "@/components/trip/DayItinerary";
 import LiveTripOverview from "@/components/trip/LiveTripOverview";
 import ParticipantsRow from "@/components/trip/ParticipantsRow";
 import TripMap from "@/components/trip/TripMap";
 import TripHeader from "@/components/trip/TripHeader";
+import TripThemeProvider from "@/components/trip/TripThemeProvider";
 import Input from "@/components/ui/Input";
+import PageBackground from "@/components/ui/PageBackground";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -72,10 +75,10 @@ async function fetchViewOnlyTripData(tripId: string, code: string): Promise<Trip
 
 function GuestBanner({ tripId }: { tripId: string }) {
   return (
-    <div className="rounded-[1.6rem] border border-[#f1c7b3] bg-[linear-gradient(180deg,#fff4ed,#ffefe5)] p-4 shadow-sm">
-      <p className="text-sm leading-6 text-[#6b4131]">
+    <div className="trip-card rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-4 shadow-sm backdrop-blur-sm">
+      <p className="text-sm leading-6 text-[#d4d4d8]">
         You&apos;re viewing this trip as a guest. Have an invite code?{" "}
-        <Link className="font-semibold text-[#b24f2d] underline underline-offset-4" href={`/trip/${tripId}/join`}>
+        <Link className="font-semibold text-[#8b5cf6] underline underline-offset-4 hover:text-[#a78bfa]" href={`/trip/${tripId}/join`}>
           Enter it to join!
         </Link>
       </p>
@@ -91,24 +94,25 @@ function InviteEntryForm({
   tripId: string;
 }) {
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
-      <div className="mx-auto max-w-lg rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,250,246,0.95),rgba(255,245,237,0.92))] p-6 shadow-[0_28px_90px_rgba(104,45,20,0.12)] sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">Trip access</p>
-        <h1 className="mt-3 font-display text-4xl leading-none text-[#34180f]">Enter your invite code</h1>
-        <p className="mt-3 text-sm leading-6 text-[#6f4a3b]">
+    <main className="page-bg relative min-h-screen px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
+      <PageBackground />
+      <div className="relative z-10 mx-auto max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-sm sm:p-8">
+        <p className="text-xs font-semibold tracking-wide uppercase gradient-text">Trip access</p>
+        <h1 className="mt-3 font-display text-4xl leading-none text-[#fafafa]">Enter your invite code</h1>
+        <p className="mt-3 text-sm leading-6 text-[#d4d4d8]">
           This trip is private. Drop in a join code to continue.
         </p>
 
         <form action={`/trip/${tripId}/join`} className="mt-6 space-y-4" method="get">
           <Input label="Invite code" name="code" placeholder="abc123join" />
           {errorMessage ? (
-            <div className="rounded-[1.25rem] border border-[#efb9a3] bg-[#fff1ea] px-4 py-3 text-sm text-[#8b3f22]">
+            <div className="rounded-2xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
               {errorMessage}
             </div>
           ) : null}
-          <div className="sticky bottom-3 z-10 -mx-1 rounded-[1.5rem] border border-white/80 bg-[rgba(255,249,245,0.96)] p-3 shadow-[0_16px_35px_rgba(90,40,20,0.12)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
+          <div className="sticky bottom-3 z-10 -mx-1 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/95 p-3 shadow-[0_4px_24px_rgba(0,0,0,0.3)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
             <button
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#c76038] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(199,96,56,0.28)] transition hover:bg-[#b55531]"
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[image:var(--accent-gradient)] px-5 py-3 text-sm font-semibold text-white shadow-[0_2px_20px_rgba(139,92,246,0.3)] transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
               type="submit"
             >
               Continue to join
@@ -135,9 +139,15 @@ function TripPageLayout({
   data: TripPageData;
   guestMode?: boolean;
 }) {
+  const theme = data.trip.theme ?? undefined;
+  const effect = theme?.effect ?? "none";
+
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#ffe1d0_0%,#fff8f4_42%,#fff6ef_100%)] px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
-      <div className="mx-auto max-w-6xl space-y-5 lg:space-y-6">
+    <TripThemeProvider theme={theme}>
+      <main className="page-bg relative min-h-screen px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
+        <PageBackground />
+        <BackgroundEffects effect={effect} />
+        <div className="relative z-10 mx-auto max-w-6xl space-y-5 lg:space-y-6">
         {guestMode ? <GuestBanner tripId={data.trip.id} /> : null}
 
         <TripHeader
@@ -150,9 +160,9 @@ function TripPageLayout({
           tripId={data.trip.id}
         />
 
-        <section className="rounded-[1.75rem] border border-[#efd5c8] bg-white/75 p-5 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b56445]">About this trip</p>
-          <div className="mt-4 text-sm leading-7 text-[#563a2e] sm:text-base">
+        <section className="trip-card rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 shadow-sm backdrop-blur-sm">
+          <p className="text-xs font-semibold tracking-wide uppercase gradient-text">About this trip</p>
+          <div className="mt-4 text-sm leading-7 text-[#d4d4d8] sm:text-base">
             {data.trip.description?.trim() || "Trip details are still coming together."}
           </div>
         </section>
@@ -186,8 +196,9 @@ function TripPageLayout({
             tripStartDate={data.trip.start_date}
           />
         )}
-      </div>
-    </main>
+        </div>
+      </main>
+    </TripThemeProvider>
   );
 }
 

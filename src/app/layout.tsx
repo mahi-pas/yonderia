@@ -1,15 +1,16 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
-import { Baloo_2, Manrope } from "next/font/google";
+import { Space_Grotesk, DM_Sans } from "next/font/google";
 import AuthProvider from "@/components/auth/AuthProvider";
 import "./globals.css";
 
-const displayFont = Baloo_2({
+const displayFont = Space_Grotesk({
+  weight: ["500", "600", "700"],
   subsets: ["latin"],
   variable: "--font-display",
 });
 
-const bodyFont = Manrope({
+const bodyFont = DM_Sans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
@@ -17,6 +18,9 @@ const bodyFont = Manrope({
 export const metadata: Metadata = {
   title: "Yonderia",
   description: "Plan adventures with your people.",
+  icons: {
+    icon: "/yonderia_logo.jpg",
+  },
 };
 
 export default function RootLayout({
@@ -27,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${displayFont.variable} ${bodyFont.variable} min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased`}
+        className={`${displayFont.variable} ${bodyFont.variable} min-h-screen bg-background text-foreground antialiased`}
       >
         <AuthProvider>{children}</AuthProvider>
       </body>

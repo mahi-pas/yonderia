@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type ReactNode, type TouchEvent } from "react";
+import { createPortal } from "react-dom";
 
 type ModalProps = {
   children: ReactNode;
@@ -115,10 +116,10 @@ export default function Modal({
     return null;
   }
 
-  return (
+  const overlay = (
     <div
       className={[
-        "fixed inset-0 z-50 bg-stone-950/50 backdrop-blur-sm transition-opacity duration-200",
+        "fixed inset-0 z-50 bg-black/70 backdrop-blur-md transition-opacity duration-200",
         isVisible ? "opacity-100" : "opacity-0",
       ]
         .filter(Boolean)
@@ -132,40 +133,43 @@ export default function Modal({
         onClick={onClose}
       />
 
-      <div className="absolute inset-x-0 bottom-0 top-auto flex max-h-[100dvh] items-end sm:inset-0 sm:items-center sm:justify-center sm:p-6">
+      <div className="absolute inset-0 flex items-end justify-center pt-[env(safe-area-inset-top)] sm:items-center sm:justify-center sm:pt-0 sm:p-6">
         <section
           aria-modal="true"
           aria-describedby={description ? descriptionId : undefined}
           aria-labelledby={title ? titleId : undefined}
           className={[
-            "relative flex h-[100dvh] w-full flex-col overflow-hidden rounded-t-[2rem] border border-white/70 bg-[rgba(255,249,245,0.98)] shadow-[0_-8px_40px_rgba(67,27,12,0.18)] transition-transform duration-300 ease-out sm:h-auto sm:max-h-[90dvh] sm:max-w-3xl sm:rounded-[2rem] sm:shadow-[0_28px_90px_rgba(90,40,20,0.24)]",
-            isVisible ? "sm:scale-100" : "sm:scale-[0.98]",
+            "relative flex w-full flex-col overflow-hidden rounded-t-2xl border border-[var(--border-strong)] bg-[rgba(20,20,31,0.98)] shadow-[0_-4px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-transform duration-300 ease-out sm:h-auto sm:max-h-[90dvh] sm:max-w-3xl sm:rounded-2xl sm:shadow-[0_8px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(139,92,246,0.08)]",
+            "min-h-[calc(100svh-env(safe-area-inset-top))] h-[calc(100svh-env(safe-area-inset-top))] sm:min-h-0 sm:h-auto",
+            isVisible ? "sm:scale-100 sm:opacity-100" : "sm:scale-[0.96] sm:opacity-0",
             panelClassName,
           ]
             .filter(Boolean)
             .join(" ")}
           role="dialog"
           style={{
-            transform: isMobile ? `translateY(${sheetOffset + (isVisible ? 0 : 32)}px)` : undefined,
+            transform: isMobile ? `translateY(${sheetOffset + (isVisible ? 0 : 100)}%)` : undefined,
             transitionDuration: sheetOffset > 0 ? "0ms" : undefined,
           }}
         >
+          <div className="absolute inset-x-0 top-0 h-px bg-[image:var(--accent-gradient)] opacity-40" />
+
           <div
-            className="touch-pan-y border-b border-[#f2d3c6] px-5 pb-4 pt-5 sm:px-8 sm:pt-7"
+            className="touch-pan-y border-b border-[var(--border)] pl-5 pr-[max(1.5rem,calc(0.5rem+env(safe-area-inset-right)))] pb-4 pt-5 sm:px-8 sm:pt-7"
             onTouchEnd={handleTouchEnd}
             onTouchMove={handleTouchMove}
             onTouchStart={handleTouchStart}
           >
-            <div className="mx-auto mb-4 h-1.5 w-14 rounded-full bg-[#e9c6b6] sm:hidden" />
+            <div className="mx-auto mb-4 h-1.5 w-14 rounded-full bg-[#3f3f46] sm:hidden" />
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-2">
                 {title ? (
-                  <h2 className="font-display text-3xl leading-none text-[#34180f] sm:text-4xl" id={titleId}>
+                  <h2 className="font-display text-3xl leading-none text-[#fafafa] sm:text-4xl" id={titleId}>
                     {title}
                   </h2>
                 ) : null}
                 {description ? (
-                  <p className="max-w-2xl text-sm leading-6 text-[#6f4a3b]" id={descriptionId}>
+                  <p className="max-w-2xl text-sm leading-6 text-[var(--muted)]" id={descriptionId}>
                     {description}
                   </p>
                 ) : null}
@@ -173,7 +177,7 @@ export default function Modal({
 
               <button
                 aria-label="Close modal"
-                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#ebc5b5] bg-white text-xl text-[#6b4131] transition hover:bg-[#fff3eb]"
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-xl text-[var(--muted)] transition hover:bg-[var(--surface-elevated)] hover:text-[#fafafa]"
                 type="button"
                 onClick={onClose}
               >
@@ -187,7 +191,7 @@ export default function Modal({
           </div>
 
           {footer ? (
-            <div className="border-t border-[#f2d3c6] bg-[rgba(255,249,245,0.98)] px-5 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:px-8 sm:pb-4">
+            <div className="border-t border-[var(--border)] bg-[rgba(20,20,31,0.98)] px-5 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:px-8 sm:pb-4">
               {footer}
             </div>
           ) : null}
@@ -195,4 +199,6 @@ export default function Modal({
       </div>
     </div>
   );
+
+  return typeof document !== "undefined" ? createPortal(overlay, document.body) : overlay;
 }
