@@ -6,6 +6,7 @@ import type {
   ItineraryItem,
   InviteCodeType,
   Profile,
+  RsvpStatus,
   RsvpSummary,
   Trip,
   TripParticipant,
@@ -233,10 +234,12 @@ export async function getTripPageData(
   supabase: SupabaseClient<Database>,
   tripId: string,
   options?: {
+    currentUserId?: string | null;
     includeProfilePaths?: boolean;
   },
 ): Promise<TripPageData | null> {
   const includeProfilePaths = options?.includeProfilePaths ?? false;
+  const currentUserId = options?.currentUserId ?? null;
 
   const [
     { data: tripData, error: tripError },
@@ -330,25 +333,29 @@ export async function getTripPageData(
   if (itineraryItemIds.length > 0) {
     const { data: rsvpRows } = await supabase
       .from("event_rsvps")
-      .select("itinerary_item_id, status")
+      .select("itinerary_item_id, status, user_id")
       .in("itinerary_item_id", itineraryItemIds);
 
-    const rows = (rsvpRows ?? []) as { itinerary_item_id: string; status: string }[];
+    const rows = (rsvpRows ?? []) as { itinerary_item_id: string; status: string; user_id: string }[];
     for (const id of itineraryItemIds) {
       let going = 0;
       let interested = 0;
       let not_going = 0;
+      let userStatus: RsvpStatus | null = null;
       for (const r of rows) {
         if (r.itinerary_item_id !== id) continue;
         if (r.status === "going") going++;
         else if (r.status === "interested") interested++;
         else if (r.status === "not_going") not_going++;
+        if (currentUserId && r.user_id === currentUserId) {
+          userStatus = r.status as RsvpStatus;
+        }
       }
       rsvpCountsByItem.set(id, {
         going,
         interested,
         not_going,
-        userStatus: null,
+        userStatus,
       });
     }
   }

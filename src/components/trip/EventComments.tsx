@@ -180,19 +180,19 @@ export default function EventComments({
 
   const addCommentArea = (
     <>
-      <div className="flex gap-2">
+      <div className="flex max-w-md gap-2">
         <textarea
           placeholder="Add a comment..."
           value={draft}
           onChange={(e) => setDraft(e.target.value.slice(0, MAX_LENGTH))}
           onKeyDown={handleKeyDown}
-          rows={2}
-          className="min-h-11 flex-1 resize-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-4 py-2.5 text-sm text-[#fafafa] placeholder:text-[var(--muted-foreground)] focus:border-[#8b5cf6] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/20"
+          rows={1}
+          className="min-h-9 max-h-24 flex-1 resize-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-3 py-2 text-sm text-[#fafafa] placeholder:text-[var(--muted-foreground)] focus:border-[#8b5cf6] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/20"
         />
         <button
           type="button"
           aria-label="Add GIF"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] text-lg text-[var(--muted-foreground)] transition hover:bg-[var(--surface)] hover:text-[#d4d4d8] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/20"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] text-sm text-[var(--muted-foreground)] transition hover:bg-[var(--surface)] hover:text-[#d4d4d8] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/20"
           onClick={() => setShowGifPicker(true)}
         >
           GIF
@@ -200,7 +200,7 @@ export default function EventComments({
         <button
           type="button"
           disabled={!canSend}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[image:var(--accent-gradient)] text-white shadow-sm transition hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[image:var(--accent-gradient)] text-white shadow-sm transition hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
           onClick={handleSend}
           aria-label="Send comment"
         >

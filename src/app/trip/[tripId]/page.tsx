@@ -216,6 +216,7 @@ export default async function TripPage({ params, searchParams }: PageProps) {
 
     if (membership) {
       const participantTripData = await getTripPageData(supabase, tripId, {
+        currentUserId: user.id,
         includeProfilePaths: true,
       });
 

@@ -6,6 +6,7 @@ import type { ItineraryListItem } from "@/hooks/useItinerary";
 import type { AllEventCommentRow } from "@/hooks/useAllEventComments";
 import type { CommentReactionSummary } from "@/lib/types";
 import { useCommentReactions } from "@/hooks/useCommentReactions";
+import { useMyEventRsvps } from "@/hooks/useMyEventRsvps";
 import CommentReactions from "./CommentReactions";
 
 export type CommentsSortBy = "newest" | "oldest" | "most_reactions";
@@ -121,6 +122,13 @@ export default function AllCommentsView({
   const [sortBy, setSortBy] = useState<CommentsSortBy>("newest");
   const [filterByGoingOnly, setFilterByGoingOnly] = useState(false);
 
+  const itineraryItemIds = useMemo(() => Array.from(itemById.keys()), [itemById]);
+  const myRsvpByItemId = useMyEventRsvps({
+    currentUserId,
+    enabled: !!currentUserId && itineraryItemIds.length > 0,
+    itineraryItemIds,
+  });
+
   const commentIds = useMemo(() => comments.map((r) => r.comment.id), [comments]);
   const {
     addReaction,
@@ -135,10 +143,7 @@ export default function AllCommentsView({
   const displayedComments = useMemo(() => {
     let list = comments;
     if (filterByGoingOnly && currentUserId) {
-      list = list.filter((row) => {
-        const item = itemById.get(row.itineraryItemId);
-        return item?.rsvpSummary?.userStatus === "going";
-      });
+      list = list.filter((row) => myRsvpByItemId.get(row.itineraryItemId) === "going");
     }
     const getReactionCount = (commentId: string) =>
       (reactionsByCommentId.get(commentId) ?? []).reduce((s, r) => s + r.count, 0);
@@ -154,7 +159,7 @@ export default function AllCommentsView({
       if (rb !== ra) return rb - ra;
       return new Date(b.comment.created_at).getTime() - new Date(a.comment.created_at).getTime();
     });
-  }, [comments, filterByGoingOnly, currentUserId, itemById, sortBy, reactionsByCommentId]);
+  }, [comments, filterByGoingOnly, currentUserId, myRsvpByItemId, sortBy, reactionsByCommentId]);
 
   if (error) {
     return (
