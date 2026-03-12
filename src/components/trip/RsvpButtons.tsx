@@ -66,6 +66,10 @@ export default function RsvpButtons({
   const userStatus = "userStatus" in summary ? summary.userStatus : null;
 
   if (variant === "compact") {
+    if (goingCount === 0) {
+      return null;
+    }
+
     return (
       <span className="inline-flex items-center gap-2">
         <span
