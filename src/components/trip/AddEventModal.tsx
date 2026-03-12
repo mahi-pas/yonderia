@@ -36,6 +36,7 @@ type AddEventModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onCreated: (item: ItineraryListItem) => void;
+  onDeleted?: (itemId: string) => void;
   onUpdated?: (item: ItineraryListItem) => void;
   tripId: string;
 };
@@ -222,6 +223,7 @@ export default function AddEventModal({
   isOpen,
   onClose,
   onCreated,
+  onDeleted,
   onUpdated,
   tripId,
 }: AddEventModalProps) {
@@ -239,6 +241,9 @@ export default function AddEventModal({
   const [itemType, setItemType] = useState<ItineraryItemType>("event");
   const [selectedSuggestionUrl, setSelectedSuggestionUrl] = useState<string | null>(null);
   const [showCustomUploader, setShowCustomUploader] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const isEditMode = editItem !== null;
   const itemTypeLabel = getItemTypeLabel(itemType);
 
@@ -260,6 +265,9 @@ export default function AddEventModal({
     setItemType(editItem?.item_type ?? "event");
     setSelectedSuggestionUrl(null);
     setShowCustomUploader(false);
+    setIsDeleteConfirmOpen(false);
+    setDeleteError(null);
+    setIsDeleting(false);
   }, [dayDate, editItem, isOpen]);
 
   useEffect(() => {
@@ -485,6 +493,31 @@ export default function AddEventModal({
       setIsSaving(false);
     }
   };
+
+  async function handleDeleteItem() {
+    if (!editItem || !onDeleted) {
+      return;
+    }
+    setDeleteError(null);
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("itinerary_items")
+        .delete()
+        .eq("id", editItem.id)
+        .eq("trip_id", tripId);
+      if (error) throw error;
+      onDeleted(editItem.id);
+      setIsDeleteConfirmOpen(false);
+      onClose();
+    } catch (err) {
+      setDeleteError(
+        err instanceof Error ? err.message : "We couldn't delete that itinerary item right now.",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  }
 
   return (
     <Modal
@@ -845,7 +878,69 @@ export default function AddEventModal({
             )}
           </div>
         </div>
+
+        {isEditMode && editItem ? (
+          <div className="mt-8 border-t border-[var(--border)] pt-6">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+              Danger zone
+            </p>
+            <button
+              type="button"
+              className="text-sm text-[#ef4444] underline decoration-[#ef4444]/40 underline-offset-2 hover:decoration-[#ef4444]"
+              onClick={() => setIsDeleteConfirmOpen(true)}
+              disabled={isSaving}
+            >
+              Delete this item
+            </button>
+          </div>
+        ) : null}
       </div>
+
+      <Modal
+        description="This action cannot be undone."
+        isOpen={isDeleteConfirmOpen}
+        title="Are you sure?"
+        onClose={() => {
+          if (!isDeleting) {
+            setDeleteError(null);
+            setIsDeleteConfirmOpen(false);
+          }
+        }}
+        footer={
+          <div className="space-y-3">
+            {deleteError ? (
+              <div className="rounded-xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
+                {deleteError}
+              </div>
+            ) : null}
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <Button
+                disabled={isDeleting}
+                variant="secondary"
+                onClick={() => {
+                  setDeleteError(null);
+                  setIsDeleteConfirmOpen(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="border border-[#ef4444]/30 bg-[#ef4444] text-white hover:bg-[#dc2626] focus:ring-[#8b5cf6]/30"
+                isLoading={isDeleting}
+                onClick={() => void handleDeleteItem()}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        }
+      >
+        <p className="text-sm leading-6 text-[#d4d4d8]">
+          {editItem
+            ? `Delete "${editItem.title}"? This action cannot be undone.`
+            : "Delete this item? This action cannot be undone."}
+        </p>
+      </Modal>
     </Modal>
   );
 }

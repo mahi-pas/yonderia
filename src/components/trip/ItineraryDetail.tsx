@@ -15,7 +15,6 @@ type ItineraryDetailProps = {
   isOpen: boolean;
   item: ItineraryListItem | null;
   onClose: () => void;
-  onDelete?: (item: ItineraryListItem) => void;
   onEdit?: (item: ItineraryListItem) => void;
   rsvpSummary?: RsvpSummary | null;
   tripId?: string;
@@ -48,7 +47,6 @@ export default function ItineraryDetail({
   isOpen,
   item,
   onClose,
-  onDelete,
   onEdit,
   rsvpSummary = null,
   tripId,
@@ -61,7 +59,6 @@ export default function ItineraryDetail({
   }
 
   const canManage = userRole === "organizer" || userRole === "planner";
-  const canDelete = canManage && typeof onDelete === "function";
   const canEdit = canManage && typeof onEdit === "function";
   const badge = getItineraryBadge(item.item_type);
   const originLabel = item.location_name ?? "Location coming together";
@@ -90,16 +87,6 @@ export default function ItineraryDetail({
               }}
             >
               Edit
-            </Button>
-          ) : null}
-          {canDelete ? (
-            <Button
-              className="border border-[#ef4444/30] bg-[#dc2626] text-white hover:bg-[#b91c1c] focus:ring-[#8b5cf6]/30"
-              onClick={() => {
-                onDelete?.(item);
-              }}
-            >
-              Delete
             </Button>
           ) : null}
         </div>

@@ -3,10 +3,7 @@
 import { eachDayOfInterval, format, parseISO } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { groupItineraryItemsByDay, type ItineraryListItem } from "@/hooks/useItinerary";
-import { createClient } from "@/lib/supabase/client";
 import type { TripParticipantRole } from "@/lib/types";
-import Button from "@/components/ui/Button";
-import Modal from "@/components/ui/Modal";
 import AddEventModal from "./AddEventModal";
 import ItineraryCard from "./ItineraryCard";
 import ItineraryDetail from "./ItineraryDetail";
@@ -44,15 +41,11 @@ export default function DayItinerary({
   tripId,
   tripStartDate,
 }: DayItineraryProps) {
-  const supabase = useMemo(() => (canManage ? createClient() : null), [canManage]);
   const [activeDayForAdd, setActiveDayForAdd] = useState<string | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<ItineraryListItem | null>(null);
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>(() => ({
     [tripStartDate]: true,
   }));
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ItineraryListItem | null>(null);
   const resolvedGroupedByDay = useMemo(() => groupedByDay ?? groupItineraryItemsByDay(items), [groupedByDay, items]);
 
@@ -73,46 +66,7 @@ export default function DayItinerary({
     }
   }, [items, selectedItem]);
 
-  const itemPendingDelete = selectedItem;
-
-  async function handleDelete() {
-    if (!itemPendingDelete) {
-      return;
-    }
-
-    if (!supabase) {
-      setDeleteError("You don't have permission to delete itinerary items.");
-      return;
-    }
-
-    setDeleteError(null);
-    setIsDeleting(true);
-
-    try {
-      const { error: deleteItemError } = await supabase
-        .from("itinerary_items")
-        .delete()
-        .eq("id", itemPendingDelete.id)
-        .eq("trip_id", tripId);
-
-      if (deleteItemError) {
-        throw deleteItemError;
-      }
-
-      onDeleted?.(itemPendingDelete.id);
-      setIsDeleteDialogOpen(false);
-      setSelectedItem(null);
-    } catch (deleteError) {
-      setDeleteError(
-        deleteError instanceof Error ? deleteError.message : "We couldn't delete that itinerary item right now.",
-      );
-    } finally {
-      setIsDeleting(false);
-    }
-  }
-
   function handleOpenEdit(item: ItineraryListItem) {
-    setDeleteError(null);
     setSelectedItem(null);
     setActiveDayForAdd(null);
     setEditingItem(item);
@@ -255,6 +209,10 @@ export default function DayItinerary({
           onCreated={(item) => {
             onCreated?.(item);
           }}
+          onDeleted={(itemId) => {
+            onDeleted?.(itemId);
+            setEditingItem(null);
+          }}
           onUpdated={(item) => {
             onUpdated?.(item);
             setEditingItem(null);
@@ -269,60 +227,11 @@ export default function DayItinerary({
         onClose={() => {
           setSelectedItem(null);
         }}
-        onDelete={() => {
-          setDeleteError(null);
-          setIsDeleteDialogOpen(true);
-        }}
         onEdit={handleOpenEdit}
         rsvpSummary={selectedItem?.rsvpSummary ?? null}
         tripId={tripId}
         userRole={currentUserRole}
       />
-      <Modal
-        description="This action cannot be undone."
-        isOpen={isDeleteDialogOpen && itemPendingDelete !== null}
-        title={itemPendingDelete ? `Delete ${itemPendingDelete.title}?` : "Delete item?"}
-        onClose={() => {
-          if (!isDeleting) {
-            setDeleteError(null);
-            setIsDeleteDialogOpen(false);
-          }
-        }}
-        footer={
-          <div className="space-y-3">
-            {deleteError ? (
-              <div className="rounded-xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
-                {deleteError}
-              </div>
-            ) : null}
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <Button
-                disabled={isDeleting}
-                variant="secondary"
-                onClick={() => {
-                  setDeleteError(null);
-                  setIsDeleteDialogOpen(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="border border-[#ef4444]/30 bg-[#ef4444] text-white hover:bg-[#dc2626] focus:ring-[#8b5cf6]/30"
-                isLoading={isDeleting}
-                onClick={() => {
-                  void handleDelete();
-                }}
-              >
-                Delete
-              </Button>
-            </div>
-          </div>
-        }
-      >
-        <p className="text-sm leading-6 text-[#d4d4d8]">
-          {itemPendingDelete ? `Delete ${itemPendingDelete.title}? This action cannot be undone.` : ""}
-        </p>
-      </Modal>
     </section>
   );
 }
