@@ -43,12 +43,12 @@ function CommentCard({
   const hasMore = (comment.content?.length ?? 0) > 200;
 
   return (
-    <article className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3 sm:p-4">
+    <article className="rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--muted-foreground)] sm:gap-x-3">
         <button
           type="button"
           onClick={onViewEvent}
-          className="font-semibold text-[#a78bfa] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface-elevated)] rounded"
+          className="rounded font-semibold text-[#a78bfa] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface)]"
         >
           {eventTitle}
         </button>
@@ -57,7 +57,7 @@ function CommentCard({
         <span>{format(new Date(comment.created_at), "MMM d, h:mm a")}</span>
       </div>
       <div className="mt-2 flex gap-2 sm:mt-3 sm:gap-3">
-        <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-[var(--surface)] sm:h-8 sm:w-8">
+        <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-[var(--surface-elevated)] sm:h-8 sm:w-8">
           {comment.author.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -102,7 +102,7 @@ function CommentCard({
         <button
           type="button"
           onClick={onViewEvent}
-          className="text-xs font-medium text-[#a78bfa] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface-elevated)] rounded"
+          className="rounded text-xs font-medium text-[#a78bfa] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface)]"
         >
           View event
         </button>
@@ -171,7 +171,7 @@ export default function AllCommentsView({
 
   if (comments.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface-elevated)] px-4 py-8 text-center sm:py-12">
+      <div className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface)]/80 px-4 py-8 text-center shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:py-12">
         <p className="text-sm text-[var(--muted-foreground)]">
           No comments yet. Open an event and start the conversation!
         </p>
@@ -181,7 +181,7 @@ export default function AllCommentsView({
 
   return (
     <div className="space-y-3 sm:space-y-4">
-      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-2 sm:p-3">
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-2 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-3">
         <label className="flex items-center gap-2 text-sm text-[var(--muted-foreground)]">
           <span className="shrink-0">Sort:</span>
           <select
@@ -210,7 +210,7 @@ export default function AllCommentsView({
       </div>
 
       {displayedComments.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface-elevated)] px-4 py-8 text-center sm:py-12">
+        <div className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface)]/80 px-4 py-8 text-center shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:py-12">
           <p className="text-sm text-[var(--muted-foreground)]">
             {filterByGoingOnly
               ? "No comments in events you&apos;re going to."

@@ -5,6 +5,8 @@ import { SmilePlus } from "lucide-react";
 import EmojiPicker, { type EmojiClickData, Theme } from "emoji-picker-react";
 import type { CommentReactionSummary } from "@/lib/types";
 
+const LONG_PRESS_MS = 500;
+
 type CommentReactionsProps = {
   canAdd: boolean;
   commentId: string;
@@ -41,20 +43,62 @@ export default function CommentReactions({
   reactions,
 }: CommentReactionsProps) {
   const [showPicker, setShowPicker] = useState(false);
-  const [hoverTooltip, setHoverTooltip] = useState<{ emoji: string } | null>(
+  const [stickyPreview, setStickyPreview] = useState<{ emoji: string } | null>(
     null,
   );
   const pickerRef = useRef<HTMLDivElement>(null);
-  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressHandledRef = useRef(false);
+  const previewPopoverRef = useRef<HTMLDivElement | null>(null);
 
   const handlePillClick = useCallback(
     (summary: CommentReactionSummary) => {
+      if (longPressHandledRef.current) {
+        longPressHandledRef.current = false;
+        return;
+      }
       if (!canAdd) return;
       const isOwn = hasUserReacted(summary, currentUserId);
       if (isOwn) onRemoveReaction(commentId, summary.emoji);
       else onAddReaction(commentId, summary.emoji);
     },
     [canAdd, commentId, currentUserId, onAddReaction, onRemoveReaction],
+  );
+
+  const showWhoReacted = useCallback((summary: CommentReactionSummary) => {
+    setStickyPreview({ emoji: summary.emoji });
+  }, []);
+
+  const clearLongPressTimer = useCallback(() => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
+
+  const handlePillTouchStart = useCallback(
+    (summary: CommentReactionSummary) => {
+      clearLongPressTimer();
+      longPressHandledRef.current = false;
+      longPressTimerRef.current = setTimeout(() => {
+        longPressTimerRef.current = null;
+        longPressHandledRef.current = true;
+        showWhoReacted(summary);
+      }, LONG_PRESS_MS);
+    },
+    [clearLongPressTimer, showWhoReacted],
+  );
+
+  const handlePillTouchEnd = useCallback(() => {
+    clearLongPressTimer();
+  }, [clearLongPressTimer]);
+
+  const handlePillContextMenu = useCallback(
+    (e: React.MouseEvent, summary: CommentReactionSummary) => {
+      e.preventDefault();
+      showWhoReacted(summary);
+    },
+    [showWhoReacted],
   );
 
   const handleEmojiPick = useCallback(
@@ -84,10 +128,28 @@ export default function CommentReactions({
   }, [showPicker]);
 
   useEffect(() => {
-    return () => {
-      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    return () => clearLongPressTimer();
+  }, [clearLongPressTimer]);
+
+  useEffect(() => {
+    if (!stickyPreview) return;
+    const dismiss = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as Node;
+      if (pickerRef.current?.contains(target)) return;
+      if (
+        (e.target as HTMLElement)?.closest?.("[data-reaction-pill]") ||
+        (e.target as HTMLElement)?.closest?.("[data-reaction-preview]")
+      )
+        return;
+      setStickyPreview(null);
     };
-  }, []);
+    document.addEventListener("mousedown", dismiss);
+    document.addEventListener("touchstart", dismiss, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", dismiss);
+      document.removeEventListener("touchstart", dismiss);
+    };
+  }, [stickyPreview]);
 
   if (reactions.length === 0 && !canAdd) return null;
 
@@ -115,25 +177,25 @@ export default function CommentReactions({
                   : "border-[var(--border)] bg-[var(--surface-elevated)] text-[#d4d4d8] hover:border-[var(--border-strong)]"
               } ${canAdd ? "cursor-pointer" : "cursor-default"}`}
               onClick={() => canAdd && handlePillClick(summary)}
-              onMouseEnter={() => {
-                hoverTimeoutRef.current = setTimeout(() => {
-                  setHoverTooltip({ emoji: summary.emoji });
-                }, 400);
-              }}
-              onMouseLeave={() => {
-                if (hoverTimeoutRef.current) {
-                  clearTimeout(hoverTimeoutRef.current);
-                  hoverTimeoutRef.current = null;
-                }
-                setHoverTooltip(null);
-              }}
+              onContextMenu={(e) => handlePillContextMenu(e, summary)}
+              onTouchStart={() => handlePillTouchStart(summary)}
+              onTouchEnd={handlePillTouchEnd}
+              onTouchCancel={handlePillTouchEnd}
             >
               <span aria-hidden>{summary.emoji}</span>
               <span className="tabular-nums">{summary.count}</span>
             </button>
-            {hoverTooltip?.emoji === summary.emoji && label ? (
+            {stickyPreview?.emoji === summary.emoji && label ? (
               <div
-                className="pointer-events-none absolute bottom-full left-0 z-10 mb-1 max-w-[220px] rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 shadow-lg"
+                ref={
+                  stickyPreview?.emoji === summary.emoji
+                    ? (el) => {
+                        previewPopoverRef.current = el;
+                      }
+                    : undefined
+                }
+                data-reaction-preview
+                className="absolute bottom-full left-0 z-10 mb-1 max-w-[220px] rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 shadow-lg pointer-events-auto"
                 role="tooltip"
               >
                 <p className="text-xs text-[#d4d4d8]">{label}</p>

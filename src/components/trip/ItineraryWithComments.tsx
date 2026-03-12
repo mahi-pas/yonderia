@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { type ItineraryListItem } from "@/hooks/useItinerary";
 import type { TripParticipantRole } from "@/lib/types";
 import { useAllEventComments } from "@/hooks/useAllEventComments";
+import AddEventModal from "./AddEventModal";
 import AllCommentsView from "./AllCommentsView";
 import DayItinerary from "./DayItinerary";
 import ItineraryDetail from "./ItineraryDetail";
@@ -42,6 +43,7 @@ export default function ItineraryWithComments({
   tripStartDate,
 }: ItineraryWithCommentsProps) {
   const [activeTab, setActiveTab] = useState<"itinerary" | "comments">("itinerary");
+  const [editingItem, setEditingItem] = useState<ItineraryListItem | null>(null);
   const [selectedItem, setSelectedItem] = useState<ItineraryListItem | null>(null);
 
   const itineraryItemIds = useMemo(() => items.map((i) => i.id), [items]);
@@ -52,9 +54,9 @@ export default function ItineraryWithComments({
   const itemById = useMemo(() => new Map(items.map((i) => [i.id, i])), [items]);
 
   function handleOpenEdit(item: ItineraryListItem) {
-    void item; // only used by parent to switch tab and clear selection
     setSelectedItem(null);
     setActiveTab("itinerary");
+    setEditingItem(item);
   }
 
   return (
@@ -159,6 +161,30 @@ export default function ItineraryWithComments({
         tripId={tripId}
         userRole={currentUserRole}
       />
+
+      {canManage && currentUserId && editingItem ? (
+        <AddEventModal
+          currentUserId={currentUserId}
+          dayDate={editingItem.day_date}
+          editItem={editingItem}
+          existingItems={items}
+          isOpen
+          tripId={tripId}
+          onClose={() => setEditingItem(null)}
+          onCreated={(item) => {
+            onCreated?.(item);
+            setEditingItem(null);
+          }}
+          onDeleted={(itemId) => {
+            onDeleted?.(itemId);
+            setEditingItem(null);
+          }}
+          onUpdated={(item) => {
+            onUpdated?.(item);
+            setEditingItem(null);
+          }}
+        />
+      ) : null}
     </section>
   );
 }
