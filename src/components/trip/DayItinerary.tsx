@@ -1,7 +1,7 @@
 "use client";
 
 import { eachDayOfInterval, format, parseISO } from "date-fns";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { groupItineraryItemsByDay, type ItineraryListItem } from "@/hooks/useItinerary";
 import type { TripParticipantRole } from "@/lib/types";
 import AddEventModal from "./AddEventModal";
@@ -19,7 +19,9 @@ type DayItineraryProps = {
   items: ItineraryListItem[];
   onDeleted?: (itemId: string) => void;
   onCreated?: (item: ItineraryListItem) => void;
+  onSelectItem?: (item: ItineraryListItem | null) => void;
   onUpdated?: (item: ItineraryListItem) => void;
+  selectedItem?: ItineraryListItem | null;
   tripEndDate: string;
   tripId: string;
   tripStartDate: string;
@@ -36,7 +38,9 @@ export default function DayItinerary({
   items,
   onDeleted,
   onCreated,
+  onSelectItem,
   onUpdated,
+  selectedItem: controlledSelectedItem,
   tripEndDate,
   tripId,
   tripStartDate,
@@ -46,7 +50,18 @@ export default function DayItinerary({
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>(() => ({
     [tripStartDate]: true,
   }));
-  const [selectedItem, setSelectedItem] = useState<ItineraryListItem | null>(null);
+  const [internalSelectedItem, setInternalSelectedItem] = useState<ItineraryListItem | null>(null);
+
+  const isControlled = controlledSelectedItem !== undefined && onSelectItem !== undefined;
+  const selectedItem = isControlled ? controlledSelectedItem ?? null : internalSelectedItem;
+  const setSelectedItem = useCallback(
+    (item: ItineraryListItem | null) => {
+      if (isControlled) onSelectItem?.(item);
+      else setInternalSelectedItem(item);
+    },
+    [isControlled, onSelectItem],
+  );
+
   const resolvedGroupedByDay = useMemo(() => groupedByDay ?? groupItineraryItemsByDay(items), [groupedByDay, items]);
 
   useEffect(() => {
@@ -64,7 +79,7 @@ export default function DayItinerary({
     if (latestItem !== selectedItem) {
       setSelectedItem(latestItem);
     }
-  }, [items, selectedItem]);
+  }, [items, selectedItem, setSelectedItem]);
 
   function handleOpenEdit(item: ItineraryListItem) {
     setSelectedItem(null);
@@ -162,9 +177,7 @@ export default function DayItinerary({
                           currentUserId={currentUserId}
                           key={item.id}
                           item={item}
-                          onClick={() => {
-                            setSelectedItem(item);
-                          }}
+                          onClick={() => setSelectedItem(item)}
                           onEdit={handleOpenEdit}
                           rsvpSummary={item.rsvpSummary ?? null}
                         />
@@ -220,18 +233,18 @@ export default function DayItinerary({
         />
       ) : null}
 
-      <ItineraryDetail
-        currentUserId={currentUserId}
-        isOpen={selectedItem !== null}
-        item={selectedItem}
-        onClose={() => {
-          setSelectedItem(null);
-        }}
-        onEdit={handleOpenEdit}
-        rsvpSummary={selectedItem?.rsvpSummary ?? null}
-        tripId={tripId}
-        userRole={currentUserRole}
-      />
+      {!isControlled ? (
+        <ItineraryDetail
+          currentUserId={currentUserId}
+          isOpen={selectedItem !== null}
+          item={selectedItem}
+          onClose={() => setSelectedItem(null)}
+          onEdit={handleOpenEdit}
+          rsvpSummary={selectedItem?.rsvpSummary ?? null}
+          tripId={tripId}
+          userRole={currentUserRole}
+        />
+      ) : null}
     </section>
   );
 }

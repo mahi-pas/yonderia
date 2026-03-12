@@ -3,6 +3,7 @@
 import { eachDayOfInterval, format, parseISO } from "date-fns";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { getItineraryItemDaySpan, type ItineraryListItem } from "@/hooks/useItinerary";
 import { loadGoogleMapsApi, type GoogleMapsWindow } from "@/lib/google-maps";
 import AddEventModal from "./AddEventModal";
@@ -332,12 +333,43 @@ export default function TripMap({
     setEditingItem(item);
   }
 
-  useEffect(() => {
-    let cancelled = false;
+  const mapOptions = useMemo(
+    () => ({
+      center: DEFAULT_CENTER,
+      clickableIcons: false,
+      fullscreenControl: false,
+      gestureHandling: "greedy" as const,
+      mapTypeControl: false,
+      streetViewControl: false,
+      zoom: 4,
+    }),
+    [],
+  );
 
+  useEffect(() => {
     if (isMockMode) {
       return;
     }
+
+    const container = mapContainerRef.current;
+    const api = googleApiRef.current;
+
+    if (api && container) {
+      const prevMap = mapRef.current;
+      const center = prevMap?.getCenter?.();
+      const zoom = prevMap?.getZoom?.();
+      mapRef.current = new api.maps.Map(container, {
+        ...mapOptions,
+        center: center ?? mapOptions.center,
+        zoom: zoom ?? mapOptions.zoom,
+      });
+      setMapStatus("ready");
+      return () => {
+        clearMapArtifacts();
+      };
+    }
+
+    let cancelled = false;
 
     const initializeMap = async () => {
       try {
@@ -347,24 +379,24 @@ export default function TripMap({
           return;
         }
 
-        if (!googleApi || !mapContainerRef.current) {
+        if (!googleApi) {
           setMapStatus("unavailable");
           return;
         }
 
         googleApiRef.current = googleApi;
 
-        if (!mapRef.current) {
-          mapRef.current = new googleApi.maps.Map(mapContainerRef.current, {
-            center: DEFAULT_CENTER,
-            clickableIcons: false,
-            fullscreenControl: false,
-            gestureHandling: "greedy",
-            mapTypeControl: false,
-            streetViewControl: false,
-            zoom: 4,
-          });
+        if (!mapContainerRef.current) {
+          setMapStatus("unavailable");
+          return;
         }
+
+        const container = mapContainerRef.current;
+        mapRef.current = new googleApi.maps.Map(container, {
+          ...mapOptions,
+          center: mapRef.current?.getCenter?.() ?? mapOptions.center,
+          zoom: mapRef.current?.getZoom?.() ?? mapOptions.zoom,
+        });
 
         setMapStatus("ready");
       } catch {
@@ -380,7 +412,7 @@ export default function TripMap({
       cancelled = true;
       clearMapArtifacts();
     };
-  }, [clearMapArtifacts, isMockMode]);
+  }, [clearMapArtifacts, isMockMode, isFullscreen, mapOptions]);
 
   useEffect(() => {
     if (isMockMode) {
@@ -435,7 +467,7 @@ export default function TripMap({
     return () => {
       clearMapArtifacts();
     };
-  }, [clearMapArtifacts, commuteSegments, isMockMode, mapStatus, visiblePoints]);
+  }, [clearMapArtifacts, commuteSegments, isFullscreen, isMockMode, mapStatus, visiblePoints]);
 
   useEffect(() => {
     if (!isFullscreen) {
@@ -508,45 +540,203 @@ export default function TripMap({
         ) : null}
       </div>
 
-      <div
-        className={[
-          isFullscreen
-            ? "fixed inset-0 z-50 flex flex-col bg-[radial-gradient(ellipse_at_top,var(--surface)_0%,var(--background)_50%)] p-4 pt-[calc(env(safe-area-inset-top)+1rem)]"
-            : "mt-4",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        data-testid={isFullscreen ? "trip-map-fullscreen-overlay" : "trip-map-inline-wrapper"}
-      >
-        <div
-          className={[
-            isFullscreen
-              ? "flex h-full flex-col rounded-2xl border border-[var(--border)] bg-[var(--surface)]/95 p-4 shadow-[0_8px_40px_rgba(0,0,0,0.3)]"
-              : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          {isFullscreen ? (
-            <div className="flex items-center justify-between gap-4 pb-3">
-              <div>
-                <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Map</p>
-                <h3 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Trip at a glance</h3>
-              </div>
-
-              <button
-                aria-label="Close full screen map"
-                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-xl text-[var(--muted)] transition hover:bg-[var(--surface-elevated)]"
-                type="button"
-                onClick={() => {
-                  setIsFullscreen(false);
-                }}
+      {isFullscreen && typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-50 flex flex-col bg-black/70 backdrop-blur-md"
+            data-testid="trip-map-fullscreen-overlay"
+          >
+            <button
+              type="button"
+              aria-label="Close map"
+              className="absolute inset-0 z-0"
+              onClick={() => setIsFullscreen(false)}
+            />
+            <div className="absolute inset-0 z-10 flex items-end justify-center pt-[env(safe-area-inset-top)] sm:items-center sm:justify-center sm:pt-0">
+              <section
+                aria-modal="true"
+                className="relative flex h-[calc(100svh-env(safe-area-inset-top))] w-full flex-col overflow-hidden rounded-t-2xl border border-[var(--border-strong)] bg-[rgba(20,20,31,0.98)] shadow-[0_-4px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:h-[90dvh] sm:max-w-4xl sm:rounded-2xl sm:shadow-[0_8px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(139,92,246,0.08)]"
+                role="dialog"
               >
-                ×
-              </button>
-            </div>
-          ) : null}
+                <div className="absolute inset-x-0 top-0 h-px bg-[image:var(--accent-gradient)] opacity-40" />
 
+                <div className="flex shrink-0 flex-col gap-2 border-b border-[var(--border)] px-4 py-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:px-5 sm:py-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="gradient-text text-[10px] font-semibold uppercase tracking-wide sm:text-xs">Map</p>
+                      <h2 className="truncate font-display text-xl leading-tight text-[#fafafa] sm:text-2xl">Trip at a glance</h2>
+                    </div>
+                    <button
+                      aria-label="Close full screen map"
+                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-lg text-[var(--muted)] transition hover:bg-[var(--surface-elevated)] hover:text-[#fafafa] sm:h-11 sm:w-11 sm:text-xl"
+                      type="button"
+                      onClick={() => {
+                        setIsFullscreen(false);
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <div className="touch-pan-x flex gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none]">
+                    <button
+                      aria-pressed={activeDay === "all"}
+                      className={[
+                        "inline-flex min-h-8 shrink-0 items-center justify-center rounded-full px-3 text-xs font-semibold transition sm:min-h-9 sm:px-4 sm:text-sm",
+                        activeDay === "all"
+                          ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_16px_rgba(139,92,246,0.25)]"
+                          : "border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-elevated)]",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      type="button"
+                      onClick={() => {
+                        setActiveDay("all");
+                      }}
+                    >
+                      All
+                    </button>
+                    {days.map((day) => {
+                      const isActive = activeDay === day.dayDate;
+                      return (
+                        <button
+                          key={day.dayDate}
+                          aria-pressed={isActive}
+                          className={[
+                            "inline-flex min-h-8 shrink-0 items-center justify-center rounded-full px-3 text-xs font-semibold transition sm:min-h-9 sm:px-4 sm:text-sm",
+                            isActive
+                              ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_16px_rgba(139,92,246,0.25)]"
+                              : "border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-elevated)]",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                          title={day.label}
+                          type="button"
+                          onClick={() => {
+                            setActiveDay(day.dayDate);
+                          }}
+                        >
+                          {`Day ${day.index + 1}`}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {mapStatus === "unavailable" ? (
+                  <div className="mx-4 mt-3 rounded-2xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm leading-6 text-[#fca5a5]">
+                    Google Maps is unavailable right now. Add a valid <code className="rounded bg-black/20 px-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> to use the trip map.
+                  </div>
+                ) : null}
+
+                <div
+                  className="relative min-h-0 flex-1 overflow-hidden rounded-b-2xl border-t-0 border-[var(--border)] bg-[var(--surface-elevated)] sm:rounded-none sm:border-t-0"
+                  data-testid="trip-map-canvas"
+                >
+                  {isMockMode ? (
+                    <div
+                      className="absolute inset-0 bg-[linear-gradient(180deg,var(--surface),var(--surface-elevated))]"
+                      data-testid="trip-map-mock"
+                    >
+                      {commuteSegments.map((segment, index) => {
+                        const originPoint = visiblePoints.find(
+                          (point) =>
+                            point.item.item_type === "commute" &&
+                            point.item.latitude === segment.origin.lat &&
+                            point.item.longitude === segment.origin.lng &&
+                            point.kind === "origin",
+                        );
+                        const destinationPoint = visiblePoints.find(
+                          (point) =>
+                            point.item.item_type === "commute" &&
+                            point.item.destination_latitude === segment.destination.lat &&
+                            point.item.destination_longitude === segment.destination.lng &&
+                            point.kind === "destination",
+                        );
+                        const originIndex = originPoint ? visiblePoints.findIndex((point) => point.key === originPoint.key) : index;
+                        const destinationIndex = destinationPoint
+                          ? visiblePoints.findIndex((point) => point.key === destinationPoint.key)
+                          : index + 1;
+                        const originPosition = MOCK_PIN_POSITIONS[originIndex % MOCK_PIN_POSITIONS.length];
+                        const destinationPosition = MOCK_PIN_POSITIONS[destinationIndex % MOCK_PIN_POSITIONS.length];
+
+                        return (
+                          <div
+                            key={`${originPoint?.key ?? index}-${destinationPoint?.key ?? index}`}
+                            className="absolute h-0.5 origin-left rounded-full bg-[#6c5ce7]/70"
+                            data-item-type="commute"
+                            data-testid="trip-map-line"
+                            style={{
+                              left: originPosition.left,
+                              top: originPosition.top,
+                              transform: `rotate(${Math.atan2(
+                                parseFloat(destinationPosition.top) - parseFloat(originPosition.top),
+                                parseFloat(destinationPosition.left) - parseFloat(originPosition.left),
+                              )}rad)`,
+                              width: `${Math.hypot(
+                                parseFloat(destinationPosition.left) - parseFloat(originPosition.left),
+                                parseFloat(destinationPosition.top) - parseFloat(originPosition.top),
+                              )}%`,
+                            }}
+                          />
+                        );
+                      })}
+
+                      {visiblePoints.map((point, index) => {
+                        const style = ITEM_STYLES[point.item.item_type];
+                        const position = MOCK_PIN_POSITIONS[index % MOCK_PIN_POSITIONS.length];
+
+                        return (
+                          <button
+                            key={point.key}
+                            aria-label={`Open ${point.item.title} pin`}
+                            className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-[var(--surface)] text-lg shadow-[0_12px_24px_rgba(0,0,0,0.3)]"
+                            data-day={point.item.day_date}
+                            data-item-id={point.item.id}
+                            data-item-type={point.item.item_type}
+                            data-point-kind={point.kind}
+                            data-testid="trip-map-pin"
+                            style={{
+                              backgroundColor: style.color,
+                              left: position.left,
+                              top: position.top,
+                            }}
+                            type="button"
+                            onClick={() => {
+                              setSelectedItem(point.item);
+                            }}
+                          >
+                            {style.emoji}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+
+                  <div
+                    ref={mapContainerRef}
+                    className={["h-full w-full", isMockMode ? "pointer-events-none opacity-0" : ""].filter(Boolean).join(" ")}
+                  />
+
+                  {mapStatus === "loading" ? (
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[var(--surface)]/75 px-6 text-center text-sm text-[var(--muted-foreground)]">
+                      Loading the map...
+                    </div>
+                  ) : null}
+
+                  {mapStatus === "ready" && visiblePoints.length === 0 ? (
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[var(--surface)]/75 px-6 text-center text-sm leading-6 text-[var(--muted-foreground)]">
+                      No mapped stops match this filter yet.
+                    </div>
+                  ) : null}
+                </div>
+              </section>
+            </div>
+          </div>,
+          document.body,
+        )
+      }
+      {!isFullscreen && (
+        <div className="mt-4" data-testid="trip-map-inline-wrapper">
           <div className="touch-pan-x flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
             <button
               aria-pressed={activeDay === "all"}
@@ -601,12 +791,7 @@ export default function TripMap({
           ) : null}
 
           <div
-            className={[
-              "relative mt-4 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]",
-              isFullscreen ? "min-h-0 flex-1" : "h-[250px] sm:h-[400px]",
-            ]
-              .filter(Boolean)
-              .join(" ")}
+            className="relative mt-4 h-[250px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] sm:h-[400px]"
             data-testid="trip-map-canvas"
           >
             {isMockMode ? (
@@ -707,7 +892,7 @@ export default function TripMap({
             ) : null}
           </div>
         </div>
-      </div>
+      )}
 
       <ItineraryDetail
         currentUserId={currentUserId}

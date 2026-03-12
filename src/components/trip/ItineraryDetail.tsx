@@ -1,6 +1,5 @@
 import { format } from "date-fns";
 import { useState } from "react";
-import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import type { ItineraryListItem } from "@/hooks/useItinerary";
 import type { RsvpSummary, TripParticipantRole } from "@/lib/types";
@@ -27,9 +26,9 @@ function DetailRow({ label, value }: { label: string; value: string | null }) {
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5">
       <p className="gradient-text text-xs font-semibold uppercase tracking-wide">{label}</p>
-      <p className="mt-1 text-sm leading-6 text-[#d4d4d8]">{value}</p>
+      <p className="mt-0.5 text-sm leading-5 text-[#d4d4d8]">{value}</p>
     </div>
   );
 }
@@ -74,31 +73,14 @@ export default function ItineraryDetail({
       onClose={onClose}
       panelClassName="sm:max-w-2xl"
       title={item.title}
-      footer={
-        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <Button variant="secondary" onClick={onClose}>
-            Close
-          </Button>
-          {canEdit ? (
-            <Button
-              variant="secondary"
-              onClick={() => {
-                onEdit?.(item);
-              }}
-            >
-              Edit
-            </Button>
-          ) : null}
-        </div>
-      }
     >
-      <div className="space-y-5 pb-8">
+      <div className="space-y-4 pb-4">
         <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]">
           {item.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img alt={item.title} className="h-64 w-full object-cover sm:h-80" src={item.image_url} />
+            <img alt={item.title} className="h-48 w-full object-cover sm:h-56" src={item.image_url} />
           ) : (
-            <div className="flex h-64 items-center justify-center text-6xl text-[var(--muted)] sm:h-80">
+            <div className="flex h-48 items-center justify-center text-5xl text-[var(--muted)] sm:h-56">
               {badge.icon}
             </div>
           )}
@@ -110,13 +92,23 @@ export default function ItineraryDetail({
             {badge.label}
           </span>
           <span className="text-sm text-[var(--muted)]">{formatItineraryItemTime(item)}</span>
+          {canEdit ? (
+            <button
+              type="button"
+              aria-label={`Edit ${item.title}`}
+              onClick={() => onEdit?.(item)}
+              className="ml-auto inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--muted)] transition hover:border-[#8b5cf6]/40 hover:bg-[var(--surface-elevated)] hover:text-[#fafafa] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
+            >
+              ✎
+            </button>
+          ) : null}
         </div>
 
         {item.description ? (
-          <p className="text-sm leading-7 text-[#d4d4d8] sm:text-base">{item.description}</p>
+          <p className="text-sm leading-6 text-[#d4d4d8] sm:text-base">{item.description}</p>
         ) : null}
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <RsvpButtons
             currentUserId={currentUserId}
             itineraryItemId={item.id}
@@ -135,7 +127,7 @@ export default function ItineraryDetail({
           ) : null}
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-2 sm:grid-cols-2">
           <DetailRow label="Day" value={formatDayLabel(item.day_date)} />
           {item.item_type === "commute" ? (
             <>

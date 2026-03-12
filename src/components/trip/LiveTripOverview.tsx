@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import DayItinerary from "@/components/trip/DayItinerary";
+import ItineraryWithComments from "@/components/trip/ItineraryWithComments";
 import EditMyInfoButton from "@/components/trip/EditMyInfoButton";
 import ParticipantsRow from "@/components/trip/ParticipantsRow";
 import TripMap from "@/components/trip/TripMap";
@@ -117,7 +117,7 @@ export default function LiveTripOverview({
         tripStartDate={tripStartDate}
         userRole={currentParticipant?.role ?? null}
       />
-      <DayItinerary
+      <ItineraryWithComments
         canManage={canManageItinerary}
         commentCountByItemId={commentCountByItemId}
         currentUserId={currentUserId}
