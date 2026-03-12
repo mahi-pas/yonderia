@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type UseEventCommentCountsOptions = {
@@ -13,6 +13,11 @@ export function useEventCommentCounts({
   itineraryItemIds,
 }: UseEventCommentCountsOptions): Record<string, number> {
   const [counts, setCounts] = useState<Record<string, number>>({});
+
+  const itineraryItemIdsKey = useMemo(
+    () => itineraryItemIds.join(","),
+    [itineraryItemIds],
+  );
 
   const fetchCounts = useCallback(async () => {
     if (itineraryItemIds.length === 0) {
@@ -44,16 +49,16 @@ export function useEventCommentCounts({
 
   useEffect(() => {
     if (!enabled || itineraryItemIds.length === 0) {
-      setCounts({});
+      queueMicrotask(() => setCounts({}));
       return;
     }
 
-    void fetchCounts();
+    queueMicrotask(() => void fetchCounts());
 
     const supabase = createClient();
     let isMounted = true;
     const channel = supabase
-      .channel(`event_comment_counts:${itineraryItemIds.join(",")}`)
+      .channel(`event_comment_counts:${itineraryItemIdsKey}`)
       .on(
         "postgres_changes",
         {
@@ -77,7 +82,7 @@ export function useEventCommentCounts({
       isMounted = false;
       void supabase.removeChannel(channel);
     };
-  }, [enabled, itineraryItemIds.join(","), fetchCounts]);
+  }, [enabled, itineraryItemIdsKey, itineraryItemIds, fetchCounts]);
 
   return counts;
 }

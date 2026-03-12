@@ -107,8 +107,10 @@ export function useEventRsvps({
 
   useEffect(() => {
     if (!enabled || !itineraryItemId) {
-      setRsvps([]);
-      setError(null);
+      queueMicrotask(() => {
+        setRsvps([]);
+        setError(null);
+      });
       return;
     }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { EventComment } from "@/lib/types";
 import type { EventCommentWithAuthor } from "./useEventComments";
@@ -27,6 +27,11 @@ export function useAllEventComments({
 } {
   const [comments, setComments] = useState<AllEventCommentRow[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const itineraryItemIdsKey = useMemo(
+    () => itineraryItemIds.join(","),
+    [itineraryItemIds],
+  );
 
   const fetchComments = useCallback(async () => {
     if (!tripId || itineraryItemIds.length === 0) {
@@ -106,12 +111,14 @@ export function useAllEventComments({
 
   useEffect(() => {
     if (!enabled || !tripId || itineraryItemIds.length === 0) {
-      setComments([]);
-      setError(null);
+      queueMicrotask(() => {
+        setComments([]);
+        setError(null);
+      });
       return;
     }
 
-    void fetchComments();
+    queueMicrotask(() => void fetchComments());
 
     const supabase = createClient();
     let isMounted = true;
@@ -134,7 +141,7 @@ export function useAllEventComments({
       isMounted = false;
       void supabase.removeChannel(channel);
     };
-  }, [enabled, tripId, itineraryItemIds.join(","), fetchComments]);
+  }, [enabled, tripId, itineraryItemIdsKey, itineraryItemIds.length, fetchComments]);
 
   return {
     comments,

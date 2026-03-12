@@ -102,12 +102,14 @@ export function useEventComments({
 
   useEffect(() => {
     if (!enabled || !itineraryItemId || !tripId) {
-      setComments([]);
-      setError(null);
+      queueMicrotask(() => {
+        setComments([]);
+        setError(null);
+      });
       return;
     }
 
-    void fetchComments();
+    queueMicrotask(() => void fetchComments());
 
     const supabase = createClient();
     let isMounted = true;
@@ -160,7 +162,7 @@ export function useEventComments({
 
       setComments((prev) => [...prev, optimistic]);
 
-      const { data: inserted, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from("event_comments")
         .insert({
           itinerary_item_id: itineraryItemId,

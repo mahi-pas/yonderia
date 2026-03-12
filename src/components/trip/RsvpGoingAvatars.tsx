@@ -27,7 +27,7 @@ export default function RsvpGoingAvatars({
 
   useEffect(() => {
     if (goingUserIds.length === 0) {
-      setProfiles(new Map());
+      queueMicrotask(() => setProfiles(new Map()));
       return;
     }
 

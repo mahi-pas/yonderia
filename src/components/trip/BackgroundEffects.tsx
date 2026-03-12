@@ -19,7 +19,9 @@ function useParticleCount() {
   const [count, setCount] = useState(PARTICLE_COUNT_DESKTOP);
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
-    setCount(mq.matches ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT_DESKTOP);
+    queueMicrotask(() =>
+      setCount(mq.matches ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT_DESKTOP),
+    );
     const handler = () => setCount(mq.matches ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT_DESKTOP);
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
@@ -181,7 +183,9 @@ type BackgroundEffectsProps = {
 export default function BackgroundEffects({ effect }: BackgroundEffectsProps) {
   const [reducedMotion, setReducedMotion] = useState(true);
   useEffect(() => {
-    setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    queueMicrotask(() =>
+      setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches),
+    );
   }, []);
 
   if (reducedMotion || effect === "none") {

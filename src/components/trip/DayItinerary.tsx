@@ -72,12 +72,12 @@ export default function DayItinerary({
     const latestItem = items.find((item) => item.id === selectedItem.id) ?? null;
 
     if (!latestItem) {
-      setSelectedItem(null);
+      queueMicrotask(() => setSelectedItem(null));
       return;
     }
 
     if (latestItem !== selectedItem) {
-      setSelectedItem(latestItem);
+      queueMicrotask(() => setSelectedItem(latestItem));
     }
   }, [items, selectedItem, setSelectedItem]);
 

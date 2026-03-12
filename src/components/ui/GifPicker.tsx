@@ -18,7 +18,6 @@ type GifPickerProps = {
 };
 
 const DEBOUNCE_MS = 300;
-const LIMIT = 20;
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -62,12 +61,14 @@ export default function GifPicker({ isOpen, onClose, onSelect }: GifPickerProps)
 
   useEffect(() => {
     if (!isOpen) return;
-    setLoading(true);
-    setResults([]);
-    setNext(null);
-    setSelected(null);
-    void fetchGifs().finally(() => setLoading(false));
-  }, [isOpen, debouncedQuery]);
+    queueMicrotask(() => {
+      setLoading(true);
+      setResults([]);
+      setNext(null);
+      setSelected(null);
+    });
+    queueMicrotask(() => void fetchGifs().finally(() => setLoading(false)));
+  }, [isOpen, debouncedQuery, fetchGifs]);
 
   const loadMore = useCallback(() => {
     if (!next || loadingMore) return;

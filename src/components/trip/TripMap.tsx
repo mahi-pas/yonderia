@@ -302,12 +302,12 @@ export default function TripMap({
     const latestItem = items.find((item) => item.id === selectedItem.id) ?? null;
 
     if (!latestItem) {
-      setSelectedItem(null);
+      queueMicrotask(() => setSelectedItem(null));
       return;
     }
 
     if (latestItem !== selectedItem) {
-      setSelectedItem(latestItem);
+      queueMicrotask(() => setSelectedItem(latestItem));
     }
   }, [items, selectedItem]);
 
@@ -319,12 +319,12 @@ export default function TripMap({
     const latestItem = items.find((item) => item.id === editingItem.id) ?? null;
 
     if (!latestItem) {
-      setEditingItem(null);
+      queueMicrotask(() => setEditingItem(null));
       return;
     }
 
     if (latestItem !== editingItem) {
-      setEditingItem(latestItem);
+      queueMicrotask(() => setEditingItem(latestItem));
     }
   }, [editingItem, items]);
 
@@ -363,7 +363,7 @@ export default function TripMap({
         center: center ?? mapOptions.center,
         zoom: zoom ?? mapOptions.zoom,
       });
-      setMapStatus("ready");
+      queueMicrotask(() => setMapStatus("ready"));
       return () => {
         clearMapArtifacts();
       };

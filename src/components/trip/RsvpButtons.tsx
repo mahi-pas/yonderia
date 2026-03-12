@@ -53,6 +53,7 @@ export default function RsvpButtons({
   summary: summaryProp,
   variant = "full",
 }: RsvpButtonsProps) {
+  void itemType; // reserved for future use (e.g. different copy per type)
   const canRsvp = Boolean(currentUserId);
   const { setRsvp, rsvps, summary: liveSummary } = useEventRsvps({
     enabled: canRsvp,

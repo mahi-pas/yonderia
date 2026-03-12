@@ -1,16 +1,19 @@
 "use client";
 
 import { format } from "date-fns";
-import { useCallback, useState } from "react";
-import type { TripParticipantRole } from "@/lib/types";
+import { useCallback, useMemo, useState } from "react";
+import type { CommentReactionSummary, TripParticipantRole } from "@/lib/types";
 import type { EventCommentWithAuthor } from "@/hooks/useEventComments";
 import { useEventComments } from "@/hooks/useEventComments";
+import { useCommentReactions } from "@/hooks/useCommentReactions";
+import CommentReactions from "./CommentReactions";
 import GifPicker from "@/components/ui/GifPicker";
 
 const MAX_LENGTH = 500;
 
 type EventCommentsProps = {
   currentUserId: string | null;
+  fullView?: boolean;
   itineraryItemId: string;
   tripId: string;
   userRole: TripParticipantRole | null;
@@ -19,13 +22,19 @@ type EventCommentsProps = {
 function CommentRow({
   comment,
   currentUserId,
+  reactions,
   userRole,
+  onAddReaction,
   onDelete,
+  onRemoveReaction,
 }: {
   comment: EventCommentWithAuthor;
   currentUserId: string | null;
+  reactions: CommentReactionSummary[];
   userRole: TripParticipantRole | null;
+  onAddReaction: (commentId: string, emoji: string) => void;
   onDelete: (id: string) => void;
+  onRemoveReaction: (commentId: string, emoji: string) => void;
 }) {
   const isOwn = currentUserId === comment.user_id;
   const canDelete = isOwn || userRole === "organizer";
@@ -80,6 +89,14 @@ function CommentRow({
             />
           </div>
         ) : null}
+        <CommentReactions
+          canAdd={!!currentUserId}
+          commentId={comment.id}
+          currentUserId={currentUserId}
+          onAddReaction={onAddReaction}
+          onRemoveReaction={onRemoveReaction}
+          reactions={reactions}
+        />
       </div>
     </div>
   );
@@ -87,6 +104,7 @@ function CommentRow({
 
 export default function EventComments({
   currentUserId,
+  fullView = false,
   itineraryItemId,
   tripId,
   userRole,
@@ -96,6 +114,15 @@ export default function EventComments({
   const [showGifPicker, setShowGifPicker] = useState(false);
   const { addComment, comments, deleteComment, error } = useEventComments({
     itineraryItemId,
+    tripId,
+  });
+  const commentIds = useMemo(() => comments.map((c) => c.id), [comments]);
+  const {
+    addReaction,
+    reactionsByCommentId,
+    removeReaction,
+  } = useCommentReactions({
+    commentIds,
     tripId,
   });
 
@@ -125,34 +152,34 @@ export default function EventComments({
     setShowGifPicker(false);
   }, []);
 
-  return (
-    <div className="space-y-3 border-t border-[var(--border)] pt-4">
-      <p className="text-xs font-semibold uppercase tracking-wide gradient-text">
-        Comments
-      </p>
-
+  const commentList = (
+    <>
       {error ? (
-        <p className="text-sm text-[#f87171]">{error}</p>
+        <p className="px-1 py-2 text-sm text-[#f87171]">{error}</p>
       ) : null}
+      {comments.length === 0 ? (
+        <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">
+          No comments yet — start the conversation!
+        </p>
+      ) : (
+        comments.map((c) => (
+          <CommentRow
+            key={c.id}
+            comment={c}
+            currentUserId={currentUserId}
+            reactions={reactionsByCommentId.get(c.id) ?? []}
+            userRole={userRole}
+            onAddReaction={addReaction}
+            onDelete={deleteComment}
+            onRemoveReaction={removeReaction}
+          />
+        ))
+      )}
+    </>
+  );
 
-      <div className="max-h-64 min-h-[6rem] overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3">
-        {comments.length === 0 ? (
-          <p className="py-6 text-center text-sm text-[var(--muted-foreground)]">
-            No comments yet — start the conversation!
-          </p>
-        ) : (
-          comments.map((c) => (
-            <CommentRow
-              key={c.id}
-              comment={c}
-              currentUserId={currentUserId}
-              userRole={userRole}
-              onDelete={deleteComment}
-            />
-          ))
-        )}
-      </div>
-
+  const addCommentArea = (
+    <>
       <div className="flex gap-2">
         <textarea
           placeholder="Add a comment..."
@@ -180,7 +207,6 @@ export default function EventComments({
           ➤
         </button>
       </div>
-
       {pendingGif ? (
         <div className="flex items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -199,13 +225,41 @@ export default function EventComments({
           </button>
         </div>
       ) : null}
-
       {draft.length > MAX_LENGTH * 0.9 ? (
         <p className="text-xs text-[var(--muted-foreground)]">
           {draft.length}/{MAX_LENGTH}
         </p>
       ) : null}
+    </>
+  );
 
+  if (fullView) {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="min-h-0 flex-1 overflow-y-auto py-2">
+          {commentList}
+        </div>
+        <div className="shrink-0 space-y-2 border-t border-[var(--border)] pt-4">
+          {addCommentArea}
+        </div>
+        <GifPicker
+          isOpen={showGifPicker}
+          onClose={() => setShowGifPicker(false)}
+          onSelect={handleGifSelect}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3 border-t border-[var(--border)] pt-4">
+      <p className="text-xs font-semibold uppercase tracking-wide gradient-text">
+        Comments
+      </p>
+      <div className="max-h-64 min-h-[6rem] overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3">
+        {commentList}
+      </div>
+      {addCommentArea}
       <GifPicker
         isOpen={showGifPicker}
         onClose={() => setShowGifPicker(false)}

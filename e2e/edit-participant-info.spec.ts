@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { expect, test, type Page } from "@playwright/test";
 import { createAuthenticatedContext, loadE2EEnv } from "./helpers/auth";
 import { addParticipant, createTestTrip } from "./helpers/seed";
@@ -79,10 +79,6 @@ function formatTimestampForInput(value: string): string {
   const pad = (segment: number) => String(segment).padStart(2, "0");
 
   return `${parsedDate.getFullYear()}-${pad(parsedDate.getMonth() + 1)}-${pad(parsedDate.getDate())}T${pad(parsedDate.getHours())}:${pad(parsedDate.getMinutes())}`;
-}
-
-function formatTravelMoment(prefix: string, timestamp: string, location: string): string {
-  return `${prefix} ${format(parseISO(timestamp), "EEE h:mm a")} at ${location}`;
 }
 
 function formatTravelMomentFromLocalInput(prefix: string, timestamp: string, location: string): string {

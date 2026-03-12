@@ -1,0 +1,17 @@
+---
+description: Run Supabase migrations after any change to the database schema
+globs: supabase/migrations/**/*.sql, supabase/**/*.sql
+alwaysApply: false
+---
+
+# Supabase migrations
+
+Whenever you create or modify any migration file under `supabase/migrations/` (or otherwise change the database schema), run the migrations so the remote database is updated:
+
+```bash
+npx supabase db push
+```
+
+Run this **after** adding or editing migration files, before considering the database change complete. If the command prompts for confirmation, proceed so the migration is applied.
+
+For local development against a local Supabase instance, use `npx supabase migration up` instead.

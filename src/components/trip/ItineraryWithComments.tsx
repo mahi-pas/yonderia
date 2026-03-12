@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { groupItineraryItemsByDay, type ItineraryListItem } from "@/hooks/useItinerary";
+import { type ItineraryListItem } from "@/hooks/useItinerary";
 import type { TripParticipantRole } from "@/lib/types";
 import { useAllEventComments } from "@/hooks/useAllEventComments";
 import AllCommentsView from "./AllCommentsView";
@@ -51,7 +51,8 @@ export default function ItineraryWithComments({
   });
   const itemById = useMemo(() => new Map(items.map((i) => [i.id, i])), [items]);
 
-  function handleOpenEdit(_item: ItineraryListItem) {
+  function handleOpenEdit(item: ItineraryListItem) {
+    void item; // only used by parent to switch tab and clear selection
     setSelectedItem(null);
     setActiveTab("itinerary");
   }
@@ -138,9 +139,11 @@ export default function ItineraryWithComments({
           {activeTab === "comments" ? (
             <AllCommentsView
               comments={comments}
+              currentUserId={currentUserId ?? null}
               error={commentsError}
               itemById={itemById}
               onEventClick={(item) => setSelectedItem(item)}
+              tripId={tripId}
             />
           ) : null}
         </div>

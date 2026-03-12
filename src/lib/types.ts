@@ -30,6 +30,24 @@ export interface EventComment {
   updated_at: string;
 }
 
+export interface EventCommentReaction {
+  id: string;
+  comment_id: string;
+  user_id: string;
+  emoji: string;
+  created_at: string;
+}
+
+export interface CommentReactionSummary {
+  emoji: string;
+  count: number;
+  reactors: Array<{
+    user_id: string;
+    display_name: string | null;
+    nickname: string | null;
+  }>;
+}
+
 export interface RsvpSummary {
   going: number;
   interested: number;

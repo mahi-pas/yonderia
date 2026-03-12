@@ -41,6 +41,8 @@ function formatDetailDateTime(value: string | null): string | null {
   return format(new Date(value), "MMM d, yyyy h:mm a");
 }
 
+type DetailTab = "details" | "comments";
+
 export default function ItineraryDetail({
   currentUserId = null,
   isOpen,
@@ -52,10 +54,13 @@ export default function ItineraryDetail({
   userRole = null,
 }: ItineraryDetailProps) {
   const [showRsvpList, setShowRsvpList] = useState(false);
+  const [activeTab, setActiveTab] = useState<DetailTab>("details");
 
   if (!item) {
     return null;
   }
+
+  const hasComments = !!(currentUserId && tripId);
 
   const canManage = userRole === "organizer" || userRole === "planner";
   const canEdit = canManage && typeof onEdit === "function";
@@ -74,8 +79,58 @@ export default function ItineraryDetail({
       panelClassName="sm:max-w-2xl"
       title={item.title}
     >
-      <div className="space-y-4 pb-4">
-        <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]">
+      <div
+        className={`-mt-3 flex min-h-full flex-col sm:-mt-4 ${activeTab === "comments" && hasComments ? "h-full" : ""}`}
+      >
+        {hasComments ? (
+          <div className="mb-1 mt-0.5 flex shrink-0 justify-center">
+            <div
+              className="flex w-fit gap-0.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-0.5"
+              role="tablist"
+              aria-label="Event sections"
+            >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "details"}
+              aria-controls="event-details-panel"
+              id="event-details-tab"
+              onClick={() => setActiveTab("details")}
+              className={`flex-none rounded-md px-3 py-1.5 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30 ${
+                activeTab === "details"
+                  ? "bg-[var(--surface-elevated)] text-[#fafafa] shadow-sm"
+                  : "text-[var(--muted-foreground)] hover:text-[#d4d4d8]"
+              }`}
+            >
+              Event details
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "comments"}
+              aria-controls="event-comments-panel"
+              id="event-comments-tab"
+              onClick={() => setActiveTab("comments")}
+              className={`flex-none rounded-md px-3 py-1.5 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30 ${
+                activeTab === "comments"
+                  ? "bg-[var(--surface-elevated)] text-[#fafafa] shadow-sm"
+                  : "text-[var(--muted-foreground)] hover:text-[#d4d4d8]"
+              }`}
+            >
+              Comments
+            </button>
+            </div>
+          </div>
+        ) : null}
+
+        {activeTab === "details" ? (
+          <div
+            id="event-details-panel"
+            role="tabpanel"
+            aria-labelledby="event-details-tab"
+            className="space-y-4 pb-4"
+          >
+            <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]">
           {item.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img alt={item.title} className="h-48 w-full object-cover sm:h-56" src={item.image_url} />
@@ -149,14 +204,22 @@ export default function ItineraryDetail({
             </>
           )}
         </div>
-
-        {currentUserId && tripId ? (
-          <EventComments
-            currentUserId={currentUserId}
-            itineraryItemId={item.id}
-            tripId={tripId}
-            userRole={userRole ?? null}
-          />
+          </div>
+        ) : hasComments ? (
+          <div
+            id="event-comments-panel"
+            role="tabpanel"
+            aria-labelledby="event-comments-tab"
+            className="flex min-h-0 flex-1 flex-col"
+          >
+            <EventComments
+              currentUserId={currentUserId!}
+              fullView
+              itineraryItemId={item.id}
+              tripId={tripId!}
+              userRole={userRole ?? null}
+            />
+          </div>
         ) : null}
       </div>
 

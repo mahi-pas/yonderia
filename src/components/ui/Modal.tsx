@@ -32,7 +32,9 @@ export default function Modal({
   const [isVisible, setIsVisible] = useState(false);
   const [sheetOffset, setSheetOffset] = useState(0);
 
-  onCloseRef.current = onClose;
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     const syncViewport = () => {

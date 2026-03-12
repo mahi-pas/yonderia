@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import ImageUploader from "@/components/ui/ImageUploader";
-import Input, { inputClassName } from "@/components/ui/Input";
+import { inputClassName } from "@/components/ui/Input";
 import BackgroundEffects from "@/components/trip/BackgroundEffects";
 import TripThemeProvider from "@/components/trip/TripThemeProvider";
 import type {

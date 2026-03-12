@@ -3,7 +3,7 @@ import { createRoot, type Root } from "react-dom/client";
 import type { User } from "@supabase/supabase-js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { NextRequest } from "next/server";
-import type { Database, Profile } from "@/lib/types";
+import type { Profile } from "@/lib/types";
 import OnboardingModal from "@/components/auth/OnboardingModal";
 import { proxy } from "@/proxy";
 import { createServerClient } from "@supabase/ssr";

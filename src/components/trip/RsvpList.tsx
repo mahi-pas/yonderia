@@ -66,7 +66,7 @@ export default function RsvpList({
 
   useEffect(() => {
     if (!isOpen || userIds.length === 0) {
-      setProfiles(new Map());
+      queueMicrotask(() => setProfiles(new Map()));
       return;
     }
 
