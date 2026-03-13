@@ -19,6 +19,8 @@ type PageProps = {
   }>;
 };
 
+const DEFAULT_OG_IMAGE_PATH = "/yonderia_logo.jpg";
+
 function buildLinkPreviewDescription(
   startDate: string,
   endDate: string,
@@ -28,7 +30,7 @@ function buildLinkPreviewDescription(
   const end = new Date(endDate);
   const dateStr = `${start.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} – ${end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
   const location = locationName?.trim() || "Location TBD";
-  return `${dateStr} · ${location}`;
+  return `${dateStr} · ${location} · Plan and share trips on Yonderia.`;
 }
 
 export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
@@ -36,10 +38,29 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const resolved = await searchParams;
   const code = normalizeCodeParam(resolved.code);
 
+  const baseUrl = await getSiteUrl();
+  const defaultImageUrl = `${baseUrl}${DEFAULT_OG_IMAGE_PATH}`;
+  const fallbackTitle = "You're Invited to a Trip | Join & Plan Adventures | Yonderia";
+  const fallbackDescription =
+    "You've been invited to a trip on Yonderia. Sign in to view the itinerary, dates, and location. Plan adventures with your people.";
+
   if (!code) {
     return {
-      title: "Invite link | Yonderia",
-      description: "Plan adventures with your people.",
+      title: fallbackTitle,
+      description: fallbackDescription,
+      openGraph: {
+        title: fallbackTitle,
+        description: fallbackDescription,
+        type: "website",
+        url: `${baseUrl}/trip/${tripId}/invite-landing`,
+        images: [{ url: defaultImageUrl, alt: "Yonderia – Plan adventures with your people" }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: fallbackTitle,
+        description: fallbackDescription,
+        images: [defaultImageUrl],
+      },
     };
   }
 
@@ -47,8 +68,21 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 
   if (!preview || preview.tripId !== tripId) {
     return {
-      title: "Invite link | Yonderia",
-      description: "Plan adventures with your people.",
+      title: fallbackTitle,
+      description: fallbackDescription,
+      openGraph: {
+        title: fallbackTitle,
+        description: fallbackDescription,
+        type: "website",
+        url: `${baseUrl}/trip/${tripId}/invite-landing`,
+        images: [{ url: defaultImageUrl, alt: "Yonderia – Plan adventures with your people" }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: fallbackTitle,
+        description: fallbackDescription,
+        images: [defaultImageUrl],
+      },
     };
   }
 
@@ -58,30 +92,27 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     preview.trip.end_date,
     preview.trip.location_name,
   );
-  const baseUrl = await getSiteUrl();
   const imageUrl = preview.trip.image_url?.startsWith("http")
     ? preview.trip.image_url
     : preview.trip.image_url
       ? `${baseUrl}${preview.trip.image_url.startsWith("/") ? "" : "/"}${preview.trip.image_url}`
-      : undefined;
+      : defaultImageUrl;
 
   return {
     title: `${title} | Yonderia`,
     description,
     openGraph: {
-      title,
+      title: `${title} | Yonderia`,
       description,
       type: "website",
       url: `${baseUrl}/trip/${tripId}/invite-landing?code=${encodeURIComponent(code)}`,
-      ...(imageUrl && {
-        images: [{ url: imageUrl, alt: `${preview.trip.name} trip header` }],
-      }),
+      images: [{ url: imageUrl, alt: `${preview.trip.name} trip header` }],
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: `${title} | Yonderia`,
       description,
-      ...(imageUrl && { images: [imageUrl] }),
+      images: [imageUrl],
     },
   };
 }

@@ -15,11 +15,34 @@ const bodyFont = DM_Sans({
   variable: "--font-sans",
 });
 
+const siteOrigin =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+
 export const metadata: Metadata = {
-  title: "Yonderia",
-  description: "Plan adventures with your people.",
+  metadataBase: siteOrigin ? new URL(siteOrigin) : undefined,
+  title: {
+    default: "Yonderia – Plan & Share Adventures with Your People",
+    template: "%s | Yonderia",
+  },
+  description:
+    "Create and share trip itineraries with friends. Coordinate dates, locations, and activities in one place. Plan adventures together on Yonderia.",
   icons: {
     icon: "/yonderia_logo.jpg",
+  },
+  openGraph: {
+    title: "Yonderia – Plan & Share Adventures with Your People",
+    description:
+      "Create and share trip itineraries with friends. Coordinate dates, locations, and activities in one place. Plan adventures together on Yonderia.",
+    type: "website",
+    images: [{ url: "/yonderia_logo.jpg", alt: "Yonderia – Plan adventures with your people" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Yonderia – Plan & Share Adventures with Your People",
+    description:
+      "Create and share trip itineraries with friends. Coordinate dates, locations, and activities in one place. Plan adventures together on Yonderia.",
+    images: ["/yonderia_logo.jpg"],
   },
 };
 
