@@ -180,7 +180,7 @@ export default function EventComments({
 
   const addCommentArea = (
     <>
-      <div className="flex max-w-md gap-2">
+      <div className="flex max-w-md gap-2 md:max-w-xl lg:max-w-2xl">
         <textarea
           placeholder="Add a comment..."
           value={draft}

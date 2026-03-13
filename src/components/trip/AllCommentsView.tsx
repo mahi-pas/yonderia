@@ -310,7 +310,7 @@ export default function AllCommentsView({
           <p className="text-xs font-semibold uppercase tracking-wide gradient-text">
             Comment on the trip
           </p>
-          <div className="flex max-w-md gap-2">
+          <div className="flex max-w-md gap-2 md:max-w-xl lg:max-w-2xl">
             <textarea
               placeholder="Comment on this trip..."
               value={tripDraft}

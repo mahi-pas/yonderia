@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Button from "@/components/ui/Button";
 
 export type GifItem = {
@@ -36,7 +37,6 @@ export default function GifPicker({ isOpen, onClose, onSelect }: GifPickerProps)
   const [next, setNext] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [selected, setSelected] = useState<GifItem | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const debouncedQuery = useDebounce(query, DEBOUNCE_MS);
 
@@ -65,7 +65,6 @@ export default function GifPicker({ isOpen, onClose, onSelect }: GifPickerProps)
       setLoading(true);
       setResults([]);
       setNext(null);
-      setSelected(null);
     });
     queueMicrotask(() => void fetchGifs().finally(() => setLoading(false)));
   }, [isOpen, debouncedQuery, fetchGifs]);
@@ -85,36 +84,28 @@ export default function GifPicker({ isOpen, onClose, onSelect }: GifPickerProps)
     }
   }, [next, loadingMore, loadMore]);
 
-  const handleSelect = useCallback((gif: GifItem) => {
-    setSelected(gif);
-  }, []);
-
-  const handleSend = useCallback(() => {
-    if (selected) {
-      onSelect(selected.fullUrl);
-      setSelected(null);
+  const handleSelect = useCallback(
+    (gif: GifItem) => {
+      onSelect(gif.fullUrl);
       onClose();
-    }
-  }, [selected, onSelect, onClose]);
-
-  const handleCancel = useCallback(() => {
-    setSelected(null);
-  }, []);
+    },
+    [onSelect, onClose],
+  );
 
   if (!isOpen) return null;
 
-  return (
+  const overlay = (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
+      className="fixed inset-0 z-[100] flex flex-col sm:items-center sm:justify-center"
       role="dialog"
       aria-label="Pick a GIF"
     >
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm sm:block hidden"
         aria-hidden
         onClick={onClose}
       />
-      <div className="relative flex max-h-[85vh] w-full max-w-lg flex-col rounded-t-2xl border border-[var(--border)] border-b-0 bg-[var(--surface)] shadow-xl sm:max-h-[70vh] sm:rounded-2xl sm:border-b">
+      <div className="relative flex min-h-0 flex-1 flex-col bg-[var(--surface)] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:pt-0 sm:pb-0 sm:max-h-[70vh] sm:w-full sm:max-w-lg sm:flex-initial sm:rounded-2xl sm:border sm:border-[var(--border)] sm:shadow-xl">
         <div className="flex shrink-0 items-center gap-2 border-b border-[var(--border)] p-3">
           <input
             type="search"
@@ -129,85 +120,70 @@ export default function GifPicker({ isOpen, onClose, onSelect }: GifPickerProps)
           </Button>
         </div>
 
-        {selected ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={selected.fullUrl}
-              alt="Selected GIF"
-              className="max-h-48 max-w-full rounded-xl object-contain"
-            />
-            <div className="flex gap-2">
-              <Button variant="secondary" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button onClick={handleSend}>Send</Button>
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="min-h-0 flex-1 overflow-y-auto p-3"
+        >
+          {loading ? (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="aspect-square animate-pulse rounded-lg bg-[var(--surface-elevated)]"
+                />
+              ))}
             </div>
-          </div>
-        ) : (
-          <>
-            <div
-              ref={scrollRef}
-              onScroll={handleScroll}
-              className="min-h-0 flex-1 overflow-y-auto p-3"
-            >
-              {loading ? (
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="aspect-square animate-pulse rounded-lg bg-[var(--surface-elevated)]"
-                    />
-                  ))}
-                </div>
-              ) : results.length === 0 ? (
-                <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">
-                  No GIFs found. Try another search.
-                </p>
-              ) : (
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {results.map((gif) => (
-                    <button
-                      key={gif.id}
-                      type="button"
-                      className="focus:ring-2 focus:ring-[#8b5cf6]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface)] rounded-lg overflow-hidden outline-none transition hover:opacity-90"
-                      onClick={() => handleSelect(gif)}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={gif.url}
-                        alt=""
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
-              {loadingMore ? (
-                <div className="grid grid-cols-2 gap-2 py-2 sm:grid-cols-3">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="aspect-square animate-pulse rounded-lg bg-[var(--surface-elevated)]"
-                    />
-                  ))}
-                </div>
-              ) : null}
+          ) : results.length === 0 ? (
+            <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">
+              No GIFs found. Try another search.
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {results.map((gif) => (
+                <button
+                  key={gif.id}
+                  type="button"
+                  className="focus:ring-2 focus:ring-[#8b5cf6]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface)] rounded-lg overflow-hidden outline-none transition hover:opacity-90"
+                  onClick={() => handleSelect(gif)}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={gif.url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </button>
+              ))}
             </div>
-            <div className="shrink-0 border-t border-[var(--border)] px-3 py-2 text-center">
-              <a
-                href="https://giphy.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-[var(--muted-foreground)] hover:underline"
-              >
-                Powered by GIPHY
-              </a>
+          )}
+          {loadingMore ? (
+            <div className="grid grid-cols-2 gap-2 py-2 sm:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="aspect-square animate-pulse rounded-lg bg-[var(--surface-elevated)]"
+                />
+              ))}
             </div>
-          </>
-        )}
+          ) : null}
+        </div>
+        <div className="shrink-0 border-t border-[var(--border)] px-3 py-2 text-center">
+          <a
+            href="https://giphy.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-[var(--muted-foreground)] hover:underline"
+          >
+            Powered by GIPHY
+          </a>
+        </div>
       </div>
     </div>
   );
+
+  return typeof document !== "undefined"
+    ? createPortal(overlay, document.body)
+    : overlay;
 }
