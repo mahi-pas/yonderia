@@ -25,10 +25,7 @@ export function useMyEventRsvps({
   const idsKey = useMemo(() => itineraryItemIds.join(","), [itineraryItemIds]);
 
   useEffect(() => {
-    if (!enabled || !currentUserId || itineraryItemIds.length === 0) {
-      setRows([]);
-      return;
-    }
+    if (!enabled || !currentUserId || itineraryItemIds.length === 0) return;
 
     const supabase = createClient();
     let isMounted = true;
@@ -83,6 +80,9 @@ export function useMyEventRsvps({
   }, [currentUserId, enabled, idsKey, itineraryItemIds]);
 
   return useMemo(() => {
+    if (!enabled || !currentUserId || itineraryItemIds.length === 0) {
+      return new Map<string, RsvpStatus>();
+    }
     const map = new Map<string, RsvpStatus>();
     for (const r of rows) {
       if (r.status === "going" || r.status === "interested" || r.status === "not_going") {
@@ -90,5 +90,5 @@ export function useMyEventRsvps({
       }
     }
     return map;
-  }, [rows]);
+  }, [enabled, currentUserId, itineraryItemIds.length, rows]);
 }

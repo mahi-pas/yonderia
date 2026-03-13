@@ -57,20 +57,19 @@ export default function ItineraryDetail({
   const [showRsvpList, setShowRsvpList] = useState(false);
   const [activeTab, setActiveTab] = useState<DetailTab>("details");
   const [creatorName, setCreatorName] = useState<string | null>(null);
+  const displayCreatorName = item?.created_by ? creatorName : null;
 
   useEffect(() => {
-    if (!item?.created_by) {
-      setCreatorName(null);
-      return;
-    }
+    if (!item?.created_by) return;
     let isMounted = true;
     const supabase = createClient();
+    type ProfileRow = { display_name: string | null };
     supabase
       .from("profiles")
       .select("display_name")
       .eq("id", item.created_by)
       .maybeSingle()
-      .then(({ data }) => {
+      .then(({ data }: { data: ProfileRow | null }) => {
         if (!isMounted) return;
         const name = data?.display_name?.trim();
         setCreatorName(name || "Someone");
@@ -208,8 +207,8 @@ export default function ItineraryDetail({
 
         <div className="grid gap-2 sm:grid-cols-2">
           <DetailRow label="Day" value={formatDayLabel(item.day_date)} />
-          {item.created_by && creatorName !== null ? (
-            <DetailRow label="Created by" value={creatorName} />
+          {displayCreatorName !== null ? (
+            <DetailRow label="Created by" value={displayCreatorName} />
           ) : null}
           {item.item_type === "commute" ? (
             <>

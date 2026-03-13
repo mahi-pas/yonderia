@@ -22,6 +22,8 @@ export function useAllEventComments({
   itineraryItemIds,
   tripId,
 }: UseAllEventCommentsOptions): {
+  addAnnouncement: (content: string | null, gifUrl: string | null) => Promise<void>;
+  addTripComment: (content: string | null, gifUrl: string | null) => Promise<void>;
   comments: AllEventCommentRow[];
   error: string | null;
   refetch: () => Promise<void>;
