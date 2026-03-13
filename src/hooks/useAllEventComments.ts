@@ -7,7 +7,8 @@ import type { EventCommentWithAuthor } from "./useEventComments";
 
 export type AllEventCommentRow = {
   comment: EventCommentWithAuthor;
-  itineraryItemId: string;
+  /** Event id, or null for trip-level comment/announcement */
+  itineraryItemId: string | null;
 };
 
 type UseAllEventCommentsOptions = {
@@ -34,30 +35,53 @@ export function useAllEventComments({
   );
 
   const fetchComments = useCallback(async () => {
-    if (!tripId || itineraryItemIds.length === 0) {
+    if (!tripId) {
       setComments([]);
       setError(null);
       return;
     }
 
     const supabase = createClient();
+    const cols = "id, trip_id, itinerary_item_id, user_id, content, gif_url, is_announcement, created_at, updated_at";
 
-    const { data: commentsData, error: commentsError } = await supabase
+    // Event comments (when we have items)
+    const eventPromise =
+      itineraryItemIds.length > 0
+        ? supabase
+            .from("event_comments")
+            .select(cols)
+            .in("itinerary_item_id", itineraryItemIds)
+            .order("created_at", { ascending: true })
+        : Promise.resolve({ data: [] as never[], error: null });
+
+    // Trip-level comments and announcements
+    const tripPromise = supabase
       .from("event_comments")
-      .select("id, itinerary_item_id, user_id, content, gif_url, created_at, updated_at")
-      .in("itinerary_item_id", itineraryItemIds)
+      .select(cols)
+      .eq("trip_id", tripId)
+      .is("itinerary_item_id", null)
       .order("created_at", { ascending: true });
 
-    if (commentsError) {
-      setError(commentsError.message);
+    const [eventResult, tripResult] = await Promise.all([eventPromise, tripPromise]);
+
+    if (eventResult.error) {
+      setError(eventResult.error.message);
+      setComments([]);
+      return;
+    }
+    if (tripResult.error) {
+      setError(tripResult.error.message);
       setComments([]);
       return;
     }
 
-    const commentsRows = (commentsData ?? []) as (Pick<
+    type CommentRow = Pick<
       EventComment,
-      "id" | "itinerary_item_id" | "user_id" | "content" | "gif_url" | "created_at" | "updated_at"
-    > & { itinerary_item_id: string })[];
+      "id" | "trip_id" | "itinerary_item_id" | "user_id" | "content" | "gif_url" | "is_announcement" | "created_at" | "updated_at"
+    >;
+    const eventRows = (eventResult.data ?? []) as CommentRow[];
+    const tripRows = (tripResult.data ?? []) as CommentRow[];
+    const commentsRows = [...eventRows, ...tripRows];
 
     if (commentsRows.length === 0) {
       setComments([]);
@@ -110,7 +134,7 @@ export function useAllEventComments({
   }, [tripId, itineraryItemIds]);
 
   useEffect(() => {
-    if (!enabled || !tripId || itineraryItemIds.length === 0) {
+    if (!enabled || !tripId) {
       queueMicrotask(() => {
         setComments([]);
         setError(null);
@@ -143,7 +167,69 @@ export function useAllEventComments({
     };
   }, [enabled, tripId, itineraryItemIdsKey, itineraryItemIds.length, fetchComments]);
 
+  const addTripComment = useCallback(
+    async (content: string | null, gifUrl: string | null) => {
+      if (!tripId || (!content && !gifUrl)) return;
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error: insertError } = await supabase
+        .from("event_comments")
+        .insert({
+          trip_id: tripId,
+          itinerary_item_id: null,
+          user_id: user.id,
+          content: content || null,
+          gif_url: gifUrl || null,
+          is_announcement: false,
+        } as never);
+
+      if (insertError) {
+        setError(insertError.message);
+        throw insertError;
+      }
+      void fetchComments();
+      setError(null);
+    },
+    [tripId, fetchComments],
+  );
+
+  const addAnnouncement = useCallback(
+    async (content: string | null, gifUrl: string | null) => {
+      if (!tripId || (!content?.trim() && !gifUrl)) return;
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error: insertError } = await supabase
+        .from("event_comments")
+        .insert({
+          trip_id: tripId,
+          itinerary_item_id: null,
+          user_id: user.id,
+          content: content?.trim() || null,
+          gif_url: gifUrl || null,
+          is_announcement: true,
+        } as never);
+
+      if (insertError) {
+        setError(insertError.message);
+        throw insertError;
+      }
+      void fetchComments();
+      setError(null);
+    },
+    [tripId, fetchComments],
+  );
+
   return {
+    addAnnouncement,
+    addTripComment,
     comments,
     error,
     refetch: fetchComments,

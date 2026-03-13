@@ -47,7 +47,12 @@ export default function ItineraryWithComments({
   const [selectedItem, setSelectedItem] = useState<ItineraryListItem | null>(null);
 
   const itineraryItemIds = useMemo(() => items.map((i) => i.id), [items]);
-  const { comments, error: commentsError } = useAllEventComments({
+  const {
+    addAnnouncement,
+    addTripComment,
+    comments,
+    error: commentsError,
+  } = useAllEventComments({
     itineraryItemIds,
     tripId,
   });
@@ -140,12 +145,15 @@ export default function ItineraryWithComments({
         >
           {activeTab === "comments" ? (
             <AllCommentsView
+              addAnnouncement={addAnnouncement}
+              addTripComment={addTripComment}
               comments={comments}
               currentUserId={currentUserId ?? null}
               error={commentsError}
               itemById={itemById}
               onEventClick={(item) => setSelectedItem(item)}
               tripId={tripId}
+              userRole={currentUserRole}
             />
           ) : null}
         </div>

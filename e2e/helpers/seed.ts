@@ -227,11 +227,21 @@ export async function insertEventComment(
   if (content === null && gifUrl === null) {
     throw new Error("Event comment must have content or gifUrl");
   }
+  const { data: item } = await supabase
+    .from("itinerary_items")
+    .select("trip_id")
+    .eq("id", itineraryItemId)
+    .single();
+  if (!item?.trip_id) {
+    throw new Error("Itinerary item not found for comment");
+  }
   const { error } = await supabase.from("event_comments").insert({
+    trip_id: item.trip_id,
     itinerary_item_id: itineraryItemId,
     user_id: userId,
     content,
     gif_url: gifUrl,
+    is_announcement: false,
   });
   if (error) {
     throw error;

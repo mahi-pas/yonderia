@@ -32,7 +32,7 @@ export function useEventComments({
 
     const { data: commentsData, error: commentsError } = await supabase
       .from("event_comments")
-      .select("id, itinerary_item_id, user_id, content, gif_url, created_at, updated_at")
+      .select("id, trip_id, itinerary_item_id, user_id, content, gif_url, is_announcement, created_at, updated_at")
       .eq("itinerary_item_id", itineraryItemId)
       .order("created_at", { ascending: true });
 
@@ -53,7 +53,7 @@ export function useEventComments({
       nicknameByUser.set(p.user_id, p.nickname ?? null);
     }
 
-    type CommentRow = Pick<EventComment, "id" | "itinerary_item_id" | "user_id" | "content" | "gif_url" | "created_at" | "updated_at">;
+    type CommentRow = Pick<EventComment, "id" | "trip_id" | "itinerary_item_id" | "user_id" | "content" | "gif_url" | "is_announcement" | "created_at" | "updated_at">;
     const commentsRows = (commentsData ?? []) as CommentRow[];
     const userIds = [...new Set(commentsRows.map((c) => c.user_id))];
     if (userIds.length === 0) {
@@ -138,7 +138,7 @@ export function useEventComments({
 
   const addComment = useCallback(
     async (content: string | null, gifUrl: string | null) => {
-      if (!itineraryItemId || (!content && !gifUrl)) return;
+      if (!itineraryItemId || !tripId || (!content && !gifUrl)) return;
       const supabase = createClient();
       const {
         data: { user },
@@ -147,10 +147,12 @@ export function useEventComments({
 
       const optimistic: EventCommentWithAuthor = {
         id: `opt-${Date.now()}`,
+        trip_id: tripId,
         itinerary_item_id: itineraryItemId,
         user_id: user.id,
         content,
         gif_url: gifUrl,
+        is_announcement: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         author: {
@@ -165,12 +167,14 @@ export function useEventComments({
       const { error: insertError } = await supabase
         .from("event_comments")
         .insert({
+          trip_id: tripId,
           itinerary_item_id: itineraryItemId,
           user_id: user.id,
           content: content || null,
           gif_url: gifUrl || null,
+          is_announcement: false,
         } as never)
-        .select("id, itinerary_item_id, user_id, content, gif_url, created_at, updated_at")
+        .select("id, trip_id, itinerary_item_id, user_id, content, gif_url, is_announcement, created_at, updated_at")
         .single();
 
       if (insertError) {
@@ -182,7 +186,7 @@ export function useEventComments({
       void fetchComments();
       setError(null);
     },
-    [itineraryItemId, fetchComments],
+    [itineraryItemId, tripId, fetchComments],
   );
 
   const deleteComment = useCallback(

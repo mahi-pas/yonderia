@@ -67,6 +67,43 @@ textarea {
   font: inherit;
 }
 
+/* Checkboxes – dark theme styling with accent color */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.25rem;
+  background: var(--surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-grid;
+  place-content: center;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+input[type="checkbox"]:hover {
+  border-color: var(--accent);
+  background: var(--surface-elevated);
+}
+input[type="checkbox"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--accent);
+}
+input[type="checkbox"]:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+input[type="checkbox"]:checked::after {
+  content: "";
+  width: 0.25rem;
+  height: 0.5rem;
+  border: solid var(--foreground);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translateY(-1px);
+  margin-bottom: 2px;
+}
+
 /* Date/datetime inputs: white calendar popup; icon and text styled below for dark theme */
 input[type="date"],
 input[type="datetime-local"],

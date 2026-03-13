@@ -33,10 +33,12 @@ const commentRow = (
   createdAt: string,
 ) => ({
   id,
+  trip_id: "trip-1",
   itinerary_item_id: "item-1",
   user_id: userId,
   content,
   gif_url: gifUrl,
+  is_announcement: false,
   created_at: createdAt,
   updated_at: createdAt,
 });

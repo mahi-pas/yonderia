@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import BackgroundEffects from "@/components/trip/BackgroundEffects";
 import DayItinerary from "@/components/trip/DayItinerary";
@@ -14,11 +15,13 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
   getInviteCodeLookup,
+  getInvitePreview,
   getParticipantMembership,
   getTripPageData,
   type ParticipantMembership,
   type TripPageData,
 } from "@/lib/trips";
+import { getSiteUrl } from "@/lib/site-url";
 
 type PageProps = {
   params: Promise<{
@@ -35,6 +38,73 @@ function normalizeCodeParam(value: string | string[] | undefined): string | null
   }
 
   return Array.isArray(value) ? value[0] ?? null : value;
+}
+
+function buildLinkPreviewDescription(
+  startDate: string,
+  endDate: string,
+  locationName: string | null,
+): string {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const dateStr = `${start.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} – ${end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+  const location = locationName?.trim() || "Location TBD";
+  return `${dateStr} · ${location}`;
+}
+
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
+  const { tripId } = await params;
+  const resolved = await searchParams;
+  const code = normalizeCodeParam(resolved.code);
+
+  if (!code) {
+    return {
+      title: "Trip | Yonderia",
+      description: "Plan adventures with your people.",
+    };
+  }
+
+  const preview = await getInvitePreview(createAdminClient(), code);
+
+  if (!preview || preview.tripId !== tripId) {
+    return {
+      title: "Trip | Yonderia",
+      description: "Plan adventures with your people.",
+    };
+  }
+
+  const title = preview.trip.name;
+  const description = buildLinkPreviewDescription(
+    preview.trip.start_date,
+    preview.trip.end_date,
+    preview.trip.location_name,
+  );
+  const baseUrl = await getSiteUrl();
+  const imageUrl = preview.trip.image_url?.startsWith("http")
+    ? preview.trip.image_url
+    : preview.trip.image_url
+      ? `${baseUrl}${preview.trip.image_url.startsWith("/") ? "" : "/"}${preview.trip.image_url}`
+      : undefined;
+
+  return {
+    title: `${title} | Yonderia`,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `${baseUrl}/trip/${tripId}?code=${encodeURIComponent(code)}`,
+      ...(imageUrl && {
+        images: [{ url: imageUrl, alt: `${preview.trip.name} trip header` }],
+      }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(imageUrl && { images: [imageUrl] }),
+    },
+  };
 }
 
 async function getBaseUrl(): Promise<string> {

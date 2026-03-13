@@ -22,10 +22,12 @@ export interface EventRsvp {
 
 export interface EventComment {
   id: string;
-  itinerary_item_id: string;
+  trip_id: string;
+  itinerary_item_id: string | null;
   user_id: string;
   content: string | null;
   gif_url: string | null;
+  is_announcement: boolean;
   created_at: string;
   updated_at: string;
 }
