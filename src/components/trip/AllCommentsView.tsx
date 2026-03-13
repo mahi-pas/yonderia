@@ -322,7 +322,7 @@ export default function AllCommentsView({
                 }
               }}
               rows={1}
-              className="h-10 min-h-10 flex-1 resize-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-3 py-2 text-sm text-[#fafafa] placeholder:text-[var(--muted-foreground)] focus:border-[#8b5cf6] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/20"
+              className="min-h-10 max-h-40 flex-1 resize-none overflow-y-auto rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-3 py-2 text-sm leading-5 text-[#fafafa] placeholder:text-[var(--muted-foreground)] focus:border-[#8b5cf6] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/20"
             />
             <button
               type="button"
