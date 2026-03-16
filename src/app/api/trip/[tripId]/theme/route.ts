@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getParticipantMembership } from "@/lib/trips";
@@ -59,6 +60,8 @@ export async function PATCH(
       { status: 500 },
     );
   }
+
+  revalidatePath(`/trip/${tripId}`);
 
   return NextResponse.json({ success: true });
 }

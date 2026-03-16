@@ -140,13 +140,13 @@ export default function DashboardTripList({ currentUserId, trips }: Props) {
       )}
 
       {activeTab === "upcoming" && upcoming.length === 0 && (
-        <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] px-5 py-4 text-sm leading-6 text-[var(--muted)]">
+        <div className="mt-6 px-5 py-4 text-sm leading-6 text-[var(--muted)]">
           No upcoming trips. Create one to get started.
         </div>
       )}
 
       {activeTab === "past" && past.length === 0 && (
-        <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] px-5 py-4 text-sm leading-6 text-[var(--muted)]">
+        <div className="mt-6 px-5 py-4 text-sm leading-6 text-[var(--muted)]">
           No past trips yet.
         </div>
       )}

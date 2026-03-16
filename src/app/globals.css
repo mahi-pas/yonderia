@@ -189,12 +189,6 @@ input[type="datetime-local"]::-webkit-datetime-edit-ampm-field {
 .trip-theme-root .page-bg {
   background: transparent !important;
 }
-.trip-theme-root {
-  --accent: var(--trip-accent, #8b5cf6);
-  --accent-gradient: var(--trip-accent-gradient, linear-gradient(135deg, #8b5cf6, #ec4899));
-  --font-display: var(--trip-font-display, var(--font-display));
-  --font-sans: var(--trip-font-body, var(--font-sans));
-}
 
 .trip-theme-root[data-card-style="solid"] .trip-card {
   background: rgba(20, 20, 31, 0.95) !important;

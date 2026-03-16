@@ -162,7 +162,7 @@ async function fetchViewOnlyTripData(tripId: string, code: string): Promise<Trip
 
 function GuestBanner({ tripId }: { tripId: string }) {
   return (
-    <div className="trip-card rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-4 shadow-sm backdrop-blur-sm">
+    <div className="p-4">
       <p className="text-sm leading-6 text-[#d4d4d8]">
         You&apos;re viewing this trip as a guest. Have an invite code?{" "}
         <Link className="font-semibold text-[#8b5cf6] underline underline-offset-4 hover:text-[#a78bfa]" href={`/trip/${tripId}/join`}>
@@ -183,7 +183,7 @@ function InviteEntryForm({
   return (
     <main className="page-bg relative min-h-screen px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
       <PageBackground />
-      <div className="relative z-10 mx-auto max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-6 shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-sm sm:p-8">
+      <div className="relative z-10 mx-auto max-w-lg p-6 sm:p-8">
         <p className="text-xs font-semibold tracking-wide uppercase gradient-text">Trip access</p>
         <h1 className="mt-3 font-display text-4xl leading-none text-[#fafafa]">Enter your invite code</h1>
         <p className="mt-3 text-sm leading-6 text-[#d4d4d8]">
@@ -197,7 +197,7 @@ function InviteEntryForm({
               {errorMessage}
             </div>
           ) : null}
-          <div className="sticky bottom-3 z-10 -mx-1 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/95 p-3 shadow-[0_4px_24px_rgba(0,0,0,0.3)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
+          <div className="sticky bottom-3 z-10 -mx-1 p-3 sm:static sm:mx-0 sm:p-0">
             <button
               className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[image:var(--accent-gradient)] px-5 py-3 text-sm font-semibold text-white shadow-[0_2px_20px_rgba(139,92,246,0.3)] transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
               type="submit"
@@ -234,7 +234,7 @@ function TripPageLayout({
       <main className="page-bg relative min-h-screen px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
         <PageBackground />
         <BackgroundEffects effect={effect} />
-        <div className="relative z-10 mx-auto max-w-6xl space-y-5 lg:space-y-6">
+        <div className="relative z-10 mx-auto max-w-6xl space-y-4 sm:space-y-5 lg:space-y-6">
         {guestMode ? <GuestBanner tripId={data.trip.id} /> : null}
 
         <TripHeader
@@ -247,9 +247,9 @@ function TripPageLayout({
           tripId={data.trip.id}
         />
 
-        <section className="trip-card rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 shadow-sm backdrop-blur-sm">
-          <p className="text-xs font-semibold tracking-wide uppercase gradient-text">About this trip</p>
-          <div className="mt-4 text-sm leading-7 text-[#d4d4d8] sm:text-base">
+        <section className="trip-card space-y-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-4 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide gradient-text">About this trip</p>
+          <div className="text-sm leading-7 text-[#d4d4d8] sm:text-base">
             {data.trip.description?.trim() || "Trip details are still coming together."}
           </div>
         </section>

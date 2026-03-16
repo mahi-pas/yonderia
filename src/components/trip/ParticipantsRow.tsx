@@ -51,7 +51,7 @@ export default function ParticipantsRow({
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold tracking-wide uppercase text-[#8b5cf6]">
+          <p className="gradient-text text-xs font-semibold tracking-wide uppercase">
             Travelers
           </p>
           <h2 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Who&apos;s in</h2>
@@ -60,7 +60,7 @@ export default function ParticipantsRow({
       </div>
 
       <div
-        className="trip-card touch-pan-x overflow-x-auto overscroll-x-contain rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 px-4 py-4 shadow-sm backdrop-blur-sm [scrollbar-width:none] [-ms-overflow-style:none]"
+        className="touch-pan-x overflow-x-auto overscroll-x-contain px-4 py-4 [scrollbar-width:none] [-ms-overflow-style:none]"
         role={showSeeAll ? "button" : undefined}
         style={{ WebkitOverflowScrolling: "touch" }}
         tabIndex={showSeeAll ? 0 : undefined}
@@ -100,7 +100,7 @@ export default function ParticipantsRow({
                       className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border text-xs shadow-sm ${
                         participant.role === "organizer"
                           ? "border-[var(--border)] bg-[var(--gold)] text-[var(--background)]"
-                          : "border-[var(--border)] bg-[#8b5cf6] text-white"
+                          : "border-[var(--border)] bg-[var(--accent)] text-white"
                       }`}
                     >
                       {badge}
@@ -133,14 +133,14 @@ export default function ParticipantsRow({
 
           {showSeeAll ? (
             <button
-              className="flex h-[92px] w-[92px] shrink-0 snap-start flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface)] text-center shadow-sm transition hover:bg-[var(--surface-elevated)]"
+              className="flex h-[92px] w-[92px] shrink-0 snap-start flex-col items-center justify-center rounded-xl border border-dashed border-[var(--border-strong)] bg-[var(--surface)]/50 text-center transition hover:bg-[var(--surface-elevated)]"
               type="button"
               onClick={(event) => {
                 event.stopPropagation();
                 router.push(`/trip/${tripId}/participants`);
               }}
             >
-              <span className="font-display text-3xl leading-none text-[#8b5cf6]">
+              <span className="font-display text-3xl leading-none text-[var(--accent)]">
                 +{participants.length}
               </span>
               <span className="mt-1 text-xs font-semibold tracking-wide uppercase text-[var(--muted)]">

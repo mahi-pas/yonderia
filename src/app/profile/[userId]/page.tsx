@@ -198,7 +198,7 @@ export default async function ProfilePage({ params }: PageProps) {
     <main className="page-bg relative min-h-screen px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
       <PageBackground />
       <div className="relative z-10 mx-auto max-w-3xl space-y-5">
-        <header className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 backdrop-blur-sm sm:p-6">
+        <header className="p-5 sm:p-6">
           <div className="flex items-start gap-4">
             <Link
               aria-label={viewer ? "Back to dashboard" : "Back to home"}
@@ -217,7 +217,7 @@ export default async function ProfilePage({ params }: PageProps) {
           </div>
         </header>
 
-        <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 px-5 py-8 text-center backdrop-blur-sm sm:px-8 sm:py-10">
+        <section className="px-5 py-8 text-center sm:px-8 sm:py-10">
           <div className="mx-auto flex max-w-xl flex-col items-center">
             <div className="relative flex h-[120px] w-[120px] items-center justify-center overflow-hidden rounded-full border-4 border-[var(--surface)] bg-[var(--surface-elevated)] text-3xl font-semibold text-[#8b5cf6] ring-2 ring-[#8b5cf6]/20 sm:h-[160px] sm:w-[160px] sm:text-5xl">
               {profile.avatar_url ? (
@@ -271,7 +271,7 @@ export default async function ProfilePage({ params }: PageProps) {
         </section>
 
         {viewer && sharedTrips.length > 0 ? (
-          <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 backdrop-blur-sm sm:p-6">
+          <section className="p-5 sm:p-6">
             <div className="space-y-2 text-center sm:text-left">
               <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Shared trips</p>
               <h2 className="font-display text-3xl leading-none text-[#fafafa]">Trips you share</h2>

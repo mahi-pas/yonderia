@@ -65,7 +65,7 @@ export default function EditMyInfoButton({
   return (
     <>
       <button
-        className="group w-full rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 text-left shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.2)] backdrop-blur-sm transition hover:border-[#8b5cf6]/30 hover:shadow-[0_2px_8px_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.3)] focus:outline-none focus:ring-4 focus:ring-[#8b5cf6]/30"
+        className="group w-full rounded-xl border border-[var(--border)] p-5 text-left transition hover:border-[#8b5cf6]/30 focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
         type="button"
         onClick={() => setIsOpen(true)}
       >

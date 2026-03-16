@@ -148,8 +148,8 @@ export default async function DashboardPage() {
     <main className="page-bg relative min-h-screen px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
       <PageBackground />
       <div className="relative z-10 mx-auto max-w-7xl">
-        <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 shadow-[0_4px_40px_rgba(0,0,0,0.3)] backdrop-blur-sm sm:p-7 lg:p-8">
-          <div className="absolute inset-x-0 top-0 h-px bg-[image:var(--accent-gradient)] opacity-20 rounded-t-2xl" />
+        <section className="p-5 sm:p-7 lg:p-8">
+          <div className="absolute inset-x-0 top-0 h-px bg-[image:var(--accent-gradient)] opacity-20" />
 
           <div className="max-w-2xl space-y-3">
             <p className="text-xs font-semibold tracking-wide uppercase gradient-text">

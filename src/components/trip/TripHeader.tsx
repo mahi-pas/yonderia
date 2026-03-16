@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { Palette, Pencil } from "lucide-react";
 import { formatTripDateRange } from "@/lib/utils";
 
 type TripHeaderProps = {
@@ -12,6 +12,24 @@ type TripHeaderProps = {
   tripId?: string;
 };
 
+function PinIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
 export default function TripHeader({
   canEdit = false,
   endDate,
@@ -22,55 +40,55 @@ export default function TripHeader({
   tripId,
 }: TripHeaderProps) {
   return (
-    <section className="trip-card relative isolate overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_4px_20px_rgba(0,0,0,0.3)]">
-      <div className="relative h-[250px] w-full sm:h-[300px] lg:h-[400px] bg-[var(--surface)]">
+    <header className="relative space-y-4 sm:space-y-5">
+      <h1 className="font-display text-center text-2xl font-bold leading-tight text-balance text-[var(--foreground)] sm:text-3xl lg:text-4xl">
+        {name}
+      </h1>
+
+      <div className="relative w-full overflow-hidden bg-[var(--surface)]">
         {imageUrl ? (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             alt={`${name} header`}
-            className="object-contain"
-            fill
-            priority
-            sizes="100vw"
+            className="block h-auto w-full"
+            decoding="async"
+            fetchPriority="high"
             src={imageUrl}
           />
         ) : (
-          <div className="h-full w-full bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.15)_0%,var(--surface)_50%,transparent_70%),linear-gradient(180deg,var(--surface),var(--background))]" />
+          <div className="aspect-[16/10] w-full bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.15)_0%,var(--surface)_50%,transparent_70%),linear-gradient(180deg,var(--surface),var(--background))] sm:aspect-[21/9]" />
         )}
+      </div>
 
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-2 min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)] sm:text-sm">
+            {formatTripDateRange(startDate, endDate)}
+          </p>
+          <p className="flex items-center gap-2 text-sm text-[var(--muted)] sm:text-base">
+            <PinIcon className="h-4 w-4 shrink-0 text-[var(--muted)] sm:h-4.5 sm:w-4.5" />
+            <span>{locationName || "Location coming together"}</span>
+          </p>
+        </div>
         {canEdit && tripId ? (
-          <div className="absolute right-4 top-4 z-10 sm:right-6 sm:top-6">
+          <div className="flex items-center gap-1.5 shrink-0">
             <Link
               aria-label="Edit trip"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)]/80 text-[#fafafa] shadow-sm backdrop-blur transition hover:bg-[var(--surface)]/95 focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--foreground)] shadow-sm transition hover:bg-[var(--surface)]/80 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 sm:h-10 sm:w-10"
               href={`/trip/${tripId}/edit`}
             >
-              <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  d="M4 20h4l10-10a2.121 2.121 0 0 0-3-3L5 17v3Z"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.8"
-                />
-                <path d="m13.5 6.5 4 4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
-              </svg>
+              <Pencil className="h-4 w-4" aria-hidden />
+            </Link>
+            <Link
+              aria-label="Edit theme"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--foreground)] shadow-sm transition hover:bg-[var(--surface)]/80 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 sm:h-10 sm:w-10"
+              href={`/trip/${tripId}/customize`}
+            >
+              <Palette className="h-4 w-4" aria-hidden />
             </Link>
           </div>
         ) : null}
       </div>
-
-      <div className="p-5 sm:p-7 lg:p-9">
-        <div className="max-w-3xl space-y-3">
-          <p className="text-xs font-semibold tracking-wide uppercase text-[var(--muted)]">
-            {formatTripDateRange(startDate, endDate)}
-          </p>
-          <h1 className="font-display text-4xl leading-[0.92] text-balance sm:text-5xl lg:text-6xl text-[var(--foreground)]">
-            {name}
-          </h1>
-          <p className="text-sm text-[var(--muted)] sm:text-base">
-            {locationName || "Location coming together"}
-          </p>
-        </div>
-      </div>
-    </section>
+    </header>
   );
 }

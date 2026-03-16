@@ -44,7 +44,7 @@ function AnnouncementCard({
 
   return (
     <article
-      className="rounded-xl border-2 border-[#8b5cf6]/50 bg-gradient-to-br from-[#8b5cf6]/15 to-[#a78bfa]/10 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(139,92,246,0.12)] backdrop-blur-sm sm:p-4"
+      className="trip-card rounded-xl border-2 border-[#8b5cf6]/50 bg-gradient-to-br from-[#8b5cf6]/15 to-[#a78bfa]/10 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(139,92,246,0.12)] backdrop-blur-sm sm:p-4"
       aria-label="Announcement"
     >
       <div className="flex items-center gap-2 text-xs text-[var(--muted-foreground)] sm:gap-3">
@@ -124,7 +124,7 @@ function CommentCard({
   const hasMore = (comment.content?.length ?? 0) > 200;
 
   return (
-    <article className="rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4">
+    <article className="trip-card rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--muted-foreground)] sm:gap-x-3">
         {isTripLevel ? (
           <span className="rounded font-semibold text-[#a78bfa]">Trip</span>
@@ -132,7 +132,7 @@ function CommentCard({
           <button
             type="button"
             onClick={onViewEvent}
-            className="rounded font-semibold text-[#a78bfa] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface)]"
+            className="rounded font-semibold text-[var(--accent)] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface)]"
           >
             {eventTitle}
           </button>
@@ -188,7 +188,7 @@ function CommentCard({
           <button
             type="button"
             onClick={onViewEvent}
-            className="rounded text-xs font-medium text-[#a78bfa] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface)]"
+            className="rounded text-xs font-medium text-[var(--accent)] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface)]"
           >
             View event
           </button>
@@ -306,7 +306,7 @@ export default function AllCommentsView({
   return (
     <div className="space-y-3 sm:space-y-4">
       {showComposer ? (
-        <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4">
+        <div className="trip-card space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4">
           <p className="text-xs font-semibold uppercase tracking-wide gradient-text">
             Comment on the trip
           </p>
@@ -327,7 +327,7 @@ export default function AllCommentsView({
             <button
               type="button"
               aria-label="Add GIF"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] text-sm text-[var(--muted-foreground)] transition hover:bg-[var(--surface)] hover:text-[#d4d4d8] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/20"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] text-sm text-[var(--muted-foreground)] transition hover:bg-[var(--surface)] hover:text-[#d4d4d8] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
               onClick={() => setShowGifPicker(true)}
             >
               GIF
@@ -336,7 +336,7 @@ export default function AllCommentsView({
               type="button"
               disabled={!canSend}
               aria-label="Send comment"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[image:var(--accent-gradient)] text-white shadow-sm transition hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[image:var(--accent-gradient)] text-white shadow-sm transition hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
               onClick={handleSend}
             >
               ➤
@@ -388,13 +388,13 @@ export default function AllCommentsView({
       ) : null}
 
       {comments.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-2 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-3">
+        <div className="trip-card flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-2 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-3">
           <label className="flex items-center gap-2 text-sm text-[var(--muted-foreground)]">
             <span className="shrink-0">Sort:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as CommentsSortBy)}
-              className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm text-[#fafafa] focus:border-[#8b5cf6] focus:outline-none focus:ring-1 focus:ring-[#8b5cf6]"
+              className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm text-[#fafafa] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               aria-label="Sort comments by"
             >
               <option value="newest">Newest first</option>
@@ -417,13 +417,13 @@ export default function AllCommentsView({
       ) : null}
 
       {showEmptyState ? (
-        <div className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface)]/80 px-4 py-8 text-center shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:py-12">
+        <div className="rounded-lg border border-dashed border-[var(--border-strong)] px-4 py-8 text-center sm:py-12">
           <p className="text-sm text-[var(--muted-foreground)]">
             No comments yet. Add one above or open an event to comment there!
           </p>
         </div>
       ) : displayedComments.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface)]/80 px-4 py-8 text-center shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:py-12">
+        <div className="rounded-lg border border-dashed border-[var(--border-strong)] px-4 py-8 text-center sm:py-12">
           <p className="text-sm text-[var(--muted-foreground)]">
             {filterByGoingOnly
               ? "No comments in events you&apos;re going to."

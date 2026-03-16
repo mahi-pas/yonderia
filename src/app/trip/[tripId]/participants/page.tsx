@@ -227,7 +227,7 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
   return (
     <main className="page-bg min-h-screen px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
       <div className="mx-auto max-w-5xl space-y-5">
-        <header className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-5 backdrop-blur-sm sm:p-6">
+        <header className="p-5 sm:p-6">
           <div className="flex items-start gap-4">
             <Link
               aria-label="Back to trip"

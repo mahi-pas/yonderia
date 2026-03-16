@@ -124,7 +124,7 @@ export default function DayItinerary({
           return (
             <div
               key={day.dayDate}
-              className="trip-card overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 shadow-sm backdrop-blur-sm"
+              className="overflow-hidden border-b border-[var(--border)] pb-3 last:border-b-0 last:pb-0"
             >
               <button
                 className="flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-[var(--surface-elevated)]"
@@ -149,7 +149,7 @@ export default function DayItinerary({
                 <span
                   aria-hidden="true"
                   className={[
-                    "text-xl text-[#8b5cf6] transition-transform duration-300",
+                    "text-xl text-[var(--accent)] transition-transform duration-300",
                     isExpanded ? "rotate-90" : "",
                   ]
                     .filter(Boolean)
@@ -182,7 +182,7 @@ export default function DayItinerary({
                         />
                       ))
                     ) : (
-                      <div className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface-elevated)] px-5 py-8 text-center text-sm leading-6 text-[var(--muted)]">
+                      <div className="rounded-lg border border-dashed border-[var(--border-strong)] bg-[var(--surface-elevated)]/50 px-5 py-8 text-center text-sm leading-6 text-[var(--muted)]">
                         {isLoading ? "Loading the plan..." : "Your crew hasn't added anything to this day yet."}
                       </div>
                     )}

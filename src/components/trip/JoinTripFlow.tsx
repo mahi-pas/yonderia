@@ -125,14 +125,14 @@ export default function JoinTripFlow({
     return (
       <>
         <main className="page-bg min-h-screen px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
-          <div className="mx-auto max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+          <div className="mx-auto max-w-lg p-6 sm:p-8">
             <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Join trip</p>
             <h1 className="mt-3 font-display text-4xl leading-none text-[#fafafa]">Checking your invite</h1>
             <p className="mt-3 text-sm leading-6 text-[#d4d4d8]">
               We&apos;re validating your code and getting your spot ready.
             </p>
 
-            <div className="mt-8 flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 px-4 py-4 text-sm text-[#d4d4d8] backdrop-blur-sm">
+            <div className="mt-8 flex items-center gap-3 px-4 py-4 text-sm text-[#d4d4d8]">
               <div className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[#8b5cf6]" />
               <span>Validating invite code...</span>
             </div>
@@ -154,7 +154,7 @@ export default function JoinTripFlow({
   return (
     <>
       <main className="page-bg min-h-screen px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
-        <div className="mx-auto max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+        <div className="mx-auto max-w-lg p-6 sm:p-8">
           <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Trip access</p>
           <h1 className="mt-3 font-display text-4xl leading-none text-[#fafafa]">Join this trip</h1>
           <p className="mt-3 text-sm leading-6 text-[#d4d4d8]">
@@ -187,7 +187,7 @@ export default function JoinTripFlow({
               </div>
             ) : null}
 
-              <div className="sticky bottom-3 z-10 -mx-1 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/95 p-3 shadow-[0_4px_24px_rgba(0,0,0,0.3)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
+              <div className="sticky bottom-3 z-10 -mx-1 p-3 sm:static sm:mx-0 sm:p-0">
               <Button
                 className="w-full"
                 disabled={!normalizedCode}

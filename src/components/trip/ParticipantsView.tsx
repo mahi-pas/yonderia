@@ -326,7 +326,7 @@ export default function ParticipantsView({
         <TopToast message={toast.message} tone={toast.tone} />
       ) : null}
 
-      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 backdrop-blur-sm p-4 shadow-sm sm:p-5">
+      <section className="p-4 sm:p-5">
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide gradient-text">People</p>
@@ -346,7 +346,7 @@ export default function ParticipantsView({
             return (
               <li
                 key={participant.participantId}
-                className="relative rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-4 shadow-sm"
+                className="relative rounded-lg border border-[var(--border)] p-4"
               >
                 <div className="flex items-start gap-3">
                   <Link

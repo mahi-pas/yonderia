@@ -8,30 +8,48 @@ const DEFAULT_ACCENT = "#8b5cf6";
 const DEFAULT_FONT_DISPLAY = "var(--font-display)";
 const DEFAULT_FONT_BODY = "var(--font-sans)";
 
-function buildThemeBackgroundCss(theme: TripTheme | null | undefined): string {
+function buildThemeBackgroundStyle(
+  theme: TripTheme | null | undefined
+): {
+  backgroundImage: string;
+  backgroundColor: string;
+  backgroundSize: string;
+  backgroundPosition: string;
+} {
+  const result = {
+    backgroundImage: "none",
+    backgroundColor: DEFAULT_BG,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  };
   if (!theme?.background?.type || !theme.background.value) {
-    return DEFAULT_BG;
+    return result;
   }
   const { type, value } = theme.background;
   if (type === "solid") {
-    return value;
+    result.backgroundColor = value;
+    return result;
   }
   if (type === "image") {
-    return `url(${value})`;
+    result.backgroundImage = `url(${value})`;
+    return result;
   }
-  return value;
+  // gradient
+  result.backgroundImage = value;
+  return result;
 }
 
 function buildGoogleFontsUrl(display: string, body: string): string {
-  const families = [
+  const families = Array.from(new Set([
     display.replace(/ /g, "+"),
     body.replace(/ /g, "+"),
-  ].filter(Boolean);
+  ].filter(Boolean)));
   if (families.length === 0) return "";
-  const query = new URLSearchParams({
-    family: families.map((f) => `${f}:wght@400;500;600;700`).join("|"),
-    display: "swap",
-  });
+  const query = new URLSearchParams();
+  for (const family of families) {
+    query.append("family", `${family}:wght@400;500;600;700`);
+  }
+  query.set("display", "swap");
   return `https://fonts.googleapis.com/css2?${query.toString()}`;
 }
 
@@ -52,7 +70,11 @@ export default function TripThemeProvider({ children, theme }: TripThemeProvider
   }, [theme?.font?.display, theme?.font?.body, hasCustomFonts]);
 
   const style = useMemo(() => {
-    const bg = buildThemeBackgroundCss(theme);
+    const bgStyle = buildThemeBackgroundStyle(theme);
+    const bg =
+      bgStyle.backgroundImage !== "none"
+        ? bgStyle.backgroundImage
+        : bgStyle.backgroundColor;
     const overlay = theme?.background?.overlay_opacity ?? 0;
     const accent = theme?.accent_color?.trim() || DEFAULT_ACCENT;
     const displayFont = theme?.font?.display?.trim()
@@ -64,6 +86,10 @@ export default function TripThemeProvider({ children, theme }: TripThemeProvider
     const cardStyle = theme?.card_style || "glass";
 
     return {
+      "--accent": accent,
+      "--accent-gradient": `linear-gradient(135deg, ${accent}, ${accent}dd)`,
+      "--font-display": displayFont,
+      "--font-sans": bodyFont,
       "--trip-bg": bg,
       "--trip-bg-overlay": String(overlay),
       "--trip-accent": accent,
@@ -82,26 +108,25 @@ export default function TripThemeProvider({ children, theme }: TripThemeProvider
     link.setAttribute("data-trip-theme-fonts", "true");
     document.head.appendChild(link);
     return () => {
-      const existing = document.querySelector('[data-trip-theme-fonts="true"]');
-      if (existing?.parentNode) existing.parentNode.removeChild(existing);
+      link.remove();
     };
   }, [fontUrl]);
 
   const cardStyle = theme?.card_style ?? "glass";
+  const bgStyle = useMemo(
+    () => buildThemeBackgroundStyle(theme),
+    [theme]
+  );
 
   return (
     <div
-      className="trip-theme-root relative min-h-screen"
+      className="trip-theme-root relative isolate min-h-screen"
       data-card-style={cardStyle}
       style={style}
     >
       <div
         className="trip-theme-bg absolute inset-0 -z-10 min-h-screen"
-        style={{
-          background: style["--trip-bg"],
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
+        style={bgStyle}
       />
       {Number(style["--trip-bg-overlay"]) > 0 ? (
         <div

@@ -68,7 +68,7 @@ export default function ItineraryWithComments({
     <section className="space-y-4">
       <div className="flex flex-col gap-4 sm:gap-5">
         <div className="flex items-center justify-between gap-4">
-          <div role="tablist" aria-label="Itinerary and comments" className="inline-flex rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-1">
+          <div role="tablist" aria-label="Itinerary and comments" className="trip-card inline-flex rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-1">
             <button
               type="button"
               role="tab"
@@ -99,7 +99,7 @@ export default function ItineraryWithComments({
             >
               Comments
               {comments.length > 0 ? (
-                <span className="ml-1.5 rounded-full bg-[#8b5cf6]/30 px-1.5 py-0.5 text-xs tabular-nums">
+                <span className="ml-1.5 rounded-full bg-[var(--accent)]/20 px-1.5 py-0.5 text-xs tabular-nums text-[var(--accent)]">
                   {comments.length}
                 </span>
               ) : null}

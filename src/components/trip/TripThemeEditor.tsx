@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import ImageUploader from "@/components/ui/ImageUploader";
@@ -76,7 +75,6 @@ export default function TripThemeEditor({
   tripId,
   tripName,
 }: TripThemeEditorProps) {
-  const router = useRouter();
   const [theme, setTheme] = useState<TripTheme>(() => initialTheme ?? {});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -138,8 +136,9 @@ export default function TripThemeEditor({
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error ?? "Failed to save theme.");
       }
-      router.push(`/trip/${tripId}`);
-      router.refresh();
+      // Full page navigation so the trip page is loaded from the server with the new theme
+      // (avoids client Router Cache showing the old theme)
+      window.location.href = `/trip/${tripId}`;
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : "Could not save theme. Try again.");
     } finally {

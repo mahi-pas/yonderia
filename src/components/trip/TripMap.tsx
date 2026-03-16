@@ -515,7 +515,7 @@ export default function TripMap({
 
   return (
     <section
-      className="trip-card rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 backdrop-blur-sm p-5 shadow-sm"
+      className="p-5"
       data-testid="trip-map-section"
     >
       <div className="flex items-start justify-between gap-4">
@@ -555,7 +555,7 @@ export default function TripMap({
             <div className="absolute inset-0 z-10 flex items-end justify-center pt-[env(safe-area-inset-top)] sm:items-center sm:justify-center sm:pt-0">
               <section
                 aria-modal="true"
-                className="relative flex h-[calc(100svh-env(safe-area-inset-top))] w-full flex-col overflow-hidden rounded-t-2xl border border-[var(--border-strong)] bg-[rgba(20,20,31,0.98)] shadow-[0_-4px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:h-[90dvh] sm:max-w-4xl sm:rounded-2xl sm:shadow-[0_8px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(139,92,246,0.08)]"
+                className="trip-card relative flex h-[calc(100svh-env(safe-area-inset-top))] w-full flex-col overflow-hidden rounded-t-2xl border border-[var(--border-strong)] bg-[rgba(20,20,31,0.98)] shadow-[0_-4px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:h-[90dvh] sm:max-w-4xl sm:rounded-2xl sm:shadow-[0_8px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(139,92,246,0.08)]"
                 role="dialog"
               >
                 <div className="absolute inset-x-0 top-0 h-px bg-[image:var(--accent-gradient)] opacity-40" />
@@ -791,7 +791,7 @@ export default function TripMap({
           ) : null}
 
           <div
-            className="relative mt-4 h-[250px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] sm:h-[400px]"
+            className="trip-card relative mt-4 h-[250px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] sm:h-[400px]"
             data-testid="trip-map-canvas"
           >
             {isMockMode ? (
