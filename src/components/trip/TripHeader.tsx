@@ -62,11 +62,11 @@ export default function TripHeader({
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-2 min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)] sm:text-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]/90 sm:text-sm">
             {formatTripDateRange(startDate, endDate)}
           </p>
-          <p className="flex items-center gap-2 text-sm text-[var(--muted)] sm:text-base">
-            <PinIcon className="h-4 w-4 shrink-0 text-[var(--muted)] sm:h-4.5 sm:w-4.5" />
+          <p className="flex items-center gap-2 text-sm text-[var(--foreground)]/90 sm:text-base">
+            <PinIcon className="h-4 w-4 shrink-0 text-[var(--foreground)]/90 sm:h-4.5 sm:w-4.5" />
             <span>{locationName || "Location coming together"}</span>
           </p>
         </div>

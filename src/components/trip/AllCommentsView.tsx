@@ -44,11 +44,11 @@ function AnnouncementCard({
 
   return (
     <article
-      className="trip-card rounded-xl border-2 border-[#8b5cf6]/50 bg-gradient-to-br from-[#8b5cf6]/15 to-[#a78bfa]/10 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(139,92,246,0.12)] backdrop-blur-sm sm:p-4"
+      className="trip-card rounded-xl border-2 border-[var(--accent)]/50 bg-gradient-to-br from-[var(--accent)]/15 to-[var(--accent)]/10 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4"
       aria-label="Announcement"
     >
       <div className="flex items-center gap-2 text-xs text-[var(--muted-foreground)] sm:gap-3">
-        <span className="inline-flex items-center gap-1 rounded bg-[#8b5cf6]/30 px-1.5 py-0.5 font-semibold uppercase tracking-wide text-[#a78bfa]">
+        <span className="inline-flex items-center gap-1 rounded bg-[var(--accent)]/30 px-1.5 py-0.5 font-semibold uppercase tracking-wide text-[var(--accent)]">
           📢 Announcement
         </span>
         <span>{authorName}</span>
@@ -71,7 +71,7 @@ function AnnouncementCard({
         </div>
         <div className="min-w-0 flex-1">
           {comment.content ? (
-            <p className="whitespace-pre-wrap break-words text-sm font-medium text-[#e4e4e7] sm:text-[15px]">
+            <p className="whitespace-pre-wrap break-words text-sm font-medium text-[var(--foreground)] sm:text-[15px]">
               {comment.content}
             </p>
           ) : null}
@@ -127,7 +127,7 @@ function CommentCard({
     <article className="trip-card rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--muted-foreground)] sm:gap-x-3">
         {isTripLevel ? (
-          <span className="rounded font-semibold text-[#a78bfa]">Trip</span>
+          <span className="rounded font-semibold text-[var(--accent)]">Trip</span>
         ) : (
           <button
             type="button"
@@ -158,7 +158,7 @@ function CommentCard({
         </div>
         <div className="min-w-0 flex-1">
           {contentPreview ? (
-            <p className="whitespace-pre-wrap break-words text-sm text-[#d4d4d8] sm:text-[15px]">
+            <p className="whitespace-pre-wrap break-words text-sm text-[var(--muted-foreground)] sm:text-[15px]">
               {contentPreview}
               {hasMore ? "…" : ""}
             </p>
@@ -322,12 +322,12 @@ export default function AllCommentsView({
                 }
               }}
               rows={1}
-              className="min-h-10 max-h-40 flex-1 resize-none overflow-y-auto rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-3 py-2 text-sm leading-5 text-[#fafafa] placeholder:text-[var(--muted-foreground)] focus:border-[#8b5cf6] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/20"
+              className="min-h-10 max-h-40 flex-1 resize-none overflow-y-auto rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-3 py-2 text-sm leading-5 text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
             />
             <button
               type="button"
               aria-label="Add GIF"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] text-sm text-[var(--muted-foreground)] transition hover:bg-[var(--surface)] hover:text-[#d4d4d8] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] text-sm text-[var(--muted-foreground)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
               onClick={() => setShowGifPicker(true)}
             >
               GIF
@@ -353,7 +353,7 @@ export default function AllCommentsView({
               <span className="text-xs text-[var(--muted-foreground)]">GIF added</span>
               <button
                 type="button"
-                className="text-xs text-[#a78bfa] underline"
+                className="text-xs text-[var(--accent)] underline"
                 onClick={() => setPendingGif(null)}
               >
                 Remove
@@ -394,7 +394,7 @@ export default function AllCommentsView({
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as CommentsSortBy)}
-              className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm text-[#fafafa] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm text-[var(--foreground)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               aria-label="Sort comments by"
             >
               <option value="newest">Newest first</option>

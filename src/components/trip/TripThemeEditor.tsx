@@ -162,8 +162,9 @@ export default function TripThemeEditor({
   }, [theme, bgImageState?.publicUrl]);
 
   return (
-    <main className="page-bg min-h-screen px-4 py-6 pb-24 sm:px-6 sm:py-8 lg:px-10">
-      <div className="mx-auto max-w-5xl space-y-8">
+    <TripThemeProvider theme={previewTheme}>
+      <main className="page-bg min-h-screen px-4 py-6 pb-24 sm:px-6 sm:py-8 lg:px-10">
+        <div className="mx-auto max-w-5xl space-y-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
@@ -387,6 +388,169 @@ export default function TripThemeEditor({
 
           <section className="space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-6 backdrop-blur-sm">
             <h2 className="font-display text-lg font-semibold text-[#fafafa]">
+              Text &amp; cards
+            </h2>
+            <p className="text-sm text-[#d4d4d8]">
+              Optional. Set these so text and cards match your background. Pick a <strong>card color</strong> that complements your background (e.g. a lighter or warmer shade so itinerary cards don’t look too dark).
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-medium text-[#d4d4d8]">Card color (itinerary, tabs, buttons)</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    className="h-10 w-14 cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]"
+                    value={theme.surface_color ?? "#14141f"}
+                    onChange={(e) =>
+                      updateTheme((prev) => ({ ...prev, surface_color: e.target.value }))
+                    }
+                  />
+                  <input
+                    type="text"
+                    className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-sm text-[#fafafa]"
+                    placeholder="#2d2a1e or #4a4035"
+                    value={theme.surface_color ?? ""}
+                    onChange={(e) =>
+                      updateTheme((prev) => ({
+                        ...prev,
+                        surface_color: e.target.value.trim() || undefined,
+                      }))
+                    }
+                  />
+                </div>
+                <span className="text-xs text-[#71717a]">Pick a complementary color so cards don’t look too dark on your background.</span>
+              </label>
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-medium text-[#d4d4d8]">Text on cards</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    className="h-10 w-14 cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]"
+                    value={theme.surface_foreground ?? "#fafafa"}
+                    onChange={(e) =>
+                      updateTheme((prev) => ({ ...prev, surface_foreground: e.target.value }))
+                    }
+                  />
+                  <input
+                    type="text"
+                    className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-sm text-[#fafafa]"
+                    placeholder="#fafafa"
+                    value={theme.surface_foreground ?? ""}
+                    onChange={(e) =>
+                      updateTheme((prev) => ({
+                        ...prev,
+                        surface_foreground: e.target.value.trim() || undefined,
+                      }))
+                    }
+                  />
+                </div>
+                <span className="text-xs text-[#71717a]">For text inside event cards (e.g. light on dark cards)</span>
+              </label>
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-medium text-[#d4d4d8]">Primary text</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    className="h-10 w-14 cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]"
+                    value={theme.text_primary ?? "#fafafa"}
+                    onChange={(e) =>
+                      updateTheme((prev) => ({ ...prev, text_primary: e.target.value }))
+                    }
+                  />
+                  <input
+                    type="text"
+                    className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-sm text-[#fafafa]"
+                    placeholder="#fafafa"
+                    value={theme.text_primary ?? ""}
+                    onChange={(e) =>
+                      updateTheme((prev) => ({
+                        ...prev,
+                        text_primary: e.target.value.trim() || undefined,
+                      }))
+                    }
+                  />
+                </div>
+              </label>
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-medium text-[#d4d4d8]">Secondary text</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    className="h-10 w-14 cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]"
+                    value={theme.text_secondary ?? "#71717a"}
+                    onChange={(e) =>
+                      updateTheme((prev) => ({ ...prev, text_secondary: e.target.value }))
+                    }
+                  />
+                  <input
+                    type="text"
+                    className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-sm text-[#fafafa]"
+                    placeholder="#71717a"
+                    value={theme.text_secondary ?? ""}
+                    onChange={(e) =>
+                      updateTheme((prev) => ({
+                        ...prev,
+                        text_secondary: e.target.value.trim() || undefined,
+                      }))
+                    }
+                  />
+                </div>
+              </label>
+              <label className="flex flex-col gap-2">
+                <span className="text-sm font-medium text-[#d4d4d8]">Section titles / accent text</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    className="h-10 w-14 cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]"
+                    value={theme.text_accent ?? theme.accent_color ?? "#8b5cf6"}
+                    onChange={(e) =>
+                      updateTheme((prev) => ({ ...prev, text_accent: e.target.value }))
+                    }
+                  />
+                  <input
+                    type="text"
+                    className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-sm text-[#fafafa]"
+                    placeholder="Uses accent"
+                    value={theme.text_accent ?? ""}
+                    onChange={(e) =>
+                      updateTheme((prev) => ({
+                        ...prev,
+                        text_accent: e.target.value.trim() || undefined,
+                      }))
+                    }
+                  />
+                </div>
+              </label>
+              <label className="flex flex-col gap-2 sm:col-span-2">
+                <span className="text-sm font-medium text-[#d4d4d8]">Border color</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    className="h-10 w-14 cursor-pointer rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]"
+                    value={theme.border_color ?? "#ffffff"}
+                    onChange={(e) =>
+                      updateTheme((prev) => ({ ...prev, border_color: e.target.value }))
+                    }
+                  />
+                  <input
+                    type="text"
+                    className="min-w-0 flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-sm text-[#fafafa]"
+                    placeholder="#ffffff"
+                    value={theme.border_color ?? ""}
+                    onChange={(e) =>
+                      updateTheme((prev) => ({
+                        ...prev,
+                        border_color: e.target.value.trim() || undefined,
+                      }))
+                    }
+                  />
+                </div>
+              </label>
+            </div>
+          </section>
+
+          <section className="space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-6 backdrop-blur-sm">
+            <h2 className="font-display text-lg font-semibold text-[#fafafa]">
               Special effect
             </h2>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -448,8 +612,12 @@ export default function TripThemeEditor({
                 <div
                   className="relative rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 backdrop-blur-sm"
                   style={{
-                    ...(previewTheme.card_style === "solid" && {
-                      background: "rgba(20,20,31,0.95)",
+                    ...(previewTheme.card_style === "solid" &&
+                      !previewTheme.surface_color && {
+                      background: previewTheme.background?.value ? "#2d2a1e" : "rgba(20,20,31,0.95)",
+                    }),
+                    ...(previewTheme.card_style === "solid" && previewTheme.surface_color && {
+                      background: previewTheme.surface_color,
                     }),
                     ...(previewTheme.card_style === "outline" && {
                       background: "transparent",
@@ -518,5 +686,6 @@ export default function TripThemeEditor({
         </div>
       </div>
     </main>
+    </TripThemeProvider>
   );
 }

@@ -81,13 +81,13 @@ function getInviteBadge(codeType: InviteCodeType): {
 
   if (codeType === "join_planner") {
     return {
-      className: "border-[#8b5cf6]/30 bg-[#8b5cf6]/10 text-[#a78bfa]",
+      className: "border-[var(--accent)]/30 bg-[var(--accent)]/10 text-[var(--accent)]",
       label: "Planner",
     };
   }
 
   return {
-    className: "border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--muted)]",
+    className: "border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--muted-foreground)]",
     label: "View Only",
   };
 }
@@ -262,8 +262,8 @@ export default function InviteManagement({
 
       <div className="space-y-5">
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-4 shadow-sm backdrop-blur-sm sm:p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide gradient-text">Generate New Invite</p>
-          <h2 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Share the trip</h2>
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]">Generate New Invite</p>
+          <h2 className="mt-1 font-display text-3xl leading-none text-[var(--foreground)]">Share the trip</h2>
 
           <div className="mt-5 space-y-3">
             {TYPE_OPTIONS.map((option) => (
@@ -272,7 +272,7 @@ export default function InviteManagement({
                 className={[
                   "flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border px-4 py-3 transition",
                   inviteType === option.value
-                    ? "border-[#8b5cf6] bg-[var(--surface-elevated)] shadow-sm"
+                    ? "border-[var(--accent)] bg-[var(--surface-elevated)] shadow-sm"
                     : "border-[var(--border)] bg-[var(--background)] hover:bg-[var(--surface)]",
                 ]
                   .filter(Boolean)
@@ -280,7 +280,7 @@ export default function InviteManagement({
               >
                 <input
                   checked={inviteType === option.value}
-                  className="mt-1 h-4 w-4 accent-[#8b5cf6]"
+                  className="mt-1 h-4 w-4 accent-[var(--accent)]"
                   name="invite-type"
                   type="radio"
                   value={option.value}
@@ -289,8 +289,8 @@ export default function InviteManagement({
                   }}
                 />
                 <span className="min-w-0">
-                  <span className="block text-sm font-semibold text-[#fafafa]">{option.label}</span>
-                  <span className="mt-1 block text-sm leading-6 text-[#d4d4d8]">{option.description}</span>
+                  <span className="block text-sm font-semibold text-[var(--foreground)]">{option.label}</span>
+                  <span className="mt-1 block text-sm leading-6 text-[var(--muted-foreground)]">{option.description}</span>
                 </span>
               </label>
             ))}
@@ -307,8 +307,8 @@ export default function InviteManagement({
 
           {generatedLink ? (
             <div className="mt-5 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-4 shadow-sm backdrop-blur-sm">
-              <p className="text-sm font-semibold text-[#fafafa]">Newest link</p>
-              <p className="mt-2 break-all text-sm leading-6 text-[#d4d4d8]">{generatedLink}</p>
+              <p className="text-sm font-semibold text-[var(--foreground)]">Newest link</p>
+              <p className="mt-2 break-all text-sm leading-6 text-[var(--muted-foreground)]">{generatedLink}</p>
               <Button
                 className="mt-4 w-full sm:w-auto"
                 variant="secondary"
@@ -323,14 +323,14 @@ export default function InviteManagement({
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-4 shadow-sm backdrop-blur-sm sm:p-5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide gradient-text">Active Invites</p>
-              <h2 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Live links</h2>
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]">Active Invites</p>
+              <h2 className="mt-1 font-display text-3xl leading-none text-[var(--foreground)]">Live links</h2>
             </div>
-            <p className="text-sm text-[var(--muted)]">{activeInvites.length} active</p>
+            <p className="text-sm text-[var(--foreground)]/90">{activeInvites.length} active</p>
           </div>
 
           {activeInvites.length === 0 ? (
-            <div className="mt-5 rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface)] px-5 py-6 text-sm leading-6 text-[var(--muted)]">
+            <div className="mt-5 rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface)] px-5 py-6 text-sm leading-6 text-[var(--muted-foreground)]">
               No active invites yet. Generate one above when you&apos;re ready to share the trip.
             </div>
           ) : (
@@ -347,7 +347,7 @@ export default function InviteManagement({
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0 space-y-2">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono text-sm font-semibold text-[#fafafa]">
+                          <span className="font-mono text-sm font-semibold text-[var(--foreground)]">
                             {truncateCode(invite.code)}
                           </span>
                           <span
@@ -356,8 +356,8 @@ export default function InviteManagement({
                             {badge.label}
                           </span>
                         </div>
-                        <p className="break-all text-sm leading-6 text-[#d4d4d8]">{fullLink}</p>
-                        <p className="text-sm text-[var(--muted)]">
+                        <p className="break-all text-sm leading-6 text-[var(--muted-foreground)]">{fullLink}</p>
+                        <p className="text-sm text-[var(--muted-foreground)]">
                           Created {formatCreatedDate(invite.createdAt)} by {invite.creatorName}
                         </p>
                       </div>
@@ -399,10 +399,10 @@ export default function InviteManagement({
             }}
           >
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide gradient-text">Revoked Invites</p>
-              <h2 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Past links</h2>
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]">Revoked Invites</p>
+              <h2 className="mt-1 font-display text-3xl leading-none text-[var(--foreground)]">Past links</h2>
             </div>
-            <span className="text-sm font-semibold text-[var(--muted)]">{isRevokedOpen ? "Hide" : "Show"}</span>
+            <span className="text-sm font-semibold text-[var(--foreground)]">{isRevokedOpen ? "Hide" : "Show"}</span>
           </button>
 
           {isRevokedOpen ? (
@@ -471,7 +471,7 @@ export default function InviteManagement({
           </div>
         }
       >
-        <p className="text-sm leading-6 text-[#d4d4d8]">
+        <p className="text-sm leading-6 text-[var(--muted-foreground)]">
           The link won&apos;t work again unless you create a fresh invite.
         </p>
       </Modal>

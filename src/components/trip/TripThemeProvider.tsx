@@ -1,7 +1,14 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo } from "react";
 import type { TripTheme } from "@/lib/types";
+
+/** CSS variables for the trip theme. Used by portaled content (e.g. event detail modal) so they inherit the theme. */
+export const TripThemeStyleContext = createContext<React.CSSProperties & Record<string, string> | null>(null);
+
+export function useTripThemeStyle(): (React.CSSProperties & Record<string, string>) | null {
+  return useContext(TripThemeStyleContext);
+}
 
 const DEFAULT_BG = "var(--background)";
 const DEFAULT_ACCENT = "#8b5cf6";
@@ -85,7 +92,7 @@ export default function TripThemeProvider({ children, theme }: TripThemeProvider
       : DEFAULT_FONT_BODY;
     const cardStyle = theme?.card_style || "glass";
 
-    return {
+    const base: React.CSSProperties & Record<string, string> = {
       "--accent": accent,
       "--accent-gradient": `linear-gradient(135deg, ${accent}, ${accent}dd)`,
       "--font-display": displayFont,
@@ -97,7 +104,48 @@ export default function TripThemeProvider({ children, theme }: TripThemeProvider
       "--trip-font-display": displayFont,
       "--trip-font-body": bodyFont,
       "--trip-card-style": cardStyle,
-    } as React.CSSProperties & Record<string, string>;
+    };
+
+    // Thematic surface, text, and border so cards/buttons match the trip theme
+    const surface = theme?.surface_color?.trim();
+    const surfaceElevated = theme?.surface_elevated_color?.trim();
+    const surfaceForeground = theme?.surface_foreground?.trim();
+    const textPrimary = theme?.text_primary?.trim();
+    const textSecondary = theme?.text_secondary?.trim();
+    const textAccent = theme?.text_accent?.trim();
+    const borderColor = theme?.border_color?.trim();
+
+    // When theme has a custom background, use a warm default surface so cards don't clash (cold grey on orange)
+    const hasCustomBg = Boolean(theme?.background?.type && theme.background.value);
+    if (surface) {
+      base["--surface"] = surface;
+      base["--surface-elevated"] = surfaceElevated || surface;
+    } else if (hasCustomBg) {
+      base["--surface"] = "#2d2a1e";
+      base["--surface-elevated"] = "#3a3628";
+    }
+    // Text on cards: when using theme surface, default to light text so it's readable on dark cards
+    if (surface || hasCustomBg) {
+      base["--surface-foreground"] = surfaceForeground || "#fafafa";
+      base["--surface-muted"] = "rgba(250,250,250,0.85)";
+    }
+    if (textPrimary) base["--foreground"] = textPrimary;
+    if (textSecondary) {
+      base["--muted-foreground"] = textSecondary;
+      base["--muted"] = textSecondary;
+    }
+    if (textAccent) {
+      base["--accent"] = textAccent;
+      base["--accent-gradient"] = `linear-gradient(135deg, ${textAccent}, ${textAccent}dd)`;
+      base["--trip-accent"] = textAccent;
+      base["--trip-accent-gradient"] = `linear-gradient(135deg, ${textAccent}, ${textAccent}dd)`;
+    }
+    if (borderColor) {
+      base["--border"] = borderColor + "40";
+      base["--border-strong"] = borderColor + "60";
+    }
+
+    return base;
   }, [theme]);
 
   useEffect(() => {
@@ -119,6 +167,7 @@ export default function TripThemeProvider({ children, theme }: TripThemeProvider
   );
 
   return (
+    <TripThemeStyleContext.Provider value={style}>
     <div
       className="trip-theme-root relative isolate min-h-screen"
       data-card-style={cardStyle}
@@ -138,5 +187,6 @@ export default function TripThemeProvider({ children, theme }: TripThemeProvider
       ) : null}
       {children}
     </div>
+    </TripThemeStyleContext.Provider>
   );
 }

@@ -36,11 +36,11 @@ function CountsLine({
   const title = notGoingTip ? `${main}${notGoingTip}`.trim() : undefined;
 
   if (!main && !notGoingTip) {
-    return <span className="text-xs text-[var(--muted)]">No responses yet</span>;
+    return <span className="text-xs text-[var(--muted-foreground)]">No responses yet</span>;
   }
 
   return (
-    <span className="text-xs text-[var(--muted)]" title={title}>
+    <span className="text-xs text-[var(--muted-foreground)]" title={title}>
       {main}
     </span>
   );
@@ -101,10 +101,10 @@ export default function RsvpButtons({
             type="button"
             onClick={() => handleClick("going")}
             className={[
-              "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30",
+              "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30",
               userStatus === "going"
                 ? "border-[#22c55e]/50 bg-[#22c55e]/20 text-[#4ade80]"
-                : "border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:border-[#22c55e]/30 hover:bg-[#22c55e]/10 hover:text-[#4ade80]",
+                : "border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] hover:border-[#22c55e]/30 hover:bg-[#22c55e]/10 hover:text-[#4ade80]",
             ].join(" ")}
             aria-pressed={userStatus === "going"}
           >
@@ -115,10 +115,10 @@ export default function RsvpButtons({
             type="button"
             onClick={() => handleClick("interested")}
             className={[
-              "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30",
+              "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30",
               userStatus === "interested"
                 ? "border-[#f59e0b]/50 bg-[#f59e0b]/20 text-[#fbbf24]"
-                : "border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:border-[#f59e0b]/30 hover:bg-[#f59e0b]/10 hover:text-[#fbbf24]",
+                : "border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] hover:border-[#f59e0b]/30 hover:bg-[#f59e0b]/10 hover:text-[#fbbf24]",
             ].join(" ")}
             aria-pressed={userStatus === "interested"}
           >
@@ -129,10 +129,10 @@ export default function RsvpButtons({
             type="button"
             onClick={() => handleClick("not_going")}
             className={[
-              "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30",
+              "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30",
               userStatus === "not_going"
-                ? "border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--muted)]"
-                : "border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-elevated)]",
+                ? "border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--muted-foreground)]"
+                : "border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--surface-elevated)]",
             ].join(" ")}
             aria-pressed={userStatus === "not_going"}
           >

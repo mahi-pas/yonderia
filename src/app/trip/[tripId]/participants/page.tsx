@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import BackgroundEffects from "@/components/trip/BackgroundEffects";
 import InviteManagement from "@/components/trip/InviteManagement";
 import ParticipantsView from "@/components/trip/ParticipantsView";
+import TripThemeProvider from "@/components/trip/TripThemeProvider";
+import PageBackground from "@/components/ui/PageBackground";
 import { createClient } from "@/lib/supabase/server";
-import type { InviteCodeType, Profile, TripParticipant } from "@/lib/types";
+import type { InviteCodeType, Profile, TripParticipant, TripTheme } from "@/lib/types";
 import { getParticipantMembership } from "@/lib/trips";
 
 type PageProps = {
@@ -33,6 +36,7 @@ type ProfileRow = Pick<Profile, "avatar_url" | "display_name" | "id">;
 type TripHeaderRow = {
   id: string;
   name: string;
+  theme: TripTheme | null;
 };
 
 type ParticipantViewModel = {
@@ -134,7 +138,7 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
 
   const [{ data: trip, error: tripError }, { data: participantRows, error: participantsError }, inviteResult] =
     await Promise.all([
-      supabase.from("trips").select("id, name").eq("id", tripId).maybeSingle(),
+      supabase.from("trips").select("id, name, theme").eq("id", tripId).maybeSingle(),
       supabase
         .from("trip_participants")
         .select(
@@ -223,23 +227,28 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
   })) satisfies InviteViewModel[];
 
   const currentUserDisplayName = profileMap.get(user.id)?.display_name ?? null;
+  const theme = resolvedTrip.theme ?? undefined;
+  const effect = theme?.effect ?? "none";
 
   return (
-    <main className="page-bg min-h-screen px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
-      <div className="mx-auto max-w-5xl space-y-5">
+    <TripThemeProvider theme={theme}>
+      <main className="page-bg relative min-h-screen px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
+        <PageBackground />
+        <BackgroundEffects effect={effect} />
+        <div className="relative z-10 mx-auto max-w-5xl space-y-5">
         <header className="p-5 sm:p-6">
           <div className="flex items-start gap-4">
             <Link
               aria-label="Back to trip"
-              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-xl text-[var(--muted)] transition hover:bg-[var(--surface-elevated)]"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-xl text-[var(--foreground)] transition hover:bg-[var(--surface-elevated)]"
               href={`/trip/${tripId}`}
             >
               ←
             </Link>
 
             <div className="min-w-0 flex-1">
-              <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Participants</p>
-              <h1 className="mt-2 text-balance font-display text-4xl leading-none text-[#fafafa] sm:text-5xl">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]">Participants</p>
+              <h1 className="mt-2 text-balance font-display text-4xl leading-none text-[var(--foreground)] sm:text-5xl">
                 {resolvedTrip.name}
               </h1>
             </div>
@@ -252,7 +261,7 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
                 "inline-flex min-h-11 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
                 activeTab === "people"
                   ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_4px_20px_rgba(139,92,246,0.25)]"
-                  : "border border-[var(--border-strong)] bg-[var(--surface)]/80 text-[#d4d4d8] hover:bg-[var(--surface-elevated)]",
+                  : "border border-[var(--accent)]/40 bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/60",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -268,7 +277,7 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
                   "inline-flex min-h-11 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
                   activeTab === "invites"
                     ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_4px_20px_rgba(139,92,246,0.25)]"
-                    : "border border-[var(--border-strong)] bg-[var(--surface)]/80 text-[#d4d4d8] hover:bg-[var(--surface-elevated)]",
+                    : "border border-[var(--accent)]/40 bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/60",
                 ]
                   .filter(Boolean)
                   .join(" ")}
@@ -297,7 +306,8 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
             tripId={tripId}
           />
         )}
-      </div>
-    </main>
+        </div>
+      </main>
+    </TripThemeProvider>
   );
 }

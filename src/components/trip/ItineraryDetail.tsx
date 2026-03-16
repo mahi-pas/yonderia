@@ -9,6 +9,7 @@ import EventComments from "./EventComments";
 import { formatItineraryItemTime, getItineraryBadge } from "./ItineraryCard";
 import RsvpButtons from "./RsvpButtons";
 import RsvpList from "./RsvpList";
+import { useTripThemeStyle } from "./TripThemeProvider";
 
 type ItineraryDetailProps = {
   currentUserId?: string | null;
@@ -28,8 +29,8 @@ function DetailRow({ label, value }: { label: string; value: string | null }) {
 
   return (
     <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5">
-      <p className="gradient-text text-xs font-semibold uppercase tracking-wide">{label}</p>
-      <p className="mt-0.5 text-sm leading-5 text-[#d4d4d8]">{value}</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-[var(--surface-foreground,var(--foreground))]">{label}</p>
+      <p className="mt-0.5 text-sm leading-5 text-[var(--surface-muted,var(--muted-foreground))]">{value}</p>
     </div>
   );
 }
@@ -57,6 +58,7 @@ export default function ItineraryDetail({
   const [showRsvpList, setShowRsvpList] = useState(false);
   const [activeTab, setActiveTab] = useState<DetailTab>("details");
   const [creatorName, setCreatorName] = useState<string | null>(null);
+  const themeStyle = useTripThemeStyle();
   const displayCreatorName = item?.created_by ? creatorName : null;
 
   useEffect(() => {
@@ -94,14 +96,7 @@ export default function ItineraryDetail({
   const endTimeLabel = formatDetailDateTime(item.end_time);
   const eventTimeLabel = item.item_type === "event" ? formatItineraryItemTime(item) : null;
 
-  return (
-    <Modal
-      description={formatItineraryItemTime(item)}
-      isOpen={isOpen}
-      onClose={onClose}
-      panelClassName="sm:max-w-2xl"
-      title={item.title}
-    >
+  const content = (
       <div
         className={`-mt-3 flex min-h-full flex-col sm:-mt-4 ${activeTab === "comments" && hasComments ? "h-full" : ""}`}
       >
@@ -119,10 +114,10 @@ export default function ItineraryDetail({
               aria-controls="event-details-panel"
               id="event-details-tab"
               onClick={() => setActiveTab("details")}
-              className={`flex-none rounded-md px-3 py-1.5 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30 ${
+              className={`flex-none rounded-md px-3 py-1.5 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 ${
                 activeTab === "details"
-                  ? "bg-[var(--surface-elevated)] text-[#fafafa] shadow-sm"
-                  : "text-[var(--muted-foreground)] hover:text-[#d4d4d8]"
+                  ? "bg-[var(--surface-elevated)] text-[var(--foreground)] shadow-sm"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               }`}
             >
               Event details
@@ -134,10 +129,10 @@ export default function ItineraryDetail({
               aria-controls="event-comments-panel"
               id="event-comments-tab"
               onClick={() => setActiveTab("comments")}
-              className={`flex-none rounded-md px-3 py-1.5 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30 ${
+              className={`flex-none rounded-md px-3 py-1.5 text-xs font-medium transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 ${
                 activeTab === "comments"
-                  ? "bg-[var(--surface-elevated)] text-[#fafafa] shadow-sm"
-                  : "text-[var(--muted-foreground)] hover:text-[#d4d4d8]"
+                  ? "bg-[var(--surface-elevated)] text-[var(--foreground)] shadow-sm"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               }`}
             >
               Comments
@@ -158,24 +153,24 @@ export default function ItineraryDetail({
             // eslint-disable-next-line @next/next/no-img-element
             <img alt={item.title} className="h-48 w-full object-cover sm:h-56" src={item.image_url} />
           ) : (
-            <div className="flex h-48 items-center justify-center text-5xl text-[var(--muted)] sm:h-56">
+            <div className="flex h-48 items-center justify-center text-5xl text-[var(--surface-muted,var(--muted))] sm:h-56">
               {badge.icon}
             </div>
           )}
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex min-h-8 items-center gap-1 rounded-md bg-[#8b5cf6]/10 px-3 text-xs font-medium uppercase tracking-wide text-[#a78bfa]">
+          <span className="inline-flex min-h-8 items-center gap-1 rounded-md bg-[var(--accent)]/10 px-3 text-xs font-medium uppercase tracking-wide text-[var(--accent)]">
             <span aria-hidden="true">{badge.icon}</span>
             {badge.label}
           </span>
-          <span className="text-sm text-[var(--muted)]">{formatItineraryItemTime(item)}</span>
+          <span className="text-sm text-[var(--surface-muted,var(--muted-foreground))]">{formatItineraryItemTime(item)}</span>
           {canEdit ? (
             <button
               type="button"
               aria-label={`Edit ${item.title}`}
               onClick={() => onEdit?.(item)}
-              className="ml-auto inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--muted)] transition hover:border-[#8b5cf6]/40 hover:bg-[var(--surface-elevated)] hover:text-[#fafafa] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
+              className="ml-auto inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--muted-foreground)] transition hover:border-[var(--accent)]/40 hover:bg-[var(--surface-elevated)] hover:text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
             >
               ✎
             </button>
@@ -183,7 +178,7 @@ export default function ItineraryDetail({
         </div>
 
         {item.description ? (
-          <p className="text-sm leading-6 text-[#d4d4d8] sm:text-base">{item.description}</p>
+          <p className="text-sm leading-6 text-[var(--surface-muted,var(--muted-foreground))] sm:text-base">{item.description}</p>
         ) : null}
 
         <div className="space-y-2">
@@ -198,7 +193,7 @@ export default function ItineraryDetail({
             <button
               type="button"
               onClick={() => setShowRsvpList(true)}
-              className="text-sm font-medium text-[#a78bfa] underline decoration-[#8b5cf6]/40 underline-offset-2 hover:decoration-[#8b5cf6]"
+              className="text-sm font-medium text-[var(--accent)] underline decoration-[var(--accent)]/40 underline-offset-2 hover:decoration-[var(--accent)]"
             >
               See who’s going
             </button>
@@ -248,7 +243,18 @@ export default function ItineraryDetail({
           </div>
         ) : null}
       </div>
+  );
 
+  return (
+    <Modal
+      description={formatItineraryItemTime(item)}
+      isOpen={isOpen}
+      onClose={onClose}
+      panelClassName="sm:max-w-2xl"
+      panelStyle={themeStyle ?? undefined}
+      title={item.title}
+    >
+      {content}
       <RsvpList
         currentUserId={currentUserId}
         isOpen={showRsvpList}

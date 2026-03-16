@@ -520,16 +520,16 @@ export default function TripMap({
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Map</p>
-          <h2 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Trip at a glance</h2>
-          <p className="mt-2 text-sm text-[var(--muted)]">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]">Map</p>
+          <h2 className="mt-1 font-display text-3xl leading-none text-[var(--foreground)]">Trip at a glance</h2>
+          <p className="mt-2 text-sm text-[var(--foreground)]/90">
             {visiblePoints.length} pin{visiblePoints.length === 1 ? "" : "s"} visible
           </p>
         </div>
 
         {mapStatus === "ready" ? (
           <button
-            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] px-4 text-sm font-semibold text-[var(--muted)] shadow-sm transition hover:bg-[var(--surface-elevated)] sm:hidden"
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-[image:var(--accent-gradient)] px-4 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 sm:hidden"
             type="button"
             onClick={() => {
               setIsFullscreen(true);
@@ -563,12 +563,12 @@ export default function TripMap({
                 <div className="flex shrink-0 flex-col gap-2 border-b border-[var(--border)] px-4 py-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:px-5 sm:py-3">
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="gradient-text text-[10px] font-semibold uppercase tracking-wide sm:text-xs">Map</p>
-                      <h2 className="truncate font-display text-xl leading-tight text-[#fafafa] sm:text-2xl">Trip at a glance</h2>
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)] sm:text-xs">Map</p>
+                      <h2 className="truncate font-display text-xl leading-tight text-[var(--foreground)] sm:text-2xl">Trip at a glance</h2>
                     </div>
                     <button
                       aria-label="Close full screen map"
-                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-lg text-[var(--muted)] transition hover:bg-[var(--surface-elevated)] hover:text-[#fafafa] sm:h-11 sm:w-11 sm:text-xl"
+                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-lg text-[var(--muted-foreground)] transition hover:bg-[var(--surface-elevated)] hover:text-[var(--foreground)] sm:h-11 sm:w-11 sm:text-xl"
                       type="button"
                       onClick={() => {
                         setIsFullscreen(false);
@@ -584,7 +584,7 @@ export default function TripMap({
                         "inline-flex min-h-8 shrink-0 items-center justify-center rounded-full px-3 text-xs font-semibold transition sm:min-h-9 sm:px-4 sm:text-sm",
                         activeDay === "all"
                           ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_16px_rgba(139,92,246,0.25)]"
-                          : "border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-elevated)]",
+                          : "border border-[var(--accent)]/40 bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/60",
                       ]
                         .filter(Boolean)
                         .join(" ")}
@@ -605,7 +605,7 @@ export default function TripMap({
                             "inline-flex min-h-8 shrink-0 items-center justify-center rounded-full px-3 text-xs font-semibold transition sm:min-h-9 sm:px-4 sm:text-sm",
                             isActive
                               ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_16px_rgba(139,92,246,0.25)]"
-                              : "border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-elevated)]",
+                              : "border border-[var(--accent)]/40 bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/60",
                           ]
                             .filter(Boolean)
                             .join(" ")}
@@ -744,7 +744,7 @@ export default function TripMap({
                 "inline-flex min-h-11 shrink-0 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
                 activeDay === "all"
                   ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_16px_rgba(139,92,246,0.25)]"
-                  : "border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-elevated)]",
+                  : "border border-[var(--accent)]/40 bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/60",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -767,7 +767,7 @@ export default function TripMap({
                     "inline-flex min-h-11 shrink-0 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
                     isActive
                       ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_16px_rgba(139,92,246,0.25)]"
-                      : "border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-elevated)]",
+                      : "border border-[var(--accent)]/40 bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/60",
                   ]
                     .filter(Boolean)
                     .join(" ")}

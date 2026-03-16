@@ -77,8 +77,8 @@ export default function ItineraryWithComments({
               id="itinerary-tab"
               className="min-w-[7rem] rounded-lg px-4 py-2.5 text-sm font-semibold transition sm:min-w-[8rem] sm:py-3"
               style={{
-                backgroundColor: activeTab === "itinerary" ? "var(--surface)" : "transparent",
-                color: activeTab === "itinerary" ? "#fafafa" : "var(--muted-foreground)",
+                backgroundColor: activeTab === "itinerary" ? "var(--accent)" : "transparent",
+                color: activeTab === "itinerary" ? "white" : "var(--foreground)",
               }}
               onClick={() => setActiveTab("itinerary")}
             >
@@ -92,8 +92,8 @@ export default function ItineraryWithComments({
               id="comments-tab"
               className="min-w-[7rem] rounded-lg px-4 py-2.5 text-sm font-semibold transition sm:min-w-[8rem] sm:py-3"
               style={{
-                backgroundColor: activeTab === "comments" ? "var(--surface)" : "transparent",
-                color: activeTab === "comments" ? "#fafafa" : "var(--muted-foreground)",
+                backgroundColor: activeTab === "comments" ? "var(--accent)" : "transparent",
+                color: activeTab === "comments" ? "white" : "var(--foreground)",
               }}
               onClick={() => setActiveTab("comments")}
             >

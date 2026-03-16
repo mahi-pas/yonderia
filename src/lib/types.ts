@@ -83,6 +83,20 @@ export interface TripTheme {
   accent_color?: string;
   effect?: TripThemeEffect;
   card_style?: TripThemeCardStyle;
+  /** Card/button background. When set, cards and buttons use this for thematic consistency. */
+  surface_color?: string;
+  /** Slightly elevated surface (e.g. hover states). Defaults to a lighter surface if unset. */
+  surface_elevated_color?: string;
+  /** Text color for content on cards/surface. Use a light color on dark cards (e.g. #fafafa). */
+  surface_foreground?: string;
+  /** Primary text (headings, main content). */
+  text_primary?: string;
+  /** Secondary/muted text (dates, descriptions). */
+  text_secondary?: string;
+  /** Section titles and accent text (e.g. "ABOUT THIS TRIP"). Uses accent_color when unset. */
+  text_accent?: string;
+  /** Border color for cards and buttons. */
+  border_color?: string;
 }
 
 export interface Trip {

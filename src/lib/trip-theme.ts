@@ -88,5 +88,29 @@ export function validateTripTheme(payload: unknown): { ok: true; theme: TripThem
     theme.card_style = v as TripThemeCardStyle;
   }
 
+  const hexColorKeys = [
+    "surface_color",
+    "surface_elevated_color",
+    "surface_foreground",
+    "text_primary",
+    "text_secondary",
+    "text_accent",
+    "border_color",
+  ] as const;
+  const hexRe = /^#[0-9a-fA-F]{6}$/;
+  for (const key of hexColorKeys) {
+    if (Object.prototype.hasOwnProperty.call(payload, key)) {
+      const v = payload[key];
+      if (typeof v !== "string") {
+        return { ok: false, error: `Theme ${key} must be a string.` };
+      }
+      if (v.trim() && !hexRe.test(v.trim())) {
+        return { ok: false, error: `Theme ${key} must be a 6-digit hex color (e.g. #1a1a2e).` };
+      }
+      const trimmed = v.trim();
+      if (trimmed) theme[key] = trimmed;
+    }
+  }
+
   return { ok: true, theme };
 }

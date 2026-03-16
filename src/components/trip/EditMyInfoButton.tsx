@@ -65,24 +65,24 @@ export default function EditMyInfoButton({
   return (
     <>
       <button
-        className="group w-full rounded-xl border border-[var(--border)] p-5 text-left transition hover:border-[#8b5cf6]/30 focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
+        className="group w-full rounded-xl border border-[var(--border)] p-5 text-left transition hover:border-[var(--accent)]/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
         type="button"
         onClick={() => setIsOpen(true)}
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
-            <p className="gradient-text text-xs font-semibold uppercase tracking-wide">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]">
               Your trip details
             </p>
-            <h2 className="font-display text-3xl leading-none text-[#fafafa]">
+            <h2 className="font-display text-3xl leading-none text-[var(--foreground)]">
               {hasTravelDetails ? "Update your info" : "Set your travel details"}
             </h2>
-            <p className="text-sm leading-6 text-[#d4d4d8]">
+            <p className="text-sm leading-6 text-[var(--foreground)]/90">
               {summary || "Add your nickname, arrival, and departure details so the crew knows your plan."}
             </p>
           </div>
 
-          <span className="inline-flex min-h-11 items-center justify-center rounded-md border border-[var(--border)] bg-[var(--background)]/50 px-4 py-2 text-sm font-semibold text-[#d4d4d8] shadow-sm transition group-hover:border-[#8b5cf6] group-hover:text-[#8b5cf6]">
+          <span className="inline-flex min-h-11 items-center justify-center rounded-md bg-[image:var(--accent-gradient)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition group-hover:brightness-110">
             {hasTravelDetails ? "Update info" : "Set details"}
           </span>
         </div>

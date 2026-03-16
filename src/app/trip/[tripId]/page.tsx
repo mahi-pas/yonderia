@@ -247,9 +247,9 @@ function TripPageLayout({
           tripId={data.trip.id}
         />
 
-        <section className="trip-card space-y-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-4 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide gradient-text">About this trip</p>
-          <div className="text-sm leading-7 text-[#d4d4d8] sm:text-base">
+        <section className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]">About this trip</p>
+          <div className="text-sm leading-7 text-[var(--muted-foreground)] sm:text-base">
             {data.trip.description?.trim() || "Trip details are still coming together."}
           </div>
         </section>

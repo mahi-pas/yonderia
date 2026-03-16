@@ -89,13 +89,13 @@ function getRoleBadge(role: TripParticipantRole): {
 
   if (role === "planner") {
     return {
-      className: "border-[#8b5cf6]/30 bg-[#8b5cf6]/10 text-[#a78bfa]",
+      className: "border-[var(--accent)]/30 bg-[var(--accent)]/10 text-[var(--accent)]",
       label: "★ Planner",
     };
   }
 
   return {
-    className: "border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--muted)]",
+    className: "border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--muted-foreground)]",
     label: "Member",
   };
 }
@@ -329,10 +329,10 @@ export default function ParticipantsView({
       <section className="p-4 sm:p-5">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide gradient-text">People</p>
-            <h2 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Your crew</h2>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]">People</p>
+            <h2 className="mt-1 font-display text-3xl leading-none text-[var(--foreground)]">Your crew</h2>
           </div>
-          <p className="text-sm text-[var(--muted)]">{participants.length} total</p>
+          <p className="text-sm text-[var(--foreground)]/90">{participants.length} total</p>
         </div>
 
         <ul className="mt-5 space-y-3">
@@ -354,7 +354,7 @@ export default function ParticipantsView({
                     className="inline-flex min-h-11 min-w-11 shrink-0 rounded-full"
                     href={`/profile/${participant.userId}`}
                   >
-                    <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--surface)] bg-[var(--surface-elevated)] ring-1 ring-[#8b5cf6]/20 text-base font-semibold text-[#d4d4d8] shadow-[0_4px_16px_rgba(0,0,0,0.2)]">
+                    <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--surface)] bg-[var(--surface-elevated)] ring-1 ring-[var(--accent)]/20 text-base font-semibold text-[var(--muted-foreground)] shadow-[0_4px_16px_rgba(0,0,0,0.2)]">
                       {participant.avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -370,7 +370,7 @@ export default function ParticipantsView({
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-base font-semibold text-[#fafafa]">{participant.nickname}</p>
+                      <p className="text-base font-semibold text-[var(--foreground)]">{participant.nickname}</p>
                       <span
                         className={`inline-flex min-h-8 items-center rounded-full border px-3 text-xs font-semibold ${roleBadge.className}`}
                       >
@@ -379,17 +379,17 @@ export default function ParticipantsView({
                     </div>
 
                     {shouldShowDisplayName(participant) ? (
-                      <p className="mt-1 text-sm text-[var(--muted)]">{participant.displayName}</p>
+                      <p className="mt-1 text-sm text-[var(--muted-foreground)]">{participant.displayName}</p>
                     ) : null}
 
-                    <p className="mt-2 text-sm leading-6 text-[var(--muted-foreground)]">{formatTravelSummary(participant)}</p>
+                    <p className="mt-2 text-sm leading-6 text-[var(--foreground)]/90">{formatTravelSummary(participant)}</p>
                   </div>
 
                   {showActions ? (
                     <div className="relative shrink-0">
                       <button
                         aria-label={`Open actions for ${participant.nickname}`}
-                        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-xl text-[var(--muted)] transition hover:bg-[var(--surface-elevated)] disabled:opacity-60"
+                        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-xl text-[var(--foreground)] transition hover:bg-[var(--surface-elevated)] disabled:opacity-60"
                         disabled={isPending}
                         type="button"
                         onClick={() => {

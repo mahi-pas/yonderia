@@ -17,10 +17,11 @@ const bodyFont = DM_Sans({
 
 const siteOrigin =
   process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+  "https://yonderia.vercel.app";
 
 export const metadata: Metadata = {
-  metadataBase: siteOrigin ? new URL(siteOrigin) : undefined,
+  metadataBase: new URL(siteOrigin),
   title: {
     default: "Yonderia – Plan & Share Adventures with Your People",
     template: "%s | Yonderia",

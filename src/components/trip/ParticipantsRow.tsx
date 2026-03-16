@@ -51,12 +51,12 @@ export default function ParticipantsRow({
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="gradient-text text-xs font-semibold tracking-wide uppercase">
+          <p className="text-xs font-semibold tracking-wide uppercase text-[var(--foreground)]">
             Travelers
           </p>
-          <h2 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Who&apos;s in</h2>
+          <h2 className="mt-1 font-display text-3xl leading-none text-[var(--foreground)]">Who&apos;s in</h2>
         </div>
-        <p className="text-sm text-[var(--muted)]">{participants.length} total</p>
+        <p className="text-sm text-[var(--foreground)]/90">{participants.length} total</p>
       </div>
 
       <div
@@ -82,7 +82,7 @@ export default function ParticipantsRow({
             const content = (
               <div className="w-[4.5rem] shrink-0 snap-start text-center">
                 <div className="relative mx-auto h-16 w-16">
-                  <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--surface)] bg-[var(--surface-elevated)] text-lg font-semibold text-[#d4d4d8] shadow-[0_4px_16px_rgba(0,0,0,0.2)] ring-1 ring-[#8b5cf6]/20">
+                  <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--surface)] bg-[var(--surface-elevated)] text-lg font-semibold text-[var(--surface-foreground,var(--muted-foreground))] shadow-[0_4px_16px_rgba(0,0,0,0.2)] ring-1 ring-[var(--accent)]/20">
                     {participant.avatarUrl ? (
                       <Image
                         alt={participant.name}
@@ -100,14 +100,14 @@ export default function ParticipantsRow({
                       className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border text-xs shadow-sm ${
                         participant.role === "organizer"
                           ? "border-[var(--border)] bg-[var(--gold)] text-[var(--background)]"
-                          : "border-[var(--border)] bg-[var(--accent)] text-white"
+                          : "border-[var(--border)] bg-[var(--accent)] text-[var(--foreground)]"
                       }`}
                     >
                       {badge}
                     </div>
                   ) : null}
                 </div>
-                <p className="mt-3 line-clamp-2 text-xs font-semibold leading-5 text-[#d4d4d8]">
+                <p className="mt-3 line-clamp-2 text-xs font-semibold leading-5 text-[var(--foreground)]/90">
                   {participant.name}
                 </p>
               </div>
@@ -143,7 +143,7 @@ export default function ParticipantsRow({
               <span className="font-display text-3xl leading-none text-[var(--accent)]">
                 +{participants.length}
               </span>
-              <span className="mt-1 text-xs font-semibold tracking-wide uppercase text-[var(--muted)]">
+              <span className="mt-1 text-xs font-semibold tracking-wide uppercase text-[var(--surface-foreground,var(--muted-foreground))]">
                 See all
               </span>
             </button>

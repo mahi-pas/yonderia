@@ -104,10 +104,10 @@ export default function DayItinerary({
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold tracking-wide uppercase gradient-text">Itinerary</p>
-          <h2 className="mt-1 font-display text-3xl leading-none text-[#fafafa]">Daily plan</h2>
+          <p className="text-xs font-semibold tracking-wide uppercase text-[var(--foreground)]">Itinerary</p>
+          <h2 className="mt-1 font-display text-3xl leading-none text-[var(--foreground)]">Daily plan</h2>
         </div>
-        <p className="text-sm text-[var(--muted)]">{items.length} items</p>
+        <p className="text-sm text-[var(--foreground)]/90">{items.length} items</p>
       </div>
 
       {error ? (
@@ -137,10 +137,10 @@ export default function DayItinerary({
                 }}
               >
                 <div>
-                  <h3 className="text-lg font-semibold text-[#fafafa]">
+                  <h3 className="text-lg font-semibold text-[var(--foreground)]">
                     {`Day ${day.index + 1} — ${day.label}`}
                   </h3>
-                  <p className="mt-1 text-sm text-[var(--muted)]">
+                  <p className="mt-1 text-sm text-[var(--foreground)]/90">
                     {dayItems.length === 0
                       ? "Nothing added yet."
                       : `${dayItems.length} item${dayItems.length === 1 ? "" : "s"}`}
@@ -149,7 +149,7 @@ export default function DayItinerary({
                 <span
                   aria-hidden="true"
                   className={[
-                    "text-xl text-[var(--accent)] transition-transform duration-300",
+                    "text-2xl font-medium text-[var(--foreground)] opacity-90 transition-transform duration-300",
                     isExpanded ? "rotate-90" : "",
                   ]
                     .filter(Boolean)
@@ -182,14 +182,14 @@ export default function DayItinerary({
                         />
                       ))
                     ) : (
-                      <div className="rounded-lg border border-dashed border-[var(--border-strong)] bg-[var(--surface-elevated)]/50 px-5 py-8 text-center text-sm leading-6 text-[var(--muted)]">
+                      <div className="rounded-lg border border-dashed border-[var(--border-strong)] bg-[var(--surface-elevated)]/50 px-5 py-8 text-center text-sm leading-6 text-[var(--surface-muted,var(--muted-foreground))]">
                         {isLoading ? "Loading the plan..." : "Your crew hasn't added anything to this day yet."}
                       </div>
                     )}
 
                     {canManage && currentUserId ? (
                       <button
-                        className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] px-4 text-sm font-semibold text-[#d4d4d8] transition hover:bg-[var(--surface-elevated)]"
+                        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[image:var(--accent-gradient)] px-4 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
                         type="button"
                         onClick={() => {
                           setActiveDayForAdd(day.dayDate);
