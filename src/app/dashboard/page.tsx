@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import CreateTripFlow from "@/components/trip/CreateTripFlow";
-import TripCard from "@/components/trip/TripCard";
+import DashboardTripList from "@/components/dashboard/DashboardTripList";
 import PageBackground from "@/components/ui/PageBackground";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile, Trip, TripParticipant } from "@/lib/types";
@@ -165,27 +164,7 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-            <CreateTripFlow currentUserId={user.id} />
-            {trips.map((trip) => (
-              <TripCard
-                key={trip.id}
-                endDate={trip.end_date}
-                id={trip.id}
-                imageUrl={trip.image_url}
-                locationName={trip.location_name}
-                name={trip.name}
-                participants={trip.participants}
-                startDate={trip.start_date}
-              />
-            ))}
-          </div>
-
-          {trips.length === 0 ? (
-            <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] px-5 py-4 text-sm leading-6 text-[var(--muted)]">
-              No trips yet. Start with one warm little plan, then invite everyone in.
-            </div>
-          ) : null}
+          <DashboardTripList currentUserId={user.id} trips={trips} />
         </section>
       </div>
     </main>
