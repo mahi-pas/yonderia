@@ -40,6 +40,12 @@ export interface EventCommentReaction {
   created_at: string;
 }
 
+export interface NotificationRead {
+  user_id: string;
+  notification_id: string;
+  read_at: string;
+}
+
 export interface CommentReactionSummary {
   emoji: string;
   count: number;
@@ -208,6 +214,12 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<EventComment>;
+        Relationships: [];
+      };
+      notification_reads: {
+        Row: NotificationRead;
+        Insert: Omit<NotificationRead, "read_at"> & { read_at?: string };
+        Update: Partial<NotificationRead>;
         Relationships: [];
       };
     };

@@ -162,7 +162,7 @@ export default function TripThemeEditor({
   }, [theme, bgImageState?.publicUrl]);
 
   return (
-    <TripThemeProvider theme={previewTheme}>
+    <TripThemeProvider applyToAppNavigation={false} theme={previewTheme}>
       <main className="page-bg min-h-screen px-4 py-6 pb-24 sm:px-6 sm:py-8 lg:px-10">
         <div className="mx-auto max-w-5xl space-y-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -606,7 +606,7 @@ export default function TripThemeEditor({
             A mini preview of your trip page with the current theme.
           </p>
           <div className="relative mt-4 h-[280px] overflow-hidden rounded-xl border border-[var(--border)]">
-            <TripThemeProvider theme={previewTheme}>
+            <TripThemeProvider applyToAppNavigation={false} theme={previewTheme}>
               <div className="absolute inset-0 p-4">
                 <BackgroundEffects effect={previewTheme.effect ?? "none"} />
                 <div

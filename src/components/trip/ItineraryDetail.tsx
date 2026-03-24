@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Modal from "@/components/ui/Modal";
 import { createClient } from "@/lib/supabase/client";
 import type { ItineraryListItem } from "@/hooks/useItinerary";
@@ -11,8 +11,12 @@ import RsvpButtons from "./RsvpButtons";
 import RsvpList from "./RsvpList";
 import { useTripThemeStyle } from "./TripThemeProvider";
 
+type DetailTab = "details" | "comments";
+
 type ItineraryDetailProps = {
   currentUserId?: string | null;
+  /** When opening from a deep link (e.g. notification on an event comment). */
+  initialDetailTab?: DetailTab;
   isOpen: boolean;
   item: ItineraryListItem | null;
   onClose: () => void;
@@ -43,10 +47,9 @@ function formatDetailDateTime(value: string | null): string | null {
   return format(new Date(value), "MMM d, yyyy h:mm a");
 }
 
-type DetailTab = "details" | "comments";
-
 export default function ItineraryDetail({
   currentUserId = null,
+  initialDetailTab,
   isOpen,
   item,
   onClose,
@@ -58,8 +61,30 @@ export default function ItineraryDetail({
   const [showRsvpList, setShowRsvpList] = useState(false);
   const [activeTab, setActiveTab] = useState<DetailTab>("details");
   const [creatorName, setCreatorName] = useState<string | null>(null);
+  const wasOpenRef = useRef(false);
+  const lastItemIdRef = useRef<string | null>(null);
   const themeStyle = useTripThemeStyle();
   const displayCreatorName = item?.created_by ? creatorName : null;
+
+  useEffect(() => {
+    if (!isOpen || !item) {
+      wasOpenRef.current = false;
+      lastItemIdRef.current = null;
+      return;
+    }
+
+    const itemChanged = lastItemIdRef.current !== item.id;
+    lastItemIdRef.current = item.id;
+
+    if (!wasOpenRef.current || itemChanged) {
+      queueMicrotask(() => {
+        setActiveTab(initialDetailTab ?? "details");
+      });
+    }
+
+    wasOpenRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- tab reset keyed by item id only
+  }, [initialDetailTab, isOpen, item?.id]);
 
   useEffect(() => {
     if (!item?.created_by) return;

@@ -21,6 +21,8 @@ type DayItineraryProps = {
   onCreated?: (item: ItineraryListItem) => void;
   onSelectItem?: (item: ItineraryListItem | null) => void;
   onUpdated?: (item: ItineraryListItem) => void;
+  /** Expand the day that contains this item (deep links / notifications). */
+  revealItemId?: string | null;
   selectedItem?: ItineraryListItem | null;
   tripEndDate: string;
   tripId: string;
@@ -40,6 +42,7 @@ export default function DayItinerary({
   onCreated,
   onSelectItem,
   onUpdated,
+  revealItemId,
   selectedItem: controlledSelectedItem,
   tripEndDate,
   tripId,
@@ -63,6 +66,25 @@ export default function DayItinerary({
   );
 
   const resolvedGroupedByDay = useMemo(() => groupedByDay ?? groupItineraryItemsByDay(items), [groupedByDay, items]);
+
+  useEffect(() => {
+    if (!revealItemId || items.length === 0) {
+      return;
+    }
+
+    const match = items.find((it) => it.id === revealItemId);
+
+    if (!match) {
+      return;
+    }
+
+    queueMicrotask(() => {
+      setExpandedDays((current) => ({
+        ...current,
+        [match.day_date]: true,
+      }));
+    });
+  }, [items, revealItemId]);
 
   useEffect(() => {
     if (!selectedItem) {

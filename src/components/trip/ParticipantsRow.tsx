@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { buildProfileHref } from "@/lib/trip-navigation";
 
 type ParticipantSummary = {
   avatarUrl: string | null;
@@ -114,11 +115,16 @@ export default function ParticipantsRow({
             );
 
             if (showProfileLinks && participant.profilePath) {
+              const profileUserId = participant.profilePath.match(/^\/profile\/([^/?#]+)/)?.[1];
+              const profileHref = profileUserId
+                ? buildProfileHref(profileUserId, `/trip/${tripId}`)
+                : participant.profilePath;
+
               return (
                 <Link
                   key={`${participant.profilePath}-${participant.name}`}
                   className="block snap-start"
-                  href={participant.profilePath}
+                  href={profileHref}
                   onClick={(event) => {
                     event.stopPropagation();
                   }}

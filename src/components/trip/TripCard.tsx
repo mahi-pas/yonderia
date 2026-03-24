@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { buildProfileHref } from "@/lib/trip-navigation";
 import { formatTripDateRange } from "@/lib/utils";
 
 type TripCardParticipant = {
@@ -88,7 +89,7 @@ export default function TripCard({
                     <Link
                       aria-label={`View ${label}'s profile`}
                       className="relative block rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8b5cf6]/30"
-                      href={`/profile/${participant.userId}`}
+                      href={buildProfileHref(participant.userId, `/trip/${id}`)}
                     >
                       <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--surface)] bg-[var(--surface-elevated)] text-sm font-semibold text-[var(--muted)] shadow-sm ring-1 ring-[#8b5cf6]/20">
                         {participant.avatarUrl ? (

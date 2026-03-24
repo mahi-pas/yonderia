@@ -1,17 +1,24 @@
 ---
-description: Run Supabase migrations after any change to the database schema
-globs: supabase/migrations/**/*.sql, supabase/**/*.sql
-alwaysApply: false
+description: Always push Supabase migrations after creating or editing migration SQL
+alwaysApply: true
 ---
 
-# Supabase migrations
+# Supabase migrations (mandatory)
 
-Whenever you create or modify any migration file under `supabase/migrations/` (or otherwise change the database schema), run the migrations so the remote database is updated:
+Whenever you **add or edit** any file under `supabase/migrations/` (or otherwise introduce a DB schema change tracked there), you **must** apply migrations before treating the task as done—do not only commit SQL.
+
+**Remote (linked project — default for this repo):**
 
 ```bash
-npx supabase db push
+npx supabase db push --yes
 ```
 
-Run this **after** adding or editing migration files, before considering the database change complete. If the command prompts for confirmation, proceed so the migration is applied.
+**Local Supabase only** (Docker stack running):
 
-For local development against a local Supabase instance, use `npx supabase migration up` instead.
+```bash
+npx supabase db push --local --yes
+```
+
+If the CLI is not linked and the user only uses local dev, use `npx supabase migration up` against the local DB instead.
+
+If push fails (not linked, missing credentials), tell the user exactly what to run and stop; do not claim the database is updated.

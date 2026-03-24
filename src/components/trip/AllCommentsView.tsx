@@ -44,6 +44,7 @@ function AnnouncementCard({
 
   return (
     <article
+      id={`event-comment-${row.comment.id}`}
       className="trip-card rounded-xl border-2 border-[var(--accent)]/50 bg-gradient-to-br from-[var(--accent)]/15 to-[var(--accent)]/10 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4"
       aria-label="Announcement"
     >
@@ -124,7 +125,10 @@ function CommentCard({
   const hasMore = (comment.content?.length ?? 0) > 200;
 
   return (
-    <article className="trip-card rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4">
+    <article
+      id={`event-comment-${row.comment.id}`}
+      className="trip-card rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4"
+    >
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--muted-foreground)] sm:gap-x-3">
         {isTripLevel ? (
           <span className="rounded font-semibold text-[var(--accent)]">Trip</span>
