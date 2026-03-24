@@ -39,6 +39,14 @@ function getKindLabel(kind: UserNotification["kind"]): string {
   return "Trip comment";
 }
 
+const KIND_COLORS: Record<string, string> = {
+  announcement: "bg-[#D02020] text-white",
+  "comment-reactions": "bg-[#F0C020] text-[#121212]",
+  "event-comment": "bg-[#1040C0] text-white",
+  "new-event": "bg-[#1040C0] text-white",
+  "trip-comment": "bg-[#121212] text-white",
+};
+
 export default function NotificationsPageClient({ notifications }: NotificationsPageClientProps) {
   const [localReadIds, setLocalReadIds] = useState<string[]>([]);
   const lastSubmittedUnreadSignature = useRef<string | null>(null);
@@ -80,10 +88,11 @@ export default function NotificationsPageClient({ notifications }: Notifications
 
   if (items.length === 0) {
     return (
-      <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--surface)]/70 px-6 py-10 text-center backdrop-blur-sm">
-        <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Notifications</p>
-        <h2 className="mt-3 font-display text-3xl text-[#fafafa]">Nothing new yet</h2>
-        <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-[var(--muted)]">
+      <section className="border-2 sm:border-4 border-[#121212] bg-white px-6 py-10 text-center shadow-[6px_6px_0px_0px_black]">
+        <div className="mx-auto mb-3 h-3 w-3 bg-[#F0C020]" />
+        <p className="text-xs font-bold uppercase tracking-widest text-[#D02020]">Notifications</p>
+        <h2 className="mt-3 font-display text-3xl font-black uppercase tracking-tighter text-[#121212]">Nothing new yet</h2>
+        <p className="mx-auto mt-3 max-w-lg text-sm font-medium leading-6 text-[#888888]">
           When your trips get new events, comments, reactions, or announcements, they&apos;ll show up
           here.
         </p>
@@ -100,15 +109,15 @@ export default function NotificationsPageClient({ notifications }: Notifications
         return (
           <Link
             key={notification.id}
-            className={`block rounded-[1.6rem] border px-4 py-4 transition hover:border-[var(--border-strong)] hover:bg-[var(--surface)]/90 sm:px-5 ${
+            className={`block border-2 border-[#121212] px-4 py-4 transition duration-200 hover:-translate-y-0.5 sm:px-5 ${
               notification.isRead
-                ? "border-[var(--border)] bg-[var(--surface)]/55"
-                : "border-[#8b5cf6]/35 bg-[rgba(33,20,56,0.82)] shadow-[0_12px_40px_rgba(139,92,246,0.12)]"
+                ? "bg-white shadow-[3px_3px_0px_0px_black]"
+                : "bg-[#F0C020]/10 shadow-[4px_4px_0px_0px_black]"
             }`}
             href={notification.href}
           >
             <div className="flex items-start gap-4">
-              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--border-strong)] bg-[var(--surface-elevated)] text-sm font-semibold text-[#fafafa]">
+              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#121212] bg-[#F0C020] text-sm font-bold text-[#121212]">
                 {notification.actor?.avatarUrl ? (
                   <Image
                     alt={actorName}
@@ -124,19 +133,19 @@ export default function NotificationsPageClient({ notifications }: Notifications
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-[var(--surface-elevated)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
+                  <span className={`px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest ${KIND_COLORS[notification.kind] ?? "bg-[#121212] text-white"}`}>
                     {getKindLabel(notification.kind)}
                   </span>
-                  <span className="text-xs text-[var(--muted-foreground)]">
+                  <span className="text-xs font-medium text-[#888888]">
                     {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                   </span>
-                  {!notification.isRead ? <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]" /> : null}
+                  {!notification.isRead ? <span className="h-2.5 w-2.5 bg-[#D02020]" /> : null}
                 </div>
 
-                <h2 className="mt-3 text-lg font-semibold text-[#fafafa]">{notification.title}</h2>
-                <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{notification.description}</p>
+                <h2 className="mt-3 text-lg font-bold text-[#121212]">{notification.title}</h2>
+                <p className="mt-1 text-sm font-medium leading-6 text-[#888888]">{notification.description}</p>
 
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[var(--muted-foreground)]">
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#888888]">
                   <span>{notification.tripName}</span>
                   {profileHref ? <span>by {actorName}</span> : null}
                 </div>

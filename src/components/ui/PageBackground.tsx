@@ -1,15 +1,5 @@
 "use client";
 
-const STREAKS = Array.from({ length: 20 }, (_, i) => ({
-  left: `${3 + i * 4.8}%`,
-  height: `${50 + (i % 4) * 30}px`,
-  opacity: 0.12 + (i % 3) * 0.06,
-  glow: 3 + (i % 3) * 2,
-  glowOpacity: 0.04 + (i % 3) * 0.03,
-  duration: `${7 + (i % 6) * 1.8}s`,
-  delay: `${i * 0.55}s`,
-}));
-
 export default function PageBackground() {
   return (
     <div
@@ -17,41 +7,25 @@ export default function PageBackground() {
       aria-hidden="true"
     >
       <div
-        className="absolute -left-20 top-1/4 h-[500px] w-[500px] rounded-full blur-[120px]"
-        style={{
-          background: "rgba(139, 92, 246, 0.08)",
-          animation: "glow-float 14s ease-in-out infinite",
-        }}
+        className="absolute -left-24 top-[10%] h-64 w-64 rounded-full bg-[#D02020] opacity-[0.06]"
       />
       <div
-        className="absolute -right-20 top-[5%] h-[400px] w-[400px] rounded-full blur-[100px]"
-        style={{
-          background: "rgba(236, 72, 153, 0.06)",
-          animation: "glow-float 18s ease-in-out infinite reverse",
-        }}
+        className="absolute -right-16 top-[30%] h-48 w-48 bg-[#1040C0] opacity-[0.05] rotate-45"
       />
       <div
-        className="absolute bottom-[-10%] left-[30%] h-[450px] w-[450px] rounded-full blur-[130px]"
-        style={{
-          background: "rgba(139, 92, 246, 0.05)",
-          animation: "glow-float 16s ease-in-out infinite",
-        }}
+        className="absolute bottom-[15%] left-[40%] h-56 w-56 rounded-full bg-[#F0C020] opacity-[0.06]"
+      />
+      <div
+        className="absolute right-[20%] top-[60%] h-32 w-32 bg-[#D02020] opacity-[0.04] rotate-12"
       />
 
-      {STREAKS.map((s, i) => (
-        <span
-          key={i}
-          className="absolute block w-px"
-          style={{
-            left: s.left,
-            height: s.height,
-            background: `linear-gradient(180deg, transparent, rgba(139, 92, 246, ${s.opacity}), transparent)`,
-            boxShadow: `0 0 ${s.glow}px rgba(139, 92, 246, ${s.glowOpacity})`,
-            animation: `streak-fall ${s.duration} linear infinite`,
-            animationDelay: s.delay,
-          }}
-        />
-      ))}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: "radial-gradient(#121212 1.5px, transparent 1.5px)",
+          backgroundSize: "24px 24px",
+        }}
+      />
     </div>
   );
 }

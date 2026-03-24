@@ -11,7 +11,6 @@ type ModalProps = {
   onClose: () => void;
   title?: string;
   panelClassName?: string;
-  /** When set (e.g. trip theme style), panel uses var(--surface) and theme-aware text colors */
   panelStyle?: React.CSSProperties & Record<string, string>;
 };
 
@@ -127,7 +126,7 @@ export default function Modal({
   const overlay = (
     <div
       className={[
-        "fixed inset-0 z-50 bg-black/70 backdrop-blur-md transition-opacity duration-200",
+        "fixed inset-0 z-50 bg-[#121212]/60 transition-opacity duration-200",
         isVisible ? "opacity-100" : "opacity-0",
       ]
         .filter(Boolean)
@@ -147,8 +146,7 @@ export default function Modal({
           aria-describedby={description ? descriptionId : undefined}
           aria-labelledby={title ? titleId : undefined}
           className={[
-            "relative flex w-full flex-col overflow-hidden rounded-t-2xl border border-[var(--border-strong)] shadow-[0_-4px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-transform duration-300 ease-out sm:h-auto sm:max-h-[90dvh] sm:max-w-3xl sm:rounded-2xl sm:shadow-[0_8px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(139,92,246,0.08)]",
-            panelStyle ? "bg-[var(--surface)]" : "bg-[rgba(20,20,31,0.98)]",
+            "relative flex w-full flex-col overflow-hidden border-2 sm:border-4 border-[#121212] bg-white shadow-[8px_8px_0px_0px_black] transition-transform duration-200 ease-out sm:h-auto sm:max-h-[90dvh] sm:max-w-3xl",
             "min-h-[calc(100svh-env(safe-area-inset-top))] h-[calc(100svh-env(safe-area-inset-top))] sm:min-h-0 sm:h-auto",
             isVisible ? "sm:scale-100 sm:opacity-100" : "sm:scale-[0.96] sm:opacity-0",
             panelClassName,
@@ -162,24 +160,22 @@ export default function Modal({
             transitionDuration: sheetOffset > 0 ? "0ms" : undefined,
           }}
         >
-          <div className="absolute inset-x-0 top-0 h-px bg-[image:var(--accent-gradient)] opacity-40" />
-
           <div
-            className="touch-pan-y border-b border-[var(--border)] pl-5 pr-[max(1.5rem,calc(0.5rem+env(safe-area-inset-right)))] pb-4 pt-5 sm:px-8 sm:pt-7"
+            className="touch-pan-y border-b-2 sm:border-b-4 border-[#121212] pl-5 pr-[max(1.5rem,calc(0.5rem+env(safe-area-inset-right)))] pb-4 pt-5 sm:px-8 sm:pt-7"
             onTouchEnd={handleTouchEnd}
             onTouchMove={handleTouchMove}
             onTouchStart={handleTouchStart}
           >
-            <div className={`mx-auto mb-4 h-1.5 w-14 rounded-full sm:hidden ${panelStyle ? "bg-[var(--surface-muted,var(--muted))]" : "bg-[#3f3f46]"}`} />
+            <div className="mx-auto mb-4 h-1.5 w-14 bg-[#121212] sm:hidden" />
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-2">
                 {title ? (
-                  <h2 className={`font-display text-3xl leading-none sm:text-4xl ${panelStyle ? "text-[var(--foreground)]" : "text-[#fafafa]"}`} id={titleId}>
+                  <h2 className="font-display text-3xl font-black uppercase tracking-tighter leading-[0.9] text-[#121212] sm:text-4xl" id={titleId}>
                     {title}
                   </h2>
                 ) : null}
                 {description ? (
-                  <p className={`max-w-2xl text-sm leading-6 ${panelStyle ? "text-[var(--muted-foreground)]" : "text-[var(--muted)]"}`} id={descriptionId}>
+                  <p className="max-w-2xl text-sm leading-6 font-medium text-[#888888]" id={descriptionId}>
                     {description}
                   </p>
                 ) : null}
@@ -187,7 +183,7 @@ export default function Modal({
 
               <button
                 aria-label="Close modal"
-                className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-xl transition hover:bg-[var(--surface-elevated)] ${panelStyle ? "text-[var(--muted-foreground)] hover:text-[var(--foreground)]" : "text-[var(--muted)] hover:text-[#fafafa]"}`}
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center border-2 border-[#121212] bg-white text-xl font-bold text-[#121212] transition hover:bg-[#F0C020] active:translate-x-[2px] active:translate-y-[2px]"
                 type="button"
                 onClick={onClose}
               >
@@ -201,7 +197,7 @@ export default function Modal({
           </div>
 
           {footer ? (
-            <div className={`border-t border-[var(--border)] px-5 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:px-8 sm:pb-4 ${panelStyle ? "bg-[var(--surface)]" : "bg-[rgba(20,20,31,0.98)]"}`}>
+            <div className="border-t-2 sm:border-t-4 border-[#121212] bg-[#F8F8F8] px-5 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] sm:px-8 sm:pb-4">
               {footer}
             </div>
           ) : null}

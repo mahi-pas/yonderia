@@ -202,15 +202,15 @@ export default async function ProfilePage({ params, searchParams }: PageProps) {
   const resolvedTripCount = tripCount ?? 0;
 
   return (
-    <main className="page-bg relative min-h-screen px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
+    <main className="page-bg relative min-h-screen px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
       <PageBackground />
-      <div className="relative z-10 mx-auto max-w-3xl space-y-5">
-        <header className="p-5 sm:p-6">
+      <div className="relative z-10 mx-auto max-w-3xl space-y-6">
+        <header>
           <div className="flex items-start gap-4">
             {returnToTrip ? (
               <Link
                 aria-label="Back to trip"
-                className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-xl text-[var(--muted)] transition hover:bg-[var(--surface-elevated)]"
+                className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center border-2 border-[#121212] bg-white text-xl font-bold text-[#121212] shadow-[3px_3px_0px_0px_black] transition hover:bg-[#F0C020] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                 href={returnToTrip}
               >
                 ←
@@ -218,17 +218,17 @@ export default async function ProfilePage({ params, searchParams }: PageProps) {
             ) : null}
 
             <div className="min-w-0 flex-1">
-              <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Profile</p>
-              <h1 className="mt-2 text-balance font-display text-4xl leading-none text-[#fafafa] sm:text-5xl">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#D02020]">Profile</p>
+              <h1 className="mt-2 text-balance font-display text-4xl font-black uppercase leading-[0.9] tracking-tighter text-[#121212] sm:text-5xl">
                 {displayName}
               </h1>
             </div>
           </div>
         </header>
 
-        <section className="px-5 py-8 text-center sm:px-8 sm:py-10">
-          <div className="mx-auto flex max-w-xl flex-col items-center">
-            <div className="relative flex h-[120px] w-[120px] items-center justify-center overflow-hidden rounded-full border-4 border-[var(--surface)] bg-[var(--surface-elevated)] text-3xl font-semibold text-[#8b5cf6] ring-2 ring-[#8b5cf6]/20 sm:h-[160px] sm:w-[160px] sm:text-5xl">
+        <section className="border-2 sm:border-4 border-[#121212] bg-white py-8 text-center shadow-[6px_6px_0px_0px_black] sm:shadow-[8px_8px_0px_0px_black] sm:py-10">
+          <div className="mx-auto flex max-w-xl flex-col items-center px-5 sm:px-8">
+            <div className="relative flex h-[120px] w-[120px] items-center justify-center overflow-hidden rounded-full border-4 border-[#121212] bg-[#F0C020] text-3xl font-black text-[#121212] sm:h-[160px] sm:w-[160px] sm:text-5xl">
               {profile.avatar_url ? (
                 <Image
                   alt={displayName}
@@ -242,26 +242,12 @@ export default async function ProfilePage({ params, searchParams }: PageProps) {
               )}
             </div>
 
-            <h2 className="mt-5 font-display text-4xl leading-none text-[#fafafa] sm:text-5xl">
+            <h2 className="mt-5 font-display text-3xl font-black uppercase tracking-tighter leading-[0.9] text-[#121212] sm:text-4xl">
               {displayName}
             </h2>
 
-            <div className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold text-[#d4d4d8]">
-              <svg
-                aria-hidden="true"
-                className="h-4 w-4 text-[#8b5cf6]"
-                fill="none"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M7 7V6a5 5 0 0 1 10 0v1m-9 0h8m-9 0A2 2 0 0 0 5 9v7a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V9a2 2 0 0 0-2-2m-9 0h10"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.8"
-                />
-              </svg>
+            <div className="mt-4 inline-flex min-h-11 items-center gap-2 border-2 border-[#121212] bg-white px-4 py-2 text-sm font-bold text-[#121212] shadow-[3px_3px_0px_0px_black]">
+              <span className="h-3 w-3 bg-[#1040C0]" />
               <span>
                 {resolvedTripCount} {resolvedTripCount === 1 ? "trip" : "trips"}
               </span>
@@ -281,10 +267,10 @@ export default async function ProfilePage({ params, searchParams }: PageProps) {
         </section>
 
         {viewer && sharedTrips.length > 0 ? (
-          <section className="p-5 sm:p-6">
+          <section>
             <div className="space-y-2 text-center sm:text-left">
-              <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Shared trips</p>
-              <h2 className="font-display text-3xl leading-none text-[#fafafa]">Trips you share</h2>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#D02020]">Shared trips</p>
+              <h2 className="font-display text-3xl font-black uppercase tracking-tighter leading-[0.9] text-[#121212]">Trips you share</h2>
             </div>
 
             <div className="mt-5 space-y-4">

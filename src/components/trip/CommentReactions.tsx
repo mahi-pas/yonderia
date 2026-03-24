@@ -171,10 +171,10 @@ export default function CommentReactions({
                   : label || `${summary.emoji} ${summary.count}`
               }
               title={label || undefined}
-              className={`inline-flex items-center gap-0.5 rounded-full border px-2 py-0.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30 ${
+              className={`inline-flex items-center gap-0.5 border-2 px-2 py-0.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-[#D02020]/30 ${
                 isOwn
-                  ? "border-[#8b5cf6]/50 bg-[#8b5cf6]/20 text-[#fafafa]"
-                  : "border-[var(--border)] bg-[var(--surface-elevated)] text-[#d4d4d8] hover:border-[var(--border-strong)]"
+                  ? "border-[#D02020] bg-[#D02020]/20 text-[#121212]"
+                  : "border-[#121212] bg-[#F8F8F8] text-[#888888] hover:border-[#121212]"
               } ${canAdd ? "cursor-pointer" : "cursor-default"}`}
               onClick={() => canAdd && handlePillClick(summary)}
               onContextMenu={(e) => handlePillContextMenu(e, summary)}
@@ -195,10 +195,10 @@ export default function CommentReactions({
                     : undefined
                 }
                 data-reaction-preview
-                className="absolute bottom-full left-0 z-10 mb-1 max-w-[220px] rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 shadow-lg pointer-events-auto"
+                className="absolute bottom-full left-0 z-10 mb-1 max-w-[220px] border-2 border-[#121212] bg-[#F8F8F8] px-3 py-2 shadow-[4px_4px_0px_0px_black] pointer-events-auto"
                 role="tooltip"
               >
-                <p className="text-xs text-[#d4d4d8]">{label}</p>
+                <p className="text-xs text-[#888888]">{label}</p>
               </div>
             ) : null}
           </div>
@@ -210,7 +210,7 @@ export default function CommentReactions({
             type="button"
             data-emoji-picker
             aria-label="Add reaction"
-            className="flex h-6 w-6 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--muted-foreground)] transition hover:border-[var(--border-strong)] hover:text-[#d4d4d8] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
+            className="flex h-6 w-6 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-[#666666] transition hover:border-[#121212] hover:text-[#888888] focus:outline-none focus:ring-2 focus:ring-[#D02020]/30"
             onClick={() => setShowPicker((v) => !v)}
           >
             <SmilePlus className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />

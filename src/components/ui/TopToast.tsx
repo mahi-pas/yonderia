@@ -10,10 +10,10 @@ export default function TopToast({ message, tone }: TopToastProps) {
     <div className="pointer-events-none fixed inset-x-4 top-[calc(env(safe-area-inset-top)+0.75rem)] z-50 flex justify-center sm:top-4">
       <div
         className={[
-          "animate-slide-in-top w-full max-w-md rounded-full px-4 py-3 text-sm font-semibold shadow-[0_4px_24px_rgba(0,0,0,0.4)] backdrop-blur-sm",
+          "animate-slide-in-top w-full max-w-md border-2 border-[#121212] px-4 py-3 text-sm font-bold uppercase tracking-wider shadow-[4px_4px_0px_0px_black]",
           tone === "success"
-            ? "border border-[#22c55e]/30 bg-[#052e16]/90 text-[#86efac]"
-            : "border border-[#ef4444]/30 bg-[#450a0a]/90 text-[#fca5a5]",
+            ? "bg-[#22c55e] text-white"
+            : "bg-[#D02020] text-white",
         ]
           .filter(Boolean)
           .join(" ")}

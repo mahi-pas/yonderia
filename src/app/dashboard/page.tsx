@@ -145,20 +145,18 @@ export default async function DashboardPage() {
   const trips = await getDashboardTrips(user.id);
 
   return (
-    <main className="page-bg relative min-h-screen px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
+    <main className="page-bg relative min-h-screen px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
       <PageBackground />
       <div className="relative z-10 mx-auto max-w-7xl">
-        <section className="p-5 sm:p-7 lg:p-8">
-          <div className="absolute inset-x-0 top-0 h-px bg-[image:var(--accent-gradient)] opacity-20" />
-
+        <section>
           <div className="max-w-2xl space-y-3">
-            <p className="text-xs font-semibold tracking-wide uppercase gradient-text">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#D02020] sm:text-sm">
               Dashboard
             </p>
-            <h1 className="font-display text-5xl leading-[0.95] text-[#fafafa] sm:text-6xl">
+            <h1 className="font-display text-5xl font-black uppercase leading-[0.9] tracking-tighter text-[#121212] sm:text-6xl lg:text-7xl">
               Your trips live here
             </h1>
-            <p className="max-w-xl text-sm leading-6 text-[var(--muted)] sm:text-base">
+            <p className="max-w-xl text-sm font-medium leading-6 text-[#888888] sm:text-base">
               Jump back into the plans already in motion or spin up a fresh trip and head straight
               to invite links for your crew.
             </p>

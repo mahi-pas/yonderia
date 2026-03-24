@@ -45,18 +45,18 @@ function AnnouncementCard({
   return (
     <article
       id={`event-comment-${row.comment.id}`}
-      className="trip-card rounded-xl border-2 border-[var(--accent)]/50 bg-gradient-to-br from-[var(--accent)]/15 to-[var(--accent)]/10 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4"
+      className="trip-card border-2 border-[#D02020] bg-[#D02020]/10 p-3 shadow-[4px_4px_0px_0px_black] sm:p-4"
       aria-label="Announcement"
     >
-      <div className="flex items-center gap-2 text-xs text-[var(--muted-foreground)] sm:gap-3">
-        <span className="inline-flex items-center gap-1 rounded bg-[var(--accent)]/30 px-1.5 py-0.5 font-semibold uppercase tracking-wide text-[var(--accent)]">
+      <div className="flex items-center gap-2 text-xs text-[#666666] sm:gap-3">
+        <span className="inline-flex items-center gap-1 bg-[#D02020]/30 px-1.5 py-0.5 font-bold uppercase tracking-widest text-[#D02020]">
           📢 Announcement
         </span>
         <span>{authorName}</span>
         <span>{format(new Date(comment.created_at), "MMM d, h:mm a")}</span>
       </div>
       <div className="mt-2 flex gap-2 sm:mt-3 sm:gap-3">
-        <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-[var(--surface-elevated)] sm:h-8 sm:w-8">
+        <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-[#F8F8F8] sm:h-8 sm:w-8">
           {comment.author.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -65,14 +65,14 @@ function AnnouncementCard({
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-[10px] text-[var(--muted-foreground)] sm:text-xs">
+            <div className="flex h-full w-full items-center justify-center text-[10px] text-[#666666] sm:text-xs">
               {authorName[0]}
             </div>
           )}
         </div>
         <div className="min-w-0 flex-1">
           {comment.content ? (
-            <p className="whitespace-pre-wrap break-words text-sm font-medium text-[var(--foreground)] sm:text-[15px]">
+            <p className="whitespace-pre-wrap break-words text-sm font-bold text-[#121212] sm:text-[15px]">
               {comment.content}
             </p>
           ) : null}
@@ -82,7 +82,7 @@ function AnnouncementCard({
               <img
                 src={comment.gif_url}
                 alt="GIF"
-                className="max-h-28 max-w-full rounded-lg object-contain sm:max-h-36"
+                className="max-h-28 max-w-full object-contain sm:max-h-36"
               />
             </div>
           ) : null}
@@ -127,26 +127,26 @@ function CommentCard({
   return (
     <article
       id={`event-comment-${row.comment.id}`}
-      className="trip-card rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4"
+      className="trip-card border-2 border-[#121212] bg-white p-3 shadow-[4px_4px_0px_0px_black] sm:p-4"
     >
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--muted-foreground)] sm:gap-x-3">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#666666] sm:gap-x-3">
         {isTripLevel ? (
-          <span className="rounded font-semibold text-[var(--accent)]">Trip</span>
+          <span className="font-bold text-[#D02020]">Trip</span>
         ) : (
           <button
             type="button"
             onClick={onViewEvent}
-            className="rounded font-semibold text-[var(--accent)] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface)]"
+            className="font-bold text-[#D02020] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-[#D02020]/30 focus:ring-offset-2 focus:ring-offset-white"
           >
             {eventTitle}
           </button>
         )}
-        <span aria-hidden className="hidden sm:inline text-[var(--border-strong)]">·</span>
+        <span aria-hidden className="hidden sm:inline text-[#121212]">·</span>
         <span>{authorName}</span>
         <span>{format(new Date(comment.created_at), "MMM d, h:mm a")}</span>
       </div>
       <div className="mt-2 flex gap-2 sm:mt-3 sm:gap-3">
-        <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-[var(--surface-elevated)] sm:h-8 sm:w-8">
+        <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-[#F8F8F8] sm:h-8 sm:w-8">
           {comment.author.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -155,14 +155,14 @@ function CommentCard({
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-[10px] text-[var(--muted-foreground)] sm:text-xs">
+            <div className="flex h-full w-full items-center justify-center text-[10px] text-[#666666] sm:text-xs">
               {authorName[0]}
             </div>
           )}
         </div>
         <div className="min-w-0 flex-1">
           {contentPreview ? (
-            <p className="whitespace-pre-wrap break-words text-sm text-[var(--muted-foreground)] sm:text-[15px]">
+            <p className="whitespace-pre-wrap break-words text-sm text-[#666666] sm:text-[15px]">
               {contentPreview}
               {hasMore ? "…" : ""}
             </p>
@@ -173,7 +173,7 @@ function CommentCard({
               <img
                 src={comment.gif_url}
                 alt="GIF"
-                className="max-h-28 max-w-full rounded-lg object-contain sm:max-h-36"
+                className="max-h-28 max-w-full object-contain sm:max-h-36"
               />
             </div>
           ) : null}
@@ -192,7 +192,7 @@ function CommentCard({
           <button
             type="button"
             onClick={onViewEvent}
-            className="rounded text-xs font-medium text-[var(--accent)] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface)]"
+            className="text-xs font-bold text-[#D02020] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-[#D02020]/30 focus:ring-offset-2 focus:ring-offset-white"
           >
             View event
           </button>
@@ -298,7 +298,7 @@ export default function AllCommentsView({
 
   if (error) {
     return (
-      <div className="rounded-xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
+      <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm text-[#D02020]">
         {error}
       </div>
     );
@@ -310,8 +310,8 @@ export default function AllCommentsView({
   return (
     <div className="space-y-3 sm:space-y-4">
       {showComposer ? (
-        <div className="trip-card space-y-3 rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide gradient-text">
+        <div className="trip-card space-y-3 border-2 border-[#121212] bg-white p-3 shadow-[4px_4px_0px_0px_black] sm:p-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#D02020]">
             Comment on the trip
           </p>
           <div className="flex max-w-md gap-2 md:max-w-xl lg:max-w-2xl">
@@ -326,12 +326,12 @@ export default function AllCommentsView({
                 }
               }}
               rows={1}
-              className="min-h-10 max-h-40 flex-1 resize-none overflow-y-auto rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-3 py-2 text-sm leading-5 text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
+              className="min-h-10 max-h-40 flex-1 resize-none overflow-y-auto border-2 border-[#121212] bg-[#F8F8F8] px-3 py-2 text-sm leading-5 text-[#121212] placeholder:text-[#666666] focus:border-[#D02020] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
             />
             <button
               type="button"
               aria-label="Add GIF"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] text-sm text-[var(--muted-foreground)] transition hover:bg-[var(--surface)] hover:text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
+              className="flex h-10 w-10 shrink-0 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-sm text-[#666666] transition hover:bg-white hover:text-[#121212] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
               onClick={() => setShowGifPicker(true)}
             >
               GIF
@@ -340,7 +340,7 @@ export default function AllCommentsView({
               type="button"
               disabled={!canSend}
               aria-label="Send comment"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[image:var(--accent-gradient)] text-white shadow-sm transition hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
+              className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#D02020] text-white shadow-[4px_4px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#D02020]/30"
               onClick={handleSend}
             >
               ➤
@@ -352,12 +352,12 @@ export default function AllCommentsView({
               <img
                 src={pendingGif}
                 alt="Selected GIF"
-                className="h-14 w-14 rounded object-cover"
+                className="h-14 w-14 object-cover"
               />
-              <span className="text-xs text-[var(--muted-foreground)]">GIF added</span>
+              <span className="text-xs text-[#666666]">GIF added</span>
               <button
                 type="button"
-                className="text-xs text-[var(--accent)] underline"
+                className="text-xs text-[#D02020] underline"
                 onClick={() => setPendingGif(null)}
               >
                 Remove
@@ -365,12 +365,12 @@ export default function AllCommentsView({
             </div>
           ) : null}
           {tripDraft.length > MAX_LENGTH * 0.9 ? (
-            <p className="text-xs text-[var(--muted-foreground)]">
+            <p className="text-xs text-[#666666]">
               {tripDraft.length}/{MAX_LENGTH}
             </p>
           ) : null}
           {addAnnouncement && canSendAnnouncement ? (
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--muted-foreground)]">
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-[#666666]">
               <input
                 type="checkbox"
                 checked={sendAsAnnouncement}
@@ -392,13 +392,13 @@ export default function AllCommentsView({
       ) : null}
 
       {comments.length > 0 ? (
-        <div className="trip-card flex flex-wrap items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)]/80 p-2 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm sm:p-3">
-          <label className="flex items-center gap-2 text-sm text-[var(--muted-foreground)]">
+        <div className="trip-card flex flex-wrap items-center gap-3 border-2 border-[#121212] bg-white p-2 shadow-[4px_4px_0px_0px_black] sm:p-3">
+          <label className="flex items-center gap-2 text-sm text-[#666666]">
             <span className="shrink-0">Sort:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as CommentsSortBy)}
-              className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm text-[var(--foreground)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              className="border-2 border-[#121212] bg-white px-3 py-1.5 text-sm text-[#121212] focus:border-[#D02020] focus:outline-none focus:ring-1 focus:ring-[#D02020]"
               aria-label="Sort comments by"
             >
               <option value="newest">Newest first</option>
@@ -407,7 +407,7 @@ export default function AllCommentsView({
             </select>
           </label>
           {currentUserId ? (
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--muted-foreground)]">
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-[#666666]">
               <input
                 type="checkbox"
                 checked={filterByGoingOnly}
@@ -421,14 +421,14 @@ export default function AllCommentsView({
       ) : null}
 
       {showEmptyState ? (
-        <div className="rounded-lg border border-dashed border-[var(--border-strong)] px-4 py-8 text-center sm:py-12">
-          <p className="text-sm text-[var(--muted-foreground)]">
+        <div className="border-2 border-dashed border-[#121212] px-4 py-8 text-center sm:py-12">
+          <p className="text-sm text-[#666666]">
             No comments yet. Add one above or open an event to comment there!
           </p>
         </div>
       ) : displayedComments.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-[var(--border-strong)] px-4 py-8 text-center sm:py-12">
-          <p className="text-sm text-[var(--muted-foreground)]">
+        <div className="border-2 border-dashed border-[#121212] px-4 py-8 text-center sm:py-12">
+          <p className="text-sm text-[#666666]">
             {filterByGoingOnly
               ? "No comments in events you&apos;re going to."
               : "No comments yet. Open an event and start the conversation!"}

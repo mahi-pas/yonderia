@@ -533,7 +533,7 @@ export default function AddEventModal({
       footer={
         <div className="space-y-3">
           {errorMessage ? (
-            <div className="rounded-2xl border border-[var(--error)] bg-[var(--error)]/15 px-4 py-3 text-sm text-[var(--error)]">
+            <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm text-[#D02020]">
               {errorMessage}
             </div>
           ) : null}
@@ -556,15 +556,15 @@ export default function AddEventModal({
     >
       <div className="space-y-6 pb-10">
         {!isEditMode ? (
-          <div className="inline-flex rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] p-1">
+          <div className="inline-flex border-2 border-[#121212] bg-white p-1">
             {ITEM_TYPES.map((type) => (
               <button
                 key={type.id}
                 className={[
-                  "min-h-11 rounded-md px-4 text-sm font-semibold transition",
+                  "min-h-11 px-4 text-sm font-bold uppercase tracking-widest transition",
                   itemType === type.id
-                    ? "bg-[var(--accent)] text-white"
-                    : "border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--muted)] hover:bg-[var(--surface-elevated)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30",
+                    ? "bg-[#D02020] text-white"
+                    : "border-2 border-[#121212] bg-white text-[#888888] hover:bg-[#F8F8F8] focus:outline-none focus:ring-2 focus:ring-[#D02020]/30",
                 ]
                   .filter(Boolean)
                   .join(" ")}
@@ -604,7 +604,7 @@ export default function AddEventModal({
             />
 
             <label className="block space-y-2">
-              <span className="block text-sm font-medium text-[var(--foreground)]">Description</span>
+              <span className="block text-sm font-bold text-[#121212]">Description</span>
               <textarea
                 className={inputClassName("min-h-28 resize-none")}
                 disabled={isSaving}
@@ -769,21 +769,21 @@ export default function AddEventModal({
             ) : null}
           </div>
 
-          <div className="space-y-4 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] p-4">
+          <div className="space-y-4 border-2 border-[#121212] bg-white p-4">
             <div className="space-y-1">
-              <p className="text-sm font-medium text-[var(--foreground)]">Image</p>
-              <p className="text-sm leading-6 text-[var(--muted)]">
+              <p className="text-sm font-bold text-[#121212]">Image</p>
+              <p className="text-sm leading-6 text-[#888888]">
                 Auto-suggested from your title{locationLabel ? ` and ${locationLabel}` : ""}.
               </p>
             </div>
 
             {previewImageUrl ? (
-              <div className="overflow-hidden rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-elevated)]">
+              <div className="overflow-hidden border-2 border-[#121212] bg-[#F8F8F8]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img alt={formState.title || "Suggested itinerary image"} className="h-48 w-full object-cover" src={previewImageUrl} />
               </div>
             ) : (
-              <div className="flex h-48 items-center justify-center rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--surface)] px-4 text-center text-sm leading-6 text-[var(--muted)]">
+              <div className="flex h-48 items-center justify-center border-2 border-dashed border-[#121212] bg-white px-4 text-center text-sm leading-6 text-[#888888]">
                 Start with a title and we&apos;ll look for a matching image.
               </div>
             )}
@@ -819,7 +819,7 @@ export default function AddEventModal({
                 </Button>
 
                 {isSearchingImages ? (
-                  <p className="text-sm text-[var(--muted)]">Finding image suggestions...</p>
+                  <p className="text-sm text-[#888888]">Finding image suggestions...</p>
                 ) : null}
 
                 {imageSuggestions.length > 0 ? (
@@ -832,8 +832,8 @@ export default function AddEventModal({
                           <button
                             key={suggestion.imageUrl}
                             className={[
-                              "overflow-hidden rounded-md border bg-[var(--surface)] transition",
-                              isSelected ? "border-[var(--accent)] ring-2 ring-[var(--accent)]/30" : "border-[var(--border-strong)] hover:border-[var(--border)]",
+                              "overflow-hidden border-2 bg-white transition",
+                              isSelected ? "border-[#D02020] ring-2 ring-[#D02020]/30" : "border-[#121212] hover:border-[#888888]",
                             ]
                               .filter(Boolean)
                               .join(" ")}
@@ -851,10 +851,10 @@ export default function AddEventModal({
                     </div>
 
                     {selectedSuggestion ? (
-                      <p className="text-xs text-[var(--muted-foreground)]">
+                      <p className="text-xs text-[#666666]">
                         Photo by{" "}
                         <a
-                          className="underline hover:text-[var(--accent)]"
+                          className="underline hover:text-[#D02020]"
                           href={selectedSuggestion.photographerUrl}
                           rel="noopener noreferrer"
                           target="_blank"
@@ -863,7 +863,7 @@ export default function AddEventModal({
                         </a>{" "}
                         on{" "}
                         <a
-                          className="underline hover:text-[var(--accent)]"
+                          className="underline hover:text-[#D02020]"
                           href="https://unsplash.com?utm_source=yonderia&utm_medium=referral"
                           rel="noopener noreferrer"
                           target="_blank"
@@ -880,13 +880,13 @@ export default function AddEventModal({
         </div>
 
         {isEditMode && editItem ? (
-          <div className="mt-8 border-t border-[var(--border)] pt-6">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+          <div className="mt-8 border-t-2 border-[#121212] pt-6">
+            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-[#888888]">
               Danger zone
             </p>
             <button
               type="button"
-              className="text-sm text-[#ef4444] underline decoration-[#ef4444]/40 underline-offset-2 hover:decoration-[#ef4444]"
+              className="text-sm text-[#D02020] underline decoration-[#D02020]/40 underline-offset-2 hover:decoration-[#D02020]"
               onClick={() => setIsDeleteConfirmOpen(true)}
               disabled={isSaving}
             >
@@ -909,7 +909,7 @@ export default function AddEventModal({
         footer={
           <div className="space-y-3">
             {deleteError ? (
-              <div className="rounded-xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
+              <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm text-[#D02020]">
                 {deleteError}
               </div>
             ) : null}
@@ -925,7 +925,7 @@ export default function AddEventModal({
                 Cancel
               </Button>
               <Button
-                className="border border-[#ef4444]/30 bg-[#ef4444] text-white hover:bg-[#dc2626] focus:ring-[#8b5cf6]/30"
+                className="border-2 border-[#D02020] bg-[#D02020] text-white hover:bg-[#D02020]/90 focus:ring-[#D02020]/30"
                 isLoading={isDeleting}
                 onClick={() => void handleDeleteItem()}
               >
@@ -935,7 +935,7 @@ export default function AddEventModal({
           </div>
         }
       >
-        <p className="text-sm leading-6 text-[#d4d4d8]">
+        <p className="text-sm leading-6 text-[#121212]/80">
           {editItem
             ? `Delete "${editItem.title}"? This action cannot be undone.`
             : "Delete this item? This action cannot be undone."}

@@ -49,22 +49,22 @@ type GoogleMapInstance = InstanceType<GoogleMapsWindow["maps"]["Map"]>;
 const DEFAULT_CENTER = { lat: 39.5, lng: -98.35 };
 const ITEM_STYLES = {
   commute: {
-    color: "#6c5ce7",
+    color: "#1040C0",
     emoji: "🚀",
     label: "🚀",
-    pinColor: "#c4bbfa",
+    pinColor: "#1040C0",
   },
   event: {
-    color: "#c76038",
+    color: "#D02020",
     emoji: "🎉",
     label: "🎉",
-    pinColor: "#f0b89e",
+    pinColor: "#D02020",
   },
   hotel: {
-    color: "#4f7ccf",
+    color: "#F0C020",
     emoji: "🏨",
     label: "🏨",
-    pinColor: "#a8c4f0",
+    pinColor: "#F0C020",
   },
 } as const;
 const MOCK_PIN_POSITIONS = [
@@ -520,16 +520,16 @@ export default function TripMap({
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]">Map</p>
-          <h2 className="mt-1 font-display text-3xl leading-none text-[var(--foreground)]">Trip at a glance</h2>
-          <p className="mt-2 text-sm text-[var(--foreground)]/90">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#121212]">Map</p>
+          <h2 className="mt-1 text-3xl uppercase tracking-tighter font-black leading-[0.9] text-[#121212]">Trip at a glance</h2>
+          <p className="mt-2 text-sm font-bold text-[#121212]/90">
             {visiblePoints.length} pin{visiblePoints.length === 1 ? "" : "s"} visible
           </p>
         </div>
 
         {mapStatus === "ready" ? (
           <button
-            className="inline-flex min-h-11 items-center justify-center rounded-full bg-[image:var(--accent-gradient)] px-4 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 sm:hidden"
+            className="inline-flex min-h-11 items-center justify-center bg-[#D02020] px-4 text-sm font-bold uppercase tracking-widest text-white shadow-[2px_2px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:outline-none focus:ring-2 focus:ring-[#D02020]/30 sm:hidden"
             type="button"
             onClick={() => {
               setIsFullscreen(true);
@@ -543,7 +543,7 @@ export default function TripMap({
       {isFullscreen && typeof document !== "undefined" &&
         createPortal(
           <div
-            className="fixed inset-0 z-50 flex flex-col bg-black/70 backdrop-blur-md"
+            className="fixed inset-0 z-50 flex flex-col bg-[#121212]/80"
             data-testid="trip-map-fullscreen-overlay"
           >
             <button
@@ -555,20 +555,20 @@ export default function TripMap({
             <div className="absolute inset-0 z-10 flex items-end justify-center pt-[env(safe-area-inset-top)] sm:items-center sm:justify-center sm:pt-0">
               <section
                 aria-modal="true"
-                className="trip-card relative flex h-[calc(100svh-env(safe-area-inset-top))] w-full flex-col overflow-hidden rounded-t-2xl border border-[var(--border-strong)] bg-[rgba(20,20,31,0.98)] shadow-[0_-4px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:h-[90dvh] sm:max-w-4xl sm:rounded-2xl sm:shadow-[0_8px_60px_rgba(0,0,0,0.6),0_0_0_1px_rgba(139,92,246,0.08)]"
+                className="trip-card relative flex h-[calc(100svh-env(safe-area-inset-top))] w-full flex-col overflow-hidden border-4 border-[#121212] bg-white sm:h-[90dvh] sm:max-w-4xl sm:shadow-[8px_8px_0px_0px_black]"
                 role="dialog"
               >
-                <div className="absolute inset-x-0 top-0 h-px bg-[image:var(--accent-gradient)] opacity-40" />
+                <div className="absolute inset-x-0 top-0 h-1 bg-[#D02020]" />
 
-                <div className="flex shrink-0 flex-col gap-2 border-b border-[var(--border)] px-4 py-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:px-5 sm:py-3">
+                <div className="flex shrink-0 flex-col gap-2 border-b-2 border-[#121212] px-4 py-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:px-5 sm:py-3">
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)] sm:text-xs">Map</p>
-                      <h2 className="truncate font-display text-xl leading-tight text-[var(--foreground)] sm:text-2xl">Trip at a glance</h2>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#121212] sm:text-xs">Map</p>
+                      <h2 className="truncate text-xl uppercase tracking-tighter font-black leading-[0.9] text-[#121212] sm:text-2xl">Trip at a glance</h2>
                     </div>
                     <button
                       aria-label="Close full screen map"
-                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-lg text-[var(--muted-foreground)] transition hover:bg-[var(--surface-elevated)] hover:text-[var(--foreground)] sm:h-11 sm:w-11 sm:text-xl"
+                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center border-2 border-[#121212] bg-white text-lg text-[#666666] transition hover:bg-[#F8F8F8] hover:text-[#121212] sm:h-11 sm:w-11 sm:text-xl"
                       type="button"
                       onClick={() => {
                         setIsFullscreen(false);
@@ -581,10 +581,10 @@ export default function TripMap({
                     <button
                       aria-pressed={activeDay === "all"}
                       className={[
-                        "inline-flex min-h-8 shrink-0 items-center justify-center rounded-full px-3 text-xs font-semibold transition sm:min-h-9 sm:px-4 sm:text-sm",
+                        "inline-flex min-h-8 shrink-0 items-center justify-center px-3 text-xs font-bold transition sm:min-h-9 sm:px-4 sm:text-sm",
                         activeDay === "all"
-                          ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_16px_rgba(139,92,246,0.25)]"
-                          : "border border-[var(--accent)]/40 bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/60",
+                          ? "bg-[#D02020] text-white shadow-[2px_2px_0px_0px_black]"
+                          : "border-2 border-[#121212] bg-white text-[#121212] hover:bg-[#D02020]/10 hover:border-[#D02020]",
                       ]
                         .filter(Boolean)
                         .join(" ")}
@@ -602,10 +602,10 @@ export default function TripMap({
                           key={day.dayDate}
                           aria-pressed={isActive}
                           className={[
-                            "inline-flex min-h-8 shrink-0 items-center justify-center rounded-full px-3 text-xs font-semibold transition sm:min-h-9 sm:px-4 sm:text-sm",
+                            "inline-flex min-h-8 shrink-0 items-center justify-center px-3 text-xs font-bold transition sm:min-h-9 sm:px-4 sm:text-sm",
                             isActive
-                              ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_16px_rgba(139,92,246,0.25)]"
-                              : "border border-[var(--accent)]/40 bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/60",
+                              ? "bg-[#D02020] text-white shadow-[2px_2px_0px_0px_black]"
+                              : "border-2 border-[#121212] bg-white text-[#121212] hover:bg-[#D02020]/10 hover:border-[#D02020]",
                           ]
                             .filter(Boolean)
                             .join(" ")}
@@ -623,18 +623,18 @@ export default function TripMap({
                 </div>
 
                 {mapStatus === "unavailable" ? (
-                  <div className="mx-4 mt-3 rounded-2xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm leading-6 text-[#fca5a5]">
-                    Google Maps is unavailable right now. Add a valid <code className="rounded bg-black/20 px-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> to use the trip map.
+                  <div className="mx-4 mt-3 border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm font-bold leading-6 text-[#D02020]">
+                    Google Maps is unavailable right now. Add a valid <code className="bg-[#121212]/10 px-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> to use the trip map.
                   </div>
                 ) : null}
 
                 <div
-                  className="relative min-h-0 flex-1 overflow-hidden rounded-b-2xl border-t-0 border-[var(--border)] bg-[var(--surface-elevated)] sm:rounded-none sm:border-t-0"
+                  className="relative min-h-0 flex-1 overflow-hidden border-[#121212] bg-[#F8F8F8]"
                   data-testid="trip-map-canvas"
                 >
                   {isMockMode ? (
                     <div
-                      className="absolute inset-0 bg-[linear-gradient(180deg,var(--surface),var(--surface-elevated))]"
+                      className="absolute inset-0 bg-[#F8F8F8]"
                       data-testid="trip-map-mock"
                     >
                       {commuteSegments.map((segment, index) => {
@@ -662,7 +662,7 @@ export default function TripMap({
                         return (
                           <div
                             key={`${originPoint?.key ?? index}-${destinationPoint?.key ?? index}`}
-                            className="absolute h-0.5 origin-left rounded-full bg-[#6c5ce7]/70"
+                            className="absolute h-0.5 origin-left bg-[#1040C0]/70"
                             data-item-type="commute"
                             data-testid="trip-map-line"
                             style={{
@@ -689,7 +689,7 @@ export default function TripMap({
                           <button
                             key={point.key}
                             aria-label={`Open ${point.item.title} pin`}
-                            className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-[var(--surface)] text-lg shadow-[0_12px_24px_rgba(0,0,0,0.3)]"
+                            className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white text-lg shadow-[4px_4px_0px_0px_black]"
                             data-day={point.item.day_date}
                             data-item-id={point.item.id}
                             data-item-type={point.item.item_type}
@@ -718,13 +718,13 @@ export default function TripMap({
                   />
 
                   {mapStatus === "loading" ? (
-                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[var(--surface)]/75 px-6 text-center text-sm text-[var(--muted-foreground)]">
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/75 px-6 text-center text-sm font-bold text-[#666666]">
                       Loading the map...
                     </div>
                   ) : null}
 
                   {mapStatus === "ready" && visiblePoints.length === 0 ? (
-                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[var(--surface)]/75 px-6 text-center text-sm leading-6 text-[var(--muted-foreground)]">
+                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/75 px-6 text-center text-sm font-bold leading-6 text-[#666666]">
                       No mapped stops match this filter yet.
                     </div>
                   ) : null}
@@ -741,10 +741,10 @@ export default function TripMap({
             <button
               aria-pressed={activeDay === "all"}
               className={[
-                "inline-flex min-h-11 shrink-0 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
+                "inline-flex min-h-11 shrink-0 items-center justify-center px-4 text-sm font-bold transition",
                 activeDay === "all"
-                  ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_16px_rgba(139,92,246,0.25)]"
-                  : "border border-[var(--accent)]/40 bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/60",
+                  ? "bg-[#D02020] text-white shadow-[4px_4px_0px_0px_black]"
+                  : "border-2 border-[#121212] bg-white text-[#121212] hover:bg-[#D02020]/10 hover:border-[#D02020]",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -764,10 +764,10 @@ export default function TripMap({
                   key={day.dayDate}
                   aria-pressed={isActive}
                   className={[
-                    "inline-flex min-h-11 shrink-0 items-center justify-center rounded-full px-4 text-sm font-semibold transition",
+                    "inline-flex min-h-11 shrink-0 items-center justify-center px-4 text-sm font-bold transition",
                     isActive
-                      ? "bg-[image:var(--accent-gradient)] text-white shadow-[0_2px_16px_rgba(139,92,246,0.25)]"
-                      : "border border-[var(--accent)]/40 bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]/60",
+                      ? "bg-[#D02020] text-white shadow-[4px_4px_0px_0px_black]"
+                      : "border-2 border-[#121212] bg-white text-[#121212] hover:bg-[#D02020]/10 hover:border-[#D02020]",
                   ]
                     .filter(Boolean)
                     .join(" ")}
@@ -784,19 +784,19 @@ export default function TripMap({
           </div>
 
           {mapStatus === "unavailable" ? (
-            <div className="mt-4 rounded-2xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-5 py-4 text-sm leading-6 text-[#fca5a5]">
+            <div className="mt-4 border-2 border-[#D02020] bg-[#D02020]/10 px-5 py-4 text-sm font-bold leading-6 text-[#D02020]">
               Google Maps is unavailable right now. Add a valid `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` to use the trip
               map.
             </div>
           ) : null}
 
           <div
-            className="trip-card relative mt-4 h-[250px] overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] sm:h-[400px]"
+            className="trip-card relative mt-4 h-[250px] overflow-hidden border-2 border-[#121212] bg-[#F8F8F8] sm:h-[400px]"
             data-testid="trip-map-canvas"
           >
             {isMockMode ? (
               <div
-                className="absolute inset-0 bg-[linear-gradient(180deg,var(--surface),var(--surface-elevated))]"
+                className="absolute inset-0 bg-[#F8F8F8]"
                 data-testid="trip-map-mock"
               >
                 {commuteSegments.map((segment, index) => {
@@ -824,7 +824,7 @@ export default function TripMap({
                   return (
                     <div
                       key={`${originPoint?.key ?? index}-${destinationPoint?.key ?? index}`}
-                      className="absolute h-0.5 origin-left rounded-full bg-[#6c5ce7]/70"
+                      className="absolute h-0.5 origin-left bg-[#1040C0]/70"
                       data-item-type="commute"
                       data-testid="trip-map-line"
                       style={{
@@ -851,7 +851,7 @@ export default function TripMap({
                     <button
                       key={point.key}
                       aria-label={`Open ${point.item.title} pin`}
-                      className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-[var(--surface)] text-lg shadow-[0_12px_24px_rgba(0,0,0,0.3)]"
+                      className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white text-lg shadow-[4px_4px_0px_0px_black]"
                       data-day={point.item.day_date}
                       data-item-id={point.item.id}
                       data-item-type={point.item.item_type}
@@ -880,13 +880,13 @@ export default function TripMap({
             />
 
             {mapStatus === "loading" ? (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[var(--surface)]/75 px-6 text-center text-sm text-[var(--muted-foreground)]">
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/75 px-6 text-center text-sm font-bold text-[#666666]">
                 Loading the map...
               </div>
             ) : null}
 
             {mapStatus === "ready" && visiblePoints.length === 0 ? (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[var(--surface)]/75 px-6 text-center text-sm leading-6 text-[var(--muted-foreground)]">
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/75 px-6 text-center text-sm font-bold leading-6 text-[#666666]">
                 No mapped stops match this filter yet.
               </div>
             ) : null}

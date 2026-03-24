@@ -31,17 +31,17 @@ function AvatarRow({ avatarUrl, displayName }: { avatarUrl: string | null; displ
   const name = displayName ?? "Traveler";
   return (
     <div className="flex items-center gap-3">
-      <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-[var(--surface-elevated)] ring-2 ring-[var(--border)]">
+      <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-[#F8F8F8] ring-2 ring-[#121212]">
         {avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img alt="" className="h-full w-full object-cover" src={avatarUrl} />
         ) : (
-          <span className="flex h-full w-full items-center justify-center text-sm font-medium text-[var(--muted)]">
+          <span className="flex h-full w-full items-center justify-center text-sm font-bold text-[#888888]">
             {name.charAt(0).toUpperCase()}
           </span>
         )}
       </div>
-      <span className="min-w-0 truncate text-sm text-[#d4d4d8]">{name}</span>
+      <span className="min-w-0 truncate text-sm font-bold text-[#121212]">{name}</span>
     </div>
   );
 }
@@ -51,7 +51,7 @@ export default function RsvpList({
   isOpen,
   itineraryItemId,
   onClose,
-  title = "Who’s going",
+  title = "Who's going",
 }: RsvpListProps) {
   const { rsvps } = useEventRsvps({
     enabled: isOpen && Boolean(itineraryItemId) && Boolean(currentUserId),
@@ -124,7 +124,7 @@ export default function RsvpList({
           if (list.length === 0) return null;
           return (
             <div key={status}>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
+              <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-[#888888]">
                 {STATUS_LABELS[status]} ({list.length})
               </h3>
               <ul className="space-y-2" role="list">
@@ -138,7 +138,7 @@ export default function RsvpList({
           );
         })}
         {rsvps.length === 0 ? (
-          <p className="text-sm text-[var(--muted)]">No one has responded yet.</p>
+          <p className="text-sm font-bold text-[#888888]">No one has responded yet.</p>
         ) : null}
       </div>
     </Modal>

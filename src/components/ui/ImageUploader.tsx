@@ -123,14 +123,14 @@ export default function ImageUploader({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-medium text-[#d4d4d8]">{label}</p>
-        {uploadedFileName ? <p className="text-xs text-[var(--muted-foreground)]">{uploadedFileName}</p> : null}
+        <p className="text-sm font-bold uppercase tracking-widest text-[#121212]">{label}</p>
+        {uploadedFileName ? <p className="text-xs font-medium text-[#888888]">{uploadedFileName}</p> : null}
       </div>
 
       <div
         className={[
-          "relative overflow-hidden rounded-2xl border border-dashed bg-[var(--surface)] transition",
-          isDragging ? "border-[#8b5cf6] bg-[var(--surface-elevated)]" : "border-[var(--border-strong)]",
+          "relative overflow-hidden border-2 border-dashed bg-white transition",
+          isDragging ? "border-[#1040C0] bg-[#1040C0]/5" : "border-[#121212]",
           disabled ? "pointer-events-none opacity-60" : "",
         ]
           .filter(Boolean)
@@ -165,21 +165,21 @@ export default function ImageUploader({
           }}
         >
           {previewUrl ? (
-            <div className="relative aspect-[16/10] w-full bg-[var(--surface-elevated)]">
+            <div className="relative aspect-[16/10] w-full bg-[#E0E0E0]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img alt="Selected trip cover preview" className="h-full w-full object-cover" src={previewUrl} />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent px-4 py-4 text-sm font-semibold text-white">
+              <div className="absolute inset-x-0 bottom-0 bg-[#121212]/70 px-4 py-3 text-sm font-bold uppercase tracking-wider text-white">
                 Tap to replace
               </div>
             </div>
           ) : (
             <div className="flex min-h-52 flex-col items-center justify-center gap-3 px-6 py-10 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--surface-elevated)] text-2xl text-[#8b5cf6] shadow-inner">
+              <div className="flex h-14 w-14 items-center justify-center border-2 border-[#121212] bg-[#F0C020] text-2xl font-black text-[#121212]">
                 +
               </div>
               <div className="space-y-1">
-                <p className="text-base font-semibold text-[#fafafa]">Drop a cover image here</p>
-                <p className="text-sm leading-6 text-[var(--muted-foreground)]">
+                <p className="text-base font-bold text-[#121212]">Drop a cover image here</p>
+                <p className="text-sm leading-6 font-medium text-[#888888]">
                   Or tap to choose a photo from your library or camera.
                 </p>
               </div>
@@ -206,17 +206,17 @@ export default function ImageUploader({
       </div>
 
       <div className="space-y-2">
-        <p className="text-sm text-[var(--muted-foreground)]">{helperText}</p>
+        <p className="text-sm font-medium text-[#888888]">{helperText}</p>
         {isUploading ? (
-          <div className="h-2 overflow-hidden rounded-full bg-[var(--surface-elevated)]">
+          <div className="h-2 overflow-hidden bg-[#E0E0E0]">
             <div
-              className="h-full rounded-full bg-[image:var(--accent-gradient)] transition-[width]"
+              className="h-full bg-[#D02020] transition-[width]"
               style={{ width: `${uploadProgress}%` }}
             />
           </div>
         ) : null}
         {errorMessage ? (
-          <div className="rounded-xl border border-[#ef4444/30] bg-[#450a0a/90] px-4 py-3 text-sm text-[#fca5a5]">
+          <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm font-medium text-[#D02020]">
             {errorMessage}
           </div>
         ) : null}

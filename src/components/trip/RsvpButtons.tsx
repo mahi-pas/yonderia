@@ -36,11 +36,11 @@ function CountsLine({
   const title = notGoingTip ? `${main}${notGoingTip}`.trim() : undefined;
 
   if (!main && !notGoingTip) {
-    return <span className="text-xs text-[var(--muted-foreground)]">No responses yet</span>;
+    return <span className="text-xs font-bold text-[#666666]">No responses yet</span>;
   }
 
   return (
-    <span className="text-xs text-[var(--muted-foreground)]" title={title}>
+    <span className="text-xs font-bold text-[#666666]" title={title}>
       {main}
     </span>
   );
@@ -53,7 +53,7 @@ export default function RsvpButtons({
   summary: summaryProp,
   variant = "full",
 }: RsvpButtonsProps) {
-  void itemType; // reserved for future use (e.g. different copy per type)
+  void itemType;
   const canRsvp = Boolean(currentUserId);
   const { setRsvp, rsvps, summary: liveSummary } = useEventRsvps({
     enabled: canRsvp,
@@ -74,7 +74,7 @@ export default function RsvpButtons({
     return (
       <span className="inline-flex items-center gap-2">
         <span
-          className="inline-flex items-center gap-1 rounded-full bg-[#22c55e]/15 px-2 py-0.5 text-xs font-medium text-[#4ade80]"
+          className="inline-flex items-center gap-1 border-2 border-[#1040C0] bg-[#1040C0]/10 px-2 py-0.5 text-xs font-bold text-[#1040C0]"
           title={`${goingCount} going`}
         >
           <span aria-hidden="true">✓</span>
@@ -101,10 +101,10 @@ export default function RsvpButtons({
             type="button"
             onClick={() => handleClick("going")}
             className={[
-              "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30",
+              "inline-flex min-h-9 items-center gap-1.5 border-2 px-3 py-1.5 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#D02020]/30",
               userStatus === "going"
-                ? "border-[#22c55e]/50 bg-[#22c55e]/20 text-[#4ade80]"
-                : "border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] hover:border-[#22c55e]/30 hover:bg-[#22c55e]/10 hover:text-[#4ade80]",
+                ? "border-[#1040C0] bg-[#1040C0]/15 text-[#1040C0]"
+                : "border-[#121212] bg-white text-[#121212] hover:border-[#1040C0] hover:bg-[#1040C0]/10 hover:text-[#1040C0]",
             ].join(" ")}
             aria-pressed={userStatus === "going"}
           >
@@ -115,10 +115,10 @@ export default function RsvpButtons({
             type="button"
             onClick={() => handleClick("interested")}
             className={[
-              "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30",
+              "inline-flex min-h-9 items-center gap-1.5 border-2 px-3 py-1.5 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#D02020]/30",
               userStatus === "interested"
-                ? "border-[#f59e0b]/50 bg-[#f59e0b]/20 text-[#fbbf24]"
-                : "border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] hover:border-[#f59e0b]/30 hover:bg-[#f59e0b]/10 hover:text-[#fbbf24]",
+                ? "border-[#F0C020] bg-[#F0C020]/15 text-[#946800]"
+                : "border-[#121212] bg-white text-[#121212] hover:border-[#F0C020] hover:bg-[#F0C020]/10 hover:text-[#946800]",
             ].join(" ")}
             aria-pressed={userStatus === "interested"}
           >
@@ -129,10 +129,10 @@ export default function RsvpButtons({
             type="button"
             onClick={() => handleClick("not_going")}
             className={[
-              "inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30",
+              "inline-flex min-h-9 items-center gap-1.5 border-2 px-3 py-1.5 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-[#D02020]/30",
               userStatus === "not_going"
-                ? "border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--muted-foreground)]"
-                : "border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] hover:bg-[var(--surface-elevated)]",
+                ? "border-[#121212] bg-[#F8F8F8] text-[#666666]"
+                : "border-[#121212] bg-white text-[#121212] hover:bg-[#F8F8F8]",
             ].join(" ")}
             aria-pressed={userStatus === "not_going"}
           >

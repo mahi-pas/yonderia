@@ -52,12 +52,12 @@ export default function ParticipantsRow({
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold tracking-wide uppercase text-[var(--foreground)]">
+          <p className="text-xs font-bold tracking-widest uppercase text-[#121212]">
             Travelers
           </p>
-          <h2 className="mt-1 font-display text-3xl leading-none text-[var(--foreground)]">Who&apos;s in</h2>
+          <h2 className="mt-1 font-display text-3xl uppercase tracking-tighter font-black leading-[0.9] text-[#121212]">Who&apos;s in</h2>
         </div>
-        <p className="text-sm text-[var(--foreground)]/90">{participants.length} total</p>
+        <p className="text-sm text-[#121212]/90">{participants.length} total</p>
       </div>
 
       <div
@@ -83,7 +83,7 @@ export default function ParticipantsRow({
             const content = (
               <div className="w-[4.5rem] shrink-0 snap-start text-center">
                 <div className="relative mx-auto h-16 w-16">
-                  <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--surface)] bg-[var(--surface-elevated)] text-lg font-semibold text-[var(--surface-foreground,var(--muted-foreground))] shadow-[0_4px_16px_rgba(0,0,0,0.2)] ring-1 ring-[var(--accent)]/20">
+                  <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-[#121212] bg-[#F8F8F8] text-lg font-bold text-[#666666] shadow-[4px_4px_0px_0px_black]">
                     {participant.avatarUrl ? (
                       <Image
                         alt={participant.name}
@@ -98,17 +98,17 @@ export default function ParticipantsRow({
                   </div>
                   {badge ? (
                     <div
-                      className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border text-xs shadow-sm ${
+                      className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 text-xs shadow-[2px_2px_0px_0px_black] ${
                         participant.role === "organizer"
-                          ? "border-[var(--border)] bg-[var(--gold)] text-[var(--background)]"
-                          : "border-[var(--border)] bg-[var(--accent)] text-[var(--foreground)]"
+                          ? "border-[#121212] bg-[#F0C020] text-[#121212]"
+                          : "border-[#121212] bg-[#D02020] text-white"
                       }`}
                     >
                       {badge}
                     </div>
                   ) : null}
                 </div>
-                <p className="mt-3 line-clamp-2 text-xs font-semibold leading-5 text-[var(--foreground)]/90">
+                <p className="mt-3 line-clamp-2 text-xs font-bold leading-5 text-[#121212]/90">
                   {participant.name}
                 </p>
               </div>
@@ -139,17 +139,17 @@ export default function ParticipantsRow({
 
           {showSeeAll ? (
             <button
-              className="flex h-[92px] w-[92px] shrink-0 snap-start flex-col items-center justify-center rounded-xl border border-dashed border-[var(--border-strong)] bg-[var(--surface)]/50 text-center transition hover:bg-[var(--surface-elevated)]"
+              className="flex h-[92px] w-[92px] shrink-0 snap-start flex-col items-center justify-center border-2 border-dashed border-[#121212] bg-white/50 text-center transition hover:bg-[#F8F8F8]"
               type="button"
               onClick={(event) => {
                 event.stopPropagation();
                 router.push(`/trip/${tripId}/participants`);
               }}
             >
-              <span className="font-display text-3xl leading-none text-[var(--accent)]">
+              <span className="font-display text-3xl leading-none text-[#D02020]">
                 +{participants.length}
               </span>
-              <span className="mt-1 text-xs font-semibold tracking-wide uppercase text-[var(--surface-foreground,var(--muted-foreground))]">
+              <span className="mt-1 text-xs font-bold tracking-widest uppercase text-[#666666]">
                 See all
               </span>
             </button>

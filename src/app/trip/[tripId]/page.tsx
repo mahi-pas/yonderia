@@ -164,10 +164,10 @@ async function fetchViewOnlyTripData(tripId: string, code: string): Promise<Trip
 
 function GuestBanner({ tripId }: { tripId: string }) {
   return (
-    <div className="p-4">
-      <p className="text-sm leading-6 text-[#d4d4d8]">
+    <div className="border-2 border-[#121212] bg-[#F0C020] p-4 shadow-[3px_3px_0px_0px_black]">
+      <p className="text-sm font-medium leading-6 text-[#121212]">
         You&apos;re viewing this trip as a guest. Have an invite code?{" "}
-        <Link className="font-semibold text-[#8b5cf6] underline underline-offset-4 hover:text-[#a78bfa]" href={`/trip/${tripId}/join`}>
+        <Link className="font-bold underline underline-offset-4 hover:text-[#D02020]" href={`/trip/${tripId}/join`}>
           Enter it to join!
         </Link>
       </p>
@@ -183,25 +183,26 @@ function InviteEntryForm({
   tripId: string;
 }) {
   return (
-    <main className="page-bg relative min-h-screen px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
+    <main className="page-bg relative min-h-screen px-4 py-12 pb-24 sm:px-6 sm:py-16 sm:pb-16">
       <PageBackground />
-      <div className="relative z-10 mx-auto max-w-lg p-6 sm:p-8">
-        <p className="text-xs font-semibold tracking-wide uppercase gradient-text">Trip access</p>
-        <h1 className="mt-3 font-display text-4xl leading-none text-[#fafafa]">Enter your invite code</h1>
-        <p className="mt-3 text-sm leading-6 text-[#d4d4d8]">
+      <div className="relative z-10 mx-auto max-w-lg border-2 sm:border-4 border-[#121212] bg-white p-6 shadow-[6px_6px_0px_0px_black] sm:shadow-[8px_8px_0px_0px_black] sm:p-8">
+        <div className="mb-3 h-2 w-2 bg-[#D02020]" />
+        <p className="text-xs font-bold uppercase tracking-widest text-[#D02020]">Trip access</p>
+        <h1 className="mt-3 font-display text-3xl font-black uppercase leading-[0.9] tracking-tighter text-[#121212] sm:text-4xl">Enter your invite code</h1>
+        <p className="mt-3 text-sm font-medium leading-6 text-[#888888]">
           This trip is private. Drop in a join code to continue.
         </p>
 
         <form action={`/trip/${tripId}/join`} className="mt-6 space-y-4" method="get">
           <Input label="Invite code" name="code" placeholder="abc123join" />
           {errorMessage ? (
-            <div className="rounded-2xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
+            <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm font-medium text-[#D02020]">
               {errorMessage}
             </div>
           ) : null}
           <div className="sticky bottom-3 z-10 -mx-1 p-3 sm:static sm:mx-0 sm:p-0">
             <button
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[image:var(--accent-gradient)] px-5 py-3 text-sm font-semibold text-white shadow-[0_2px_20px_rgba(139,92,246,0.3)] transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
+              className="inline-flex min-h-11 w-full items-center justify-center border-2 border-[#121212] bg-[#D02020] px-5 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-[4px_4px_0px_0px_black] transition duration-200 hover:bg-[#D02020]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:outline-none focus:ring-2 focus:ring-[#D02020]/40"
               type="submit"
             >
               Continue to join
@@ -209,8 +210,8 @@ function InviteEntryForm({
           </div>
         </form>
 
-        <div className="mt-8 border-t border-[#3f3f46] pt-6">
-          <p className="text-center text-sm text-[#d4d4d8]">Already in the trip? Sign in</p>
+        <div className="mt-8 border-t-2 border-[#121212] pt-6">
+          <p className="text-center text-sm font-medium text-[#888888]">Already in the trip? Sign in</p>
           <div className="mt-4 flex justify-center">
             <LoginButton
               buttonLabel="Sign in with Google"
@@ -244,10 +245,10 @@ function TripPageLayout({
   return (
     <TripThemeProvider theme={theme}>
       {guestMode ? <ViewOnlyPromoOverlay /> : null}
-      <main className="page-bg relative min-h-screen px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
+      <main className="page-bg relative min-h-screen px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
         <PageBackground />
         <BackgroundEffects effect={effect} />
-        <div className="relative z-10 mx-auto max-w-6xl space-y-4 sm:space-y-5 lg:space-y-6">
+        <div className="relative z-10 mx-auto max-w-6xl space-y-5 sm:space-y-6 lg:space-y-8">
         {guestMode ? <GuestBanner tripId={data.trip.id} /> : null}
 
         <TripHeader
@@ -261,8 +262,8 @@ function TripPageLayout({
         />
 
         <section className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]">About this trip</p>
-          <div className="text-sm leading-7 text-[var(--muted-foreground)] sm:text-base">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--foreground)]">About this trip</p>
+          <div className="text-sm font-medium leading-7 text-[#888888] sm:text-base">
             {data.trip.description?.trim() || "Trip details are still coming together."}
           </div>
         </section>

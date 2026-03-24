@@ -101,21 +101,21 @@ export default function GifPicker({ isOpen, onClose, onSelect }: GifPickerProps)
       aria-label="Pick a GIF"
     >
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm sm:block hidden"
+        className="absolute inset-0 bg-[#121212]/60 sm:block hidden"
         aria-hidden
         onClick={onClose}
       />
-      <div className="relative flex min-h-0 flex-1 flex-col bg-[var(--surface)] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:pt-0 sm:pb-0 sm:max-h-[70vh] sm:w-full sm:max-w-lg sm:flex-initial sm:rounded-2xl sm:border sm:border-[var(--border)] sm:shadow-xl">
-        <div className="flex shrink-0 items-center gap-2 border-b border-[var(--border)] p-3">
+      <div className="relative flex min-h-0 flex-1 flex-col border-2 sm:border-4 border-[#121212] bg-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] sm:pt-0 sm:pb-0 sm:max-h-[70vh] sm:w-full sm:max-w-lg sm:flex-initial sm:shadow-[8px_8px_0px_0px_black]">
+        <div className="flex shrink-0 items-center gap-2 border-b-2 border-[#121212] p-3">
           <input
             type="search"
             placeholder="Search GIFs"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="min-h-10 flex-1 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-4 py-2 text-sm text-[#fafafa] placeholder:text-[var(--muted-foreground)] focus:border-[#8b5cf6] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/20"
+            className="min-h-10 flex-1 border-2 border-[#121212] bg-white px-4 py-2 text-sm text-[#121212] font-medium placeholder:text-[#888888] focus:outline-none focus:ring-2 focus:ring-[#1040C0]"
             autoFocus
           />
-          <Button variant="secondary" size="md" onClick={onClose}>
+          <Button variant="outline" size="md" onClick={onClose}>
             Close
           </Button>
         </div>
@@ -130,12 +130,12 @@ export default function GifPicker({ isOpen, onClose, onSelect }: GifPickerProps)
               {Array.from({ length: 12 }).map((_, i) => (
                 <div
                   key={i}
-                  className="aspect-square animate-pulse rounded-lg bg-[var(--surface-elevated)]"
+                  className="aspect-square animate-pulse bg-[#E0E0E0]"
                 />
               ))}
             </div>
           ) : results.length === 0 ? (
-            <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">
+            <p className="py-8 text-center text-sm font-medium text-[#888888]">
               No GIFs found. Try another search.
             </p>
           ) : (
@@ -144,7 +144,7 @@ export default function GifPicker({ isOpen, onClose, onSelect }: GifPickerProps)
                 <button
                   key={gif.id}
                   type="button"
-                  className="focus:ring-2 focus:ring-[#8b5cf6]/30 focus:ring-offset-2 focus:ring-offset-[var(--surface)] rounded-lg overflow-hidden outline-none transition hover:opacity-90"
+                  className="overflow-hidden border-2 border-[#121212] outline-none transition hover:opacity-90 focus:ring-2 focus:ring-[#1040C0]"
                   onClick={() => handleSelect(gif)}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -163,18 +163,18 @@ export default function GifPicker({ isOpen, onClose, onSelect }: GifPickerProps)
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
-                  className="aspect-square animate-pulse rounded-lg bg-[var(--surface-elevated)]"
+                  className="aspect-square animate-pulse bg-[#E0E0E0]"
                 />
               ))}
             </div>
           ) : null}
         </div>
-        <div className="shrink-0 border-t border-[var(--border)] px-3 py-2 text-center">
+        <div className="shrink-0 border-t-2 border-[#121212] px-3 py-2 text-center">
           <a
             href="https://giphy.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-[var(--muted-foreground)] hover:underline"
+            className="text-xs font-bold uppercase tracking-wider text-[#888888] hover:text-[#D02020]"
           >
             Powered by GIPHY
           </a>

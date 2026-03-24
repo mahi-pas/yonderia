@@ -1,19 +1,20 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
-import { Space_Grotesk, DM_Sans } from "next/font/google";
+import { Outfit } from "next/font/google";
 import AuthProvider from "@/components/auth/AuthProvider";
 import AppShell from "@/components/navigation/AppShell";
 import "./globals.css";
 
-const displayFont = Space_Grotesk({
-  weight: ["500", "600", "700"],
-  subsets: ["latin"],
-  variable: "--font-display",
-});
-
-const bodyFont = DM_Sans({
+const outfit = Outfit({
+  weight: ["400", "500", "700", "900"],
   subsets: ["latin"],
   variable: "--font-sans",
+});
+
+const displayFont = Outfit({
+  weight: ["700", "900"],
+  subsets: ["latin"],
+  variable: "--font-display",
 });
 
 const siteOrigin =
@@ -56,7 +57,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${displayFont.variable} ${bodyFont.variable} min-h-screen bg-background text-foreground antialiased`}
+        className={`${outfit.variable} ${displayFont.variable} min-h-screen bg-background text-foreground antialiased`}
       >
         <AuthProvider>
           <AppShell>{children}</AppShell>

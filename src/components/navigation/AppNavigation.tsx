@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState, type ComponentType } from "r
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, BriefcaseBusiness, MapPin, Plus } from "lucide-react";
+import { Bell, BriefcaseBusiness, MapPin, Plus, Circle, Square, Triangle } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import {
   LAST_TRIP_UPDATED_EVENT,
@@ -65,11 +65,11 @@ function isCurrentTripActive(pathname: string, tripId: string | null): boolean {
 }
 
 const linkBaseClass =
-  "relative inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition";
+  "relative inline-flex min-h-11 items-center justify-center gap-2 px-3 py-2 text-sm font-bold uppercase tracking-wider transition duration-200";
 const linkActiveClass =
-  "bg-[image:var(--accent-gradient)] text-white shadow-[0_6px_24px_rgba(139,92,246,0.28)]";
+  "bg-[#D02020] text-white border-2 border-[#121212] shadow-[3px_3px_0px_0px_black]";
 const linkInactiveClass =
-  "text-[var(--muted)] hover:bg-[var(--surface)] hover:text-[var(--foreground)]";
+  "text-[#121212] hover:bg-[#F0C020] border-2 border-transparent hover:border-[#121212]";
 
 export default function AppNavigation({ mobile = false }: AppNavigationProps) {
   const pathname = usePathname();
@@ -195,10 +195,7 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
     : "hidden md:sticky md:top-0 md:z-50 md:block md:w-full";
 
   const mobileShellClass =
-    "mx-auto max-w-lg rounded-[1.75rem] border px-2 py-2 shadow-[0_-10px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl " +
-    (tripNavTheme
-      ? "border-[var(--border-strong)] bg-[var(--surface-elevated)]/92"
-      : "border-[var(--border-strong)] bg-[rgba(10,10,15,0.92)]");
+    "mx-auto max-w-lg border-2 border-[#121212] bg-white px-2 py-2 shadow-[0_-4px_0px_0px_black]";
 
   const cardClassName = mobile ? mobileShellClass : "w-full";
 
@@ -207,7 +204,7 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
   const currentTripActive = isCurrentTripActive(pathname, currentTripId);
 
   const newTripButtonClass =
-    "inline-flex shrink-0 items-center justify-center rounded-full bg-[image:var(--accent-gradient)] px-3 py-1.5 text-xs font-semibold text-white shadow-[0_2px_12px_rgba(139,92,246,0.25)] transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40 sm:text-sm sm:px-4 sm:py-2";
+    "inline-flex shrink-0 items-center justify-center bg-[#D02020] border-2 border-[#121212] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white shadow-[3px_3px_0px_0px_black] transition hover:bg-[#D02020]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:outline-none focus:ring-2 focus:ring-[#D02020]/40 sm:text-sm sm:px-4 sm:py-2";
 
   if (!user) {
     return null;
@@ -228,7 +225,7 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
         <span className="relative">
           <Icon className="h-5 w-5" />
           {item.id === "notifications" && unreadCount > 0 ? (
-            <span className="absolute -right-2 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#ef4444] px-1 text-[10px] font-bold leading-none text-white">
+            <span className="absolute -right-2 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center bg-[#D02020] border border-[#121212] px-1 text-[10px] font-bold leading-none text-white">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           ) : null}
@@ -245,7 +242,7 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
       return (
         <span
           aria-label="Loading current trip"
-          className={`${linkBaseClass} pointer-events-none text-[var(--muted)] opacity-50 ${layoutClass}`}
+          className={`${linkBaseClass} pointer-events-none text-[#888888] opacity-50 ${layoutClass}`}
         >
           <MapPin className="h-5 w-5" />
           {layout === "desktop" ? <span>Current trip</span> : <span className="sr-only">Current trip</span>}
@@ -276,12 +273,12 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
             <span className="sr-only">
               You have no upcoming trips. Want a new adventure? Use the New adventure link to create a trip.
             </span>
-            <p className="line-clamp-2 text-[9px] font-medium leading-tight text-[var(--muted)]" aria-hidden>
-              No upcoming trips
+            <p className="line-clamp-2 text-[9px] font-bold uppercase tracking-wider leading-tight text-[#888888]" aria-hidden>
+              No trips
             </p>
             <Link
               href="/trips/new"
-              className="text-[10px] font-semibold leading-none text-[var(--accent)] underline-offset-2 hover:underline"
+              className="text-[10px] font-bold leading-none text-[#D02020] uppercase tracking-wider underline-offset-2 hover:underline"
             >
               New adventure
             </Link>
@@ -291,10 +288,10 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
 
       return (
         <div
-          className="flex max-w-xl min-w-0 flex-wrap items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/60 px-3 py-2 sm:gap-3"
+          className="flex max-w-xl min-w-0 flex-wrap items-center gap-2 border-2 border-[#121212] bg-white px-3 py-2 sm:gap-3"
           role="status"
         >
-          <p className="min-w-0 text-sm leading-snug text-[var(--muted)]">
+          <p className="min-w-0 text-sm leading-snug font-medium text-[#121212]">
             You have no upcoming trips. Want a new adventure?
           </p>
           <Link href="/trips/new" className={newTripButtonClass}>
@@ -323,11 +320,11 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
     <Link
       aria-label={profileLabel}
       className={`${linkBaseClass} ${
-        profileIsActive ? "bg-[color-mix(in_srgb,var(--accent)_22%,transparent)] text-[var(--foreground)]" : linkInactiveClass
+        profileIsActive ? linkActiveClass : linkInactiveClass
       } ${layout === "mobile" ? "w-full min-w-0" : ""}`}
       href={profileHref}
     >
-      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[var(--border-strong)] bg-[var(--surface-elevated)] text-xs font-semibold text-[#fafafa]">
+      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#121212] bg-[#F0C020] text-xs font-bold text-[#121212]">
         {profile?.avatar_url ? (
           <Image
             alt={profileLabel}
@@ -360,13 +357,20 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
         ) : (
           <nav
             aria-label="Primary"
-            className="flex min-h-[3.25rem] w-full items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--surface-elevated)]/95 px-4 py-2 backdrop-blur-md sm:px-6 lg:px-8"
+            className="flex min-h-[3.25rem] w-full items-center justify-between gap-4 border-b-4 border-[#121212] bg-white px-4 py-2 sm:px-6 lg:px-8"
             style={tripNavTheme ?? undefined}
           >
-            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-              {leftItems.map((item) => renderSideLink(item, "desktop"))}
-              {renderCurrentTripControl("desktop")}
-              {renderNotificationsLink("desktop")}
+            <div className="flex min-w-0 items-center gap-1">
+              <Link href="/dashboard" className="mr-3 flex items-center gap-1.5" aria-label="Yonderia home">
+                <Circle className="h-4 w-4 fill-[#D02020] text-[#D02020]" />
+                <Square className="h-4 w-4 fill-[#1040C0] text-[#1040C0]" />
+                <Triangle className="h-4 w-4 fill-[#F0C020] text-[#F0C020]" />
+              </Link>
+              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
+                {leftItems.map((item) => renderSideLink(item, "desktop"))}
+                {renderCurrentTripControl("desktop")}
+                {renderNotificationsLink("desktop")}
+              </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">{profileLink("desktop")}</div>
           </nav>

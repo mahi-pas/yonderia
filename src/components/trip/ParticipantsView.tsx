@@ -83,20 +83,20 @@ function getRoleBadge(role: TripParticipantRole): {
 } {
   if (role === "organizer") {
     return {
-      className: "border-[#f59e0b]/30 bg-[#f59e0b]/10 text-[#fbbf24]",
+      className: "border-[#121212] bg-[#F0C020]/20 text-[#121212]",
       label: "♛ Organizer",
     };
   }
 
   if (role === "planner") {
     return {
-      className: "border-[var(--accent)]/30 bg-[var(--accent)]/10 text-[var(--accent)]",
+      className: "border-[#121212] bg-[#D02020]/20 text-[#D02020]",
       label: "★ Planner",
     };
   }
 
   return {
-    className: "border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--muted-foreground)]",
+    className: "border-[#121212] bg-[#F8F8F8] text-[#666666]",
     label: "Member",
   };
 }
@@ -330,10 +330,10 @@ export default function ParticipantsView({
       <section className="p-4 sm:p-5">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]">People</p>
-            <h2 className="mt-1 font-display text-3xl leading-none text-[var(--foreground)]">Your crew</h2>
+            <p className="text-xs font-bold uppercase tracking-widest text-[#121212]">People</p>
+            <h2 className="mt-1 font-display text-3xl uppercase tracking-tighter font-black leading-[0.9] text-[#121212]">Your crew</h2>
           </div>
-          <p className="text-sm text-[var(--foreground)]/90">{participants.length} total</p>
+          <p className="text-sm text-[#121212]/90">{participants.length} total</p>
         </div>
 
         <ul className="mt-5 space-y-3">
@@ -347,7 +347,7 @@ export default function ParticipantsView({
             return (
               <li
                 key={participant.participantId}
-                className="relative rounded-lg border border-[var(--border)] p-4"
+                className="relative border-2 border-[#121212] p-4"
               >
                 <div className="flex items-start gap-3">
                   <Link
@@ -355,7 +355,7 @@ export default function ParticipantsView({
                     className="inline-flex min-h-11 min-w-11 shrink-0 rounded-full"
                     href={buildProfileHref(participant.userId, `/trip/${tripId}`)}
                   >
-                    <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--surface)] bg-[var(--surface-elevated)] ring-1 ring-[var(--accent)]/20 text-base font-semibold text-[var(--muted-foreground)] shadow-[0_4px_16px_rgba(0,0,0,0.2)]">
+                    <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 border-[#121212] bg-[#F8F8F8] text-base font-bold text-[#666666] shadow-[4px_4px_0px_0px_black]">
                       {participant.avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -371,26 +371,26 @@ export default function ParticipantsView({
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-base font-semibold text-[var(--foreground)]">{participant.nickname}</p>
+                      <p className="text-base font-bold text-[#121212]">{participant.nickname}</p>
                       <span
-                        className={`inline-flex min-h-8 items-center rounded-full border px-3 text-xs font-semibold ${roleBadge.className}`}
+                        className={`inline-flex min-h-8 items-center border-2 px-3 text-xs font-bold ${roleBadge.className}`}
                       >
                         {roleBadge.label}
                       </span>
                     </div>
 
                     {shouldShowDisplayName(participant) ? (
-                      <p className="mt-1 text-sm text-[var(--muted-foreground)]">{participant.displayName}</p>
+                      <p className="mt-1 text-sm text-[#666666]">{participant.displayName}</p>
                     ) : null}
 
-                    <p className="mt-2 text-sm leading-6 text-[var(--foreground)]/90">{formatTravelSummary(participant)}</p>
+                    <p className="mt-2 text-sm leading-6 text-[#121212]/90">{formatTravelSummary(participant)}</p>
                   </div>
 
                   {showActions ? (
                     <div className="relative shrink-0">
                       <button
                         aria-label={`Open actions for ${participant.nickname}`}
-                        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)] text-xl text-[var(--foreground)] transition hover:bg-[var(--surface-elevated)] disabled:opacity-60"
+                        className="inline-flex min-h-11 min-w-11 items-center justify-center border-2 border-[#121212] bg-white text-xl text-[#121212] transition hover:bg-[#F8F8F8] disabled:opacity-60"
                         disabled={isPending}
                         type="button"
                         onClick={() => {
@@ -403,10 +403,10 @@ export default function ParticipantsView({
                       </button>
 
                       {menuParticipantId === participant.participantId ? (
-                        <div className="absolute right-0 top-12 z-10 w-48 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface)] backdrop-blur-xl p-2 shadow-[0_4px_24px_rgba(0,0,0,0.3)]">
+                        <div className="absolute right-0 top-12 z-10 w-48 border-2 border-[#121212] bg-white p-2 shadow-[4px_4px_0px_0px_black]">
                           {canChangeRole && participant.role !== "planner" ? (
                             <button
-                              className="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-sm font-semibold text-[#fafafa] transition hover:bg-[var(--surface-elevated)]"
+                              className="flex min-h-11 w-full items-center px-3 text-left text-sm font-bold text-[#121212] transition hover:bg-[#F8F8F8]"
                               type="button"
                               onClick={() => {
                                 void changeRole(participant.participantId, "planner");
@@ -418,7 +418,7 @@ export default function ParticipantsView({
 
                           {canChangeRole && participant.role !== "member" ? (
                             <button
-                              className="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-sm font-semibold text-[#fafafa] transition hover:bg-[var(--surface-elevated)]"
+                              className="flex min-h-11 w-full items-center px-3 text-left text-sm font-bold text-[#121212] transition hover:bg-[#F8F8F8]"
                               type="button"
                               onClick={() => {
                                 void changeRole(participant.participantId, "member");
@@ -430,7 +430,7 @@ export default function ParticipantsView({
 
                           {isOrganizer ? (
                             <button
-                              className="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-sm font-semibold text-[#fafafa] transition hover:bg-[var(--surface-elevated)]"
+                              className="flex min-h-11 w-full items-center px-3 text-left text-sm font-bold text-[#121212] transition hover:bg-[#F8F8F8]"
                               type="button"
                               onClick={() => {
                                 setMenuParticipantId(null);
@@ -445,7 +445,7 @@ export default function ParticipantsView({
 
                           {canKick ? (
                             <button
-                              className="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-sm font-semibold text-[#fca5a5] transition hover:bg-[var(--surface-elevated)]"
+                              className="flex min-h-11 w-full items-center px-3 text-left text-sm font-bold text-[#D02020] transition hover:bg-[#F8F8F8]"
                               type="button"
                               onClick={() => {
                                 setMenuParticipantId(null);
@@ -497,7 +497,7 @@ export default function ParticipantsView({
           </div>
         }
       >
-        <p className="text-sm leading-6 text-[var(--muted-foreground)]">
+        <p className="text-sm leading-6 text-[#666666]">
           This will remove them from the participant list right away.
         </p>
       </Modal>

@@ -216,7 +216,7 @@ export default function CreateTripForm({ currentUserId }: CreateTripFormProps) {
       />
 
       <label className="block space-y-2">
-        <span className="block text-sm font-medium text-[var(--foreground)]">Description</span>
+        <span className="block text-sm font-bold uppercase tracking-widest text-[#121212]">Description</span>
         <textarea
           className={inputClassName("min-h-36 resize-none")}
           disabled={isSubmitting}
@@ -233,7 +233,7 @@ export default function CreateTripForm({ currentUserId }: CreateTripFormProps) {
       </label>
 
       {errorMessage ? (
-        <div className="rounded-xl border border-[var(--error)] bg-[var(--error)]/15 px-4 py-3 text-sm text-[var(--error)]">
+        <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm font-medium text-[#D02020]">
           {errorMessage}
         </div>
       ) : null}

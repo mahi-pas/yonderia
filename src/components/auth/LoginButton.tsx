@@ -70,7 +70,7 @@ export default function LoginButton({
     <div className={["w-full max-w-sm", containerClassName].filter(Boolean).join(" ")}>
       <button
         className={[
-          "btn-press group inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-full bg-[image:var(--accent-gradient)] px-5 py-4 text-base font-semibold text-white shadow-[0_2px_24px_rgba(139,92,246,0.3)] transition hover:brightness-110 hover:shadow-[0_4px_32px_rgba(139,92,246,0.4)] focus:outline-none focus:ring-4 focus:ring-[#8b5cf6]/30 disabled:cursor-not-allowed disabled:opacity-70",
+          "group inline-flex min-h-12 w-full items-center justify-center gap-3 border-2 sm:border-4 border-[#121212] bg-[#D02020] px-5 py-4 text-base font-bold uppercase tracking-wider text-white shadow-[4px_4px_0px_0px_black] sm:shadow-[6px_6px_0px_0px_black] transition duration-200 hover:bg-[#D02020]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:outline-none focus:ring-2 focus:ring-[#D02020]/40 disabled:cursor-not-allowed disabled:opacity-70",
           buttonClassName,
         ]
           .filter(Boolean)
@@ -81,14 +81,14 @@ export default function LoginButton({
           void handleLogin();
         }}
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-base text-white shadow-sm">
+        <span className="flex h-8 w-8 items-center justify-center border-2 border-white/40 bg-white text-base font-black text-[#D02020]">
           G
         </span>
         <span>{isSubmitting ? "Opening Google..." : buttonLabel}</span>
       </button>
 
       {errorMessage ? (
-        <p className="mt-3 text-center text-sm text-[#fca5a5]">{errorMessage}</p>
+        <p className="mt-3 text-center text-sm font-medium text-[#D02020]">{errorMessage}</p>
       ) : null}
     </div>
   );

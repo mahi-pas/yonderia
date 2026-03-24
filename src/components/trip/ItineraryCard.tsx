@@ -112,7 +112,7 @@ export default function ItineraryCard({
     <div className="relative" id={`itinerary-item-${item.id}`}>
       <button
         className={[
-          "card-hover group flex w-full items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 text-left shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm transition gradient-border-hover focus:outline-none focus:ring-4 focus:ring-[var(--accent)]/20 sm:p-4",
+          "group flex w-full items-center gap-4 border-2 border-[#121212] bg-white p-3 text-left shadow-[4px_4px_0px_0px_black] transition focus:outline-none focus:ring-4 focus:ring-[#D02020]/20 sm:p-4",
           canEdit ? "pr-14 sm:pr-16" : "",
         ]
           .filter(Boolean)
@@ -120,12 +120,12 @@ export default function ItineraryCard({
         type="button"
         onClick={onClick}
       >
-        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[var(--surface-elevated)] sm:h-20 sm:w-20">
+        <div className="relative h-16 w-16 shrink-0 overflow-hidden bg-[#F8F8F8] sm:h-20 sm:w-20">
           {item.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img alt={item.title} className="h-full w-full object-cover" src={item.image_url} />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-2xl text-[var(--surface-muted,var(--muted))]">
+            <div className="flex h-full w-full items-center justify-center text-2xl text-[#888888]">
               {badge.icon}
             </div>
           )}
@@ -133,11 +133,11 @@ export default function ItineraryCard({
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex min-h-7 items-center gap-1 rounded-full bg-[var(--accent)]/10 px-2.5 text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">
+            <span className="inline-flex min-h-7 items-center gap-1 bg-[#D02020]/10 px-2.5 text-xs font-bold tracking-widest uppercase text-[#D02020]">
               <span aria-hidden="true">{badge.icon}</span>
               {badge.label}
             </span>
-            <span className="text-xs font-medium text-[var(--surface-muted,var(--muted-foreground))]">{formatItineraryItemTime(item)}</span>
+            <span className="text-xs font-bold text-[#666666]">{formatItineraryItemTime(item)}</span>
             {item.item_type === "event" ? (
               <RsvpButtons
                 currentUserId={currentUserId}
@@ -148,20 +148,20 @@ export default function ItineraryCard({
               />
             ) : null}
             {currentUserId != null && commentCount != null && commentCount > 0 ? (
-              <span className="text-xs text-[var(--surface-muted,var(--muted-foreground))]" title="Comments">
+              <span className="text-xs text-[#666666]" title="Comments">
                 💬 {commentCount}
               </span>
             ) : null}
           </div>
 
-          <h3 className="mt-2 line-clamp-2 text-base font-semibold text-[var(--surface-foreground,var(--foreground))] sm:text-lg">{item.title}</h3>
-          <p className="mt-1 line-clamp-1 text-sm text-[var(--surface-muted,var(--muted-foreground))]">{locationLabel}</p>
+          <h3 className="mt-2 line-clamp-2 text-base font-bold text-[#121212] sm:text-lg">{item.title}</h3>
+          <p className="mt-1 line-clamp-1 text-sm text-[#666666]">{locationLabel}</p>
         </div>
       </button>
       {canEdit && onEdit ? (
         <button
           aria-label={`Edit ${item.title}`}
-          className="absolute right-3 top-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface-elevated)] text-[var(--surface-foreground,var(--muted-foreground))] shadow-sm transition hover:border-[var(--accent)]/40 hover:bg-[var(--accent)]/10 hover:text-[var(--accent)] focus:outline-none focus:ring-4 focus:ring-[var(--accent)]/20"
+          className="absolute right-3 top-3 z-10 inline-flex h-9 w-9 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-[#666666] shadow-[4px_4px_0px_0px_black] transition hover:border-[#D02020] hover:bg-[#D02020]/10 hover:text-[#D02020] focus:outline-none focus:ring-4 focus:ring-[#D02020]/20"
           type="button"
           onClick={(event) => {
             event.preventDefault();

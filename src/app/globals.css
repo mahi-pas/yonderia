@@ -1,24 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0f;
-  --foreground: #fafafa;
-  --surface: #14141f;
-  --surface-elevated: #1a1a2e;
-  --muted: #a1a1aa;
-  --muted-foreground: #71717a;
-  --border: #ffffff12;
-  --border-strong: #ffffff1a;
-  --accent: #8b5cf6;
-  --accent-pink: #ec4899;
-  --accent-gradient: linear-gradient(135deg, #8b5cf6, #ec4899);
-  --accent-gradient-hover: linear-gradient(135deg, #9d74f7, #f06bac);
+  --background: #F0F0F0;
+  --foreground: #121212;
+  --surface: #FFFFFF;
+  --surface-elevated: #F8F8F8;
+  --muted: #888888;
+  --muted-foreground: #666666;
+  --border: #121212;
+  --border-strong: #121212;
+  --accent: #D02020;
+  --accent-blue: #1040C0;
+  --accent-yellow: #F0C020;
   --success: #22c55e;
   --warning: #f59e0b;
-  --error: #ef4444;
+  --error: #D02020;
   --gold: #f59e0b;
-  --glow-accent: rgba(139, 92, 246, 0.15);
-  --glow-pink: rgba(236, 72, 153, 0.12);
 }
 
 @theme inline {
@@ -28,7 +25,8 @@
   --color-surface-elevated: var(--surface-elevated);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
-  --color-accent-pink: var(--accent-pink);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-yellow: var(--accent-yellow);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --font-display: var(--font-display);
@@ -48,6 +46,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
+  font-weight: 500;
   text-rendering: optimizeLegibility;
   -webkit-tap-highlight-color: transparent;
 }
@@ -67,23 +66,21 @@ textarea {
   font: inherit;
 }
 
-/* Checkboxes – dark theme styling with accent color */
 input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
-  width: 1rem;
-  height: 1rem;
-  border: 1px solid var(--border-strong);
-  border-radius: 0.25rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid var(--border);
+  border-radius: 0;
   background: var(--surface);
   cursor: pointer;
   flex-shrink: 0;
   display: inline-grid;
   place-content: center;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 input[type="checkbox"]:hover {
-  border-color: var(--accent);
   background: var(--surface-elevated);
 }
 input[type="checkbox"]:focus {
@@ -92,55 +89,28 @@ input[type="checkbox"]:focus {
 }
 input[type="checkbox"]:checked {
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: var(--foreground);
 }
 input[type="checkbox"]:checked::after {
   content: "";
   width: 0.25rem;
   height: 0.5rem;
-  border: solid var(--foreground);
+  border: solid #fff;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg) translateY(-1px);
   margin-bottom: 2px;
 }
 
-/* Date/datetime inputs: white calendar popup; icon and text styled below for dark theme */
 input[type="date"],
 input[type="datetime-local"],
 input[type="time"] {
   color-scheme: light;
 }
 
-/* WebKit: calendar icon – use light (white) icon instead of black */
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="datetime-local"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  opacity: 0.85;
   cursor: pointer;
-}
-
-/* WebKit: keep date/datetime text light when browser ignores input color */
-input[type="date"]::-webkit-datetime-edit,
-input[type="datetime-local"]::-webkit-datetime-edit {
-  color: var(--foreground);
-}
-input[type="date"]::-webkit-datetime-edit-fields-wrapper,
-input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper {
-  color: var(--foreground);
-}
-input[type="date"]::-webkit-datetime-edit-text,
-input[type="date"]::-webkit-datetime-edit-month-field,
-input[type="date"]::-webkit-datetime-edit-day-field,
-input[type="date"]::-webkit-datetime-edit-year-field,
-input[type="datetime-local"]::-webkit-datetime-edit-text,
-input[type="datetime-local"]::-webkit-datetime-edit-month-field,
-input[type="datetime-local"]::-webkit-datetime-edit-day-field,
-input[type="datetime-local"]::-webkit-datetime-edit-year-field,
-input[type="datetime-local"]::-webkit-datetime-edit-hour-field,
-input[type="datetime-local"]::-webkit-datetime-edit-minute-field,
-input[type="datetime-local"]::-webkit-datetime-edit-ampm-field {
-  color: var(--foreground);
 }
 
 @supports (padding: max(0px)) {
@@ -153,12 +123,12 @@ input[type="datetime-local"]::-webkit-datetime-edit-ampm-field {
   }
 }
 
-/* Google Maps InfoWindow – match app dark theme */
+/* Google Maps InfoWindow – match Bauhaus theme */
 .gm-style .gm-style-iw-c {
   background: var(--surface) !important;
-  border-radius: 12px !important;
-  border: 1px solid var(--border) !important;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4) !important;
+  border-radius: 0 !important;
+  border: 4px solid var(--foreground) !important;
+  box-shadow: 6px 6px 0px 0px black !important;
   padding: 0 !important;
 }
 .gm-style .gm-style-iw-d {
@@ -180,12 +150,11 @@ input[type="datetime-local"]::-webkit-datetime-edit-ampm-field {
   touch-action: pan-y;
 }
 
-/* Page background gradient */
 .page-bg {
-  background: linear-gradient(180deg, #0f0a1f 0%, #0c0a18 35%, var(--background) 80%) fixed;
+  background: var(--background);
 }
 
-/* Per-trip theme: use custom accent/fonts when set, keep default page bg transparent so theme bg shows */
+/* Per-trip theme overrides */
 .trip-theme-root .page-bg {
   background: transparent !important;
 }
@@ -197,17 +166,11 @@ input[type="datetime-local"]::-webkit-datetime-edit-ampm-field {
 
 .trip-theme-root[data-card-style="outline"] .trip-card {
   background: transparent !important;
-  border-width: 2px;
+  border-width: 4px;
   backdrop-filter: none;
 }
 
-/* Micro-animations */
-@keyframes btn-press {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.97); }
-  100% { transform: scale(1); }
-}
-
+/* Bauhaus animations – mechanical, snappy */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -223,35 +186,7 @@ input[type="datetime-local"]::-webkit-datetime-edit-ampm-field {
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes hero-gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes streak-fall {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  8% {
-    opacity: 1;
-  }
-  92% {
-    opacity: 0.5;
-  }
-  100% {
-    transform: translateY(100vh);
-    opacity: 0;
-  }
-}
-
-@keyframes glow-float {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(0, -20px, 0) scale(1.08); }
-}
-
-/* Trip theme background effects */
+/* Trip theme background effects (kept for TripThemeProvider) */
 @keyframes confetti-fall {
   0% { transform: translateY(-10px) translateX(0) rotate(0deg); opacity: 0.95; }
   25% { transform: translateY(25vh) translateX(8px) rotate(180deg); opacity: 0.9; }
@@ -319,101 +254,46 @@ input[type="datetime-local"]::-webkit-datetime-edit-ampm-field {
   100% { background-position: 0% 30%, 100% 70%, 50% 50%, 80% 20%; opacity: 0.4; }
 }
 
-@keyframes float-shape {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(10px, -15px) rotate(5deg); }
-  50% { transform: translate(-5px, -25px) rotate(-3deg); }
-  75% { transform: translate(-15px, -10px) rotate(2deg); }
-}
-
 .animate-fade-in {
-  animation: fade-in 0.4s ease-out both;
+  animation: fade-in 0.3s ease-out both;
 }
 
 .animate-slide-up {
-  animation: slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: slide-up 0.3s ease-out both;
 }
 
 .animate-slide-in-top {
-  animation: slide-in-top 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: slide-in-top 0.2s ease-out both;
 }
 
-/* Button press effect */
-.btn-press:active {
-  animation: btn-press 0.15s ease-out;
-}
-
-/* Card hover effect */
+/* Bauhaus card hover – mechanical lift */
 .card-hover {
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
 
 .card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.08), 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-/* Glassmorphism card */
-.glass-card {
-  background: rgba(20, 20, 31, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border);
-}
-
-/* Accent gradient border on hover */
-.gradient-border-hover {
-  position: relative;
-  transition: border-color 0.3s ease;
-}
-
-.gradient-border-hover:hover {
-  border-color: rgba(139, 92, 246, 0.4);
-}
-
-/* Accent gradient text */
-.gradient-text {
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Hero animated gradient */
-.hero-gradient {
-  background: linear-gradient(
-    -45deg,
-    #0a0a0f,
-    #1a0a2e,
-    #0f1a2e,
-    #1a0a20,
-    #0a0a0f
-  );
-  background-size: 400% 400%;
-  animation: hero-gradient 15s ease infinite;
+  transform: translateY(-4px);
 }
 
 /* Smooth height transition for expand/collapse */
 .expand-collapse {
   display: grid;
-  transition: grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  transition: grid-template-rows 0.3s ease-out, opacity 0.2s ease;
 }
 
-/* Google Places autocomplete styling – force light text on dark background */
+/* Google Places autocomplete styling – Bauhaus theme */
 .pac-container {
   z-index: 70 !important;
   margin-top: 0.35rem;
   overflow: hidden;
-  border: 1px solid var(--border-strong);
-  border-radius: 1rem;
-  background: var(--surface-elevated) !important;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--foreground);
+  border-radius: 0;
+  background: var(--surface) !important;
+  box-shadow: 4px 4px 0px 0px black;
   font-family: var(--font-sans), sans-serif;
   color: var(--foreground) !important;
 }
 
-/* Override Google’s default black text in suggestion items */
 .pac-container *,
 .pac-item,
 .pac-item span,
@@ -433,5 +313,5 @@ input[type="datetime-local"]::-webkit-datetime-edit-ampm-field {
 
 .pac-item:hover,
 .pac-item-selected {
-  background: var(--surface-elevated);
+  background: var(--accent-yellow) !important;
 }
