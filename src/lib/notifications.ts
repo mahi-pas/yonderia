@@ -4,6 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   Database,
   EventComment,
+  EventCommentReaction,
   EventRsvp,
   ItineraryItem,
   NotificationRead,
@@ -12,7 +13,12 @@ import type {
   TripParticipant,
 } from "@/lib/types";
 
-export type NotificationKind = "announcement" | "event-comment" | "new-event" | "trip-comment";
+export type NotificationKind =
+  | "announcement"
+  | "comment-reactions"
+  | "event-comment"
+  | "new-event"
+  | "trip-comment";
 
 export type UserNotification = {
   actor: {
@@ -38,7 +44,11 @@ type EventCommentRow = Pick<
   EventComment,
   "content" | "created_at" | "gif_url" | "id" | "is_announcement" | "itinerary_item_id" | "trip_id" | "user_id"
 >;
-type OwnEventCommentRow = Pick<EventComment, "created_at" | "itinerary_item_id">;
+type OwnEventCommentRow = Pick<
+  EventComment,
+  "content" | "created_at" | "gif_url" | "id" | "itinerary_item_id" | "trip_id"
+>;
+type ReactionRow = Pick<EventCommentReaction, "comment_id" | "created_at" | "emoji" | "user_id">;
 type EventRsvpRow = Pick<EventRsvp, "itinerary_item_id" | "status" | "updated_at">;
 type ProfileRow = Pick<Profile, "avatar_url" | "display_name" | "id">;
 type NotificationReadRow = Pick<NotificationRead, "notification_id">;
@@ -80,6 +90,30 @@ function trimNotificationText(value: string | null, fallback: string): string {
   }
 
   return trimmed.length > 140 ? `${trimmed.slice(0, 137)}...` : trimmed;
+}
+
+function buildCompressedReactionDescription(
+  reactorNames: string[],
+  itemTitle: string,
+  uniqueEmojis: string[],
+): string {
+  const emojiClause = uniqueEmojis.length === 1 ? ` with ${uniqueEmojis[0]}` : "";
+  const target = `your comment on ${itemTitle}`;
+  const n = reactorNames.length;
+
+  if (n === 1) {
+    return `${reactorNames[0]} reacted${emojiClause} to ${target}.`;
+  }
+
+  if (n === 2) {
+    return `${reactorNames[0]} and ${reactorNames[1]} reacted${emojiClause} to ${target}.`;
+  }
+
+  if (n === 3) {
+    return `${reactorNames[0]}, ${reactorNames[1]}, and ${reactorNames[2]} reacted${emojiClause} to ${target}.`;
+  }
+
+  return `${reactorNames[0]}, ${reactorNames[1]}, and ${n - 2} others reacted${emojiClause} to ${target}.`;
 }
 
 function getActor(profileMap: Map<string, ProfileRow>, userId: string | null): UserNotification["actor"] {
@@ -170,7 +204,7 @@ export async function getNotificationsForUser(
       .eq("status", "going"),
     supabase
       .from("event_comments")
-      .select("itinerary_item_id, created_at")
+      .select("id, trip_id, itinerary_item_id, created_at, content, gif_url")
       .eq("user_id", userId)
       .in("trip_id", tripIds)
       .not("itinerary_item_id", "is", null),
@@ -241,10 +275,31 @@ export async function getNotificationsForUser(
     );
   }
 
-  const actorUserIds = [...new Set([
-    ...itineraryItems.map((item) => item.created_by).filter((value): value is string => Boolean(value)),
-    ...comments.map((comment) => comment.user_id),
-  ])];
+  const myCommentIds = ownComments.map((comment) => comment.id);
+
+  const { data: reactionsData, error: reactionsError } =
+    myCommentIds.length === 0
+      ? { data: [] as ReactionRow[], error: null }
+      : await supabase
+          .from("event_comment_reactions")
+          .select("comment_id, user_id, emoji, created_at")
+          .in("comment_id", myCommentIds)
+          .neq("user_id", userId);
+
+  if (reactionsError) {
+    throw new Error(reactionsError.message);
+  }
+
+  const reactionRows = (reactionsData ?? []) as ReactionRow[];
+  const reactorUserIds = [...new Set(reactionRows.map((row) => row.user_id))];
+
+  const actorUserIds = [
+    ...new Set([
+      ...itineraryItems.map((item) => item.created_by).filter((value): value is string => Boolean(value)),
+      ...comments.map((comment) => comment.user_id),
+      ...reactorUserIds,
+    ]),
+  ];
 
   const { data: profilesData, error: profilesError } =
     actorUserIds.length === 0
@@ -258,6 +313,18 @@ export async function getNotificationsForUser(
   const profileMap = new Map<string, ProfileRow>();
   for (const profile of (profilesData ?? []) as ProfileRow[]) {
     profileMap.set(profile.id, profile);
+  }
+
+  const ownCommentById = new Map<string, OwnEventCommentRow>();
+  for (const comment of ownComments) {
+    ownCommentById.set(comment.id, comment);
+  }
+
+  const reactionsByCommentId = new Map<string, ReactionRow[]>();
+  for (const row of reactionRows) {
+    const list = reactionsByCommentId.get(row.comment_id) ?? [];
+    list.push(row);
+    reactionsByCommentId.set(row.comment_id, list);
   }
 
   const readIds = new Set(reads.map((read) => read.notification_id));
@@ -344,6 +411,86 @@ export async function getNotificationsForUser(
       isRead: readIds.has(notificationId),
       kind: "event-comment",
       title: `New comment on ${itineraryItem.title}`,
+      tripId: comment.trip_id,
+      tripName: trip.name,
+    });
+  }
+
+  for (const [commentId, rows] of reactionsByCommentId) {
+    const comment = ownCommentById.get(commentId);
+    if (!comment?.itinerary_item_id) {
+      continue;
+    }
+
+    const trip = tripMap.get(comment.trip_id);
+    const membership = membershipByTrip.get(comment.trip_id);
+    if (!trip || !membership || comment.created_at <= membership.joined_at) {
+      continue;
+    }
+
+    const itineraryItem = itineraryMap.get(comment.itinerary_item_id);
+    const relevantSince = relevantSinceByItem.get(comment.itinerary_item_id);
+    if (!itineraryItem || !relevantSince) {
+      continue;
+    }
+
+    const eligible = rows.filter(
+      (row) => row.created_at > membership.joined_at && row.created_at > relevantSince,
+    );
+    if (eligible.length === 0) {
+      continue;
+    }
+
+    eligible.sort((left, right) => right.created_at.localeCompare(left.created_at));
+    const seenReactors = new Set<string>();
+    const reactorIdsOrdered: string[] = [];
+    for (const row of eligible) {
+      if (seenReactors.has(row.user_id)) {
+        continue;
+      }
+      seenReactors.add(row.user_id);
+      reactorIdsOrdered.push(row.user_id);
+    }
+
+    const seenEmojis = new Set<string>();
+    const uniqueEmojis: string[] = [];
+    for (const row of eligible) {
+      if (seenEmojis.has(row.emoji)) {
+        continue;
+      }
+      seenEmojis.add(row.emoji);
+      uniqueEmojis.push(row.emoji);
+    }
+
+    const createdAt = eligible.reduce(
+      (latest, row) => (row.created_at > latest ? row.created_at : latest),
+      eligible[0].created_at,
+    );
+
+    const reactorNames = reactorIdsOrdered.map(
+      (id) => profileMap.get(id)?.display_name?.trim() || "Someone",
+    );
+    const description = buildCompressedReactionDescription(
+      reactorNames,
+      itineraryItem.title,
+      uniqueEmojis,
+    );
+    const primaryReactorId = reactorIdsOrdered[0];
+    const actor = getActor(profileMap, primaryReactorId);
+    const notificationId = toReadId("comment-reactions", comment.id);
+
+    notifications.push({
+      actor,
+      createdAt,
+      description,
+      href: tripNotificationHref(comment.trip_id, {
+        detailComments: "1",
+        item: comment.itinerary_item_id,
+      }),
+      id: notificationId,
+      isRead: readIds.has(notificationId),
+      kind: "comment-reactions",
+      title: `Reactions on ${itineraryItem.title}`,
       tripId: comment.trip_id,
       tripName: trip.name,
     });

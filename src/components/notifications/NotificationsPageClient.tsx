@@ -24,6 +24,10 @@ function getKindLabel(kind: UserNotification["kind"]): string {
     return "Announcement";
   }
 
+  if (kind === "comment-reactions") {
+    return "Reactions";
+  }
+
   if (kind === "event-comment") {
     return "Event comment";
   }
@@ -80,7 +84,8 @@ export default function NotificationsPageClient({ notifications }: Notifications
         <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Notifications</p>
         <h2 className="mt-3 font-display text-3xl text-[#fafafa]">Nothing new yet</h2>
         <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-[var(--muted)]">
-          When your trips get new events, comments, or announcements, they&apos;ll show up here.
+          When your trips get new events, comments, reactions, or announcements, they&apos;ll show up
+          here.
         </p>
       </section>
     );
