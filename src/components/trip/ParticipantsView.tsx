@@ -9,6 +9,7 @@ import Input from "@/components/ui/Input";
 import Modal from "@/components/ui/Modal";
 import TopToast from "@/components/ui/TopToast";
 import { createClient } from "@/lib/supabase/client";
+import { buildProfileHref } from "@/lib/trip-navigation";
 import type { TripParticipantRole } from "@/lib/types";
 
 type ParticipantRow = {
@@ -352,7 +353,7 @@ export default function ParticipantsView({
                   <Link
                     aria-label={`View ${participant.nickname}'s profile`}
                     className="inline-flex min-h-11 min-w-11 shrink-0 rounded-full"
-                    href={`/profile/${participant.userId}`}
+                    href={buildProfileHref(participant.userId, `/trip/${tripId}`)}
                   >
                     <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--surface)] bg-[var(--surface-elevated)] ring-1 ring-[var(--accent)]/20 text-base font-semibold text-[var(--muted-foreground)] shadow-[0_4px_16px_rgba(0,0,0,0.2)]">
                       {participant.avatarUrl ? (

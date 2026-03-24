@@ -9,6 +9,7 @@ import ParticipantsRow from "@/components/trip/ParticipantsRow";
 import TripMap from "@/components/trip/TripMap";
 import TripHeader from "@/components/trip/TripHeader";
 import TripThemeProvider from "@/components/trip/TripThemeProvider";
+import ViewOnlyPromoOverlay from "@/components/trip/ViewOnlyPromoOverlay";
 import Input from "@/components/ui/Input";
 import PageBackground from "@/components/ui/PageBackground";
 import LoginButton from "@/components/auth/LoginButton";
@@ -242,6 +243,7 @@ function TripPageLayout({
 
   return (
     <TripThemeProvider theme={theme}>
+      {guestMode ? <ViewOnlyPromoOverlay /> : null}
       <main className="page-bg relative min-h-screen px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
         <PageBackground />
         <BackgroundEffects effect={effect} />

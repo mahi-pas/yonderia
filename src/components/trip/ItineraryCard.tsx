@@ -109,7 +109,7 @@ export default function ItineraryCard({
       : (item.location_name ?? "Location coming together");
 
   return (
-    <div className="relative">
+    <div className="relative" id={`itinerary-item-${item.id}`}>
       <button
         className={[
           "card-hover group flex w-full items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-3 text-left shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm transition gradient-border-hover focus:outline-none focus:ring-4 focus:ring-[var(--accent)]/20 sm:p-4",

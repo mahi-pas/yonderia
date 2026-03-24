@@ -2,15 +2,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import EditProfileButton from "@/components/profile/EditProfileButton";
+import SignOutButton from "@/components/profile/SignOutButton";
 import TripCard from "@/components/trip/TripCard";
 import PageBackground from "@/components/ui/PageBackground";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { sanitizeProfileReturnPath } from "@/lib/trip-navigation";
 import type { Profile, Trip, TripParticipant } from "@/lib/types";
 
 type PageProps = {
   params: Promise<{
     userId: string;
+  }>;
+  searchParams: Promise<{
+    from?: string | string[];
   }>;
 };
 
@@ -133,8 +138,10 @@ async function getSharedTrips(tripIds: string[]): Promise<SharedTripCard[]> {
     }));
 }
 
-export default async function ProfilePage({ params }: PageProps) {
+export default async function ProfilePage({ params, searchParams }: PageProps) {
   const { userId } = await params;
+  const resolvedSearch = await searchParams;
+  const returnToTrip = sanitizeProfileReturnPath(resolvedSearch.from);
   const supabase = await createClient();
   const adminSupabase = createAdminClient();
   const [
@@ -200,13 +207,15 @@ export default async function ProfilePage({ params }: PageProps) {
       <div className="relative z-10 mx-auto max-w-3xl space-y-5">
         <header className="p-5 sm:p-6">
           <div className="flex items-start gap-4">
-            <Link
-              aria-label={viewer ? "Back to dashboard" : "Back to home"}
-              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-xl text-[var(--muted)] transition hover:bg-[var(--surface-elevated)]"
-              href={viewer ? "/dashboard" : "/"}
-            >
-              ←
-            </Link>
+            {returnToTrip ? (
+              <Link
+                aria-label="Back to trip"
+                className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--surface)] text-xl text-[var(--muted)] transition hover:bg-[var(--surface-elevated)]"
+                href={returnToTrip}
+              >
+                ←
+              </Link>
+            ) : null}
 
             <div className="min-w-0 flex-1">
               <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Profile</p>
@@ -259,12 +268,13 @@ export default async function ProfilePage({ params }: PageProps) {
             </div>
 
             {isOwnProfile ? (
-              <div className="mt-5">
+              <div className="mt-5 flex flex-col items-center gap-3">
                 <EditProfileButton
                   initialAvatarUrl={profile.avatar_url}
                   initialDisplayName={profile.display_name}
                   userId={profile.id}
                 />
+                <SignOutButton />
               </div>
             ) : null}
           </div>

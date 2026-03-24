@@ -164,7 +164,7 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          <DashboardTripList currentUserId={user.id} trips={trips} />
+          <DashboardTripList trips={trips} />
         </section>
       </div>
     </main>

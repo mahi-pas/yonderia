@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { Space_Grotesk, DM_Sans } from "next/font/google";
 import AuthProvider from "@/components/auth/AuthProvider";
+import AppShell from "@/components/navigation/AppShell";
 import "./globals.css";
 
 const displayFont = Space_Grotesk({
@@ -57,7 +58,9 @@ export default function RootLayout({
       <body
         className={`${displayFont.variable} ${bodyFont.variable} min-h-screen bg-background text-foreground antialiased`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <AppShell>{children}</AppShell>
+        </AuthProvider>
       </body>
     </html>
   );

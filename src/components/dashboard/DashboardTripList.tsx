@@ -46,11 +46,10 @@ function splitTripsByDate(trips: DashboardTrip[]) {
 }
 
 type Props = {
-  currentUserId: string;
   trips: DashboardTrip[];
 };
 
-export default function DashboardTripList({ currentUserId, trips }: Props) {
+export default function DashboardTripList({ trips }: Props) {
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
 
   const { upcoming, past } = useMemo(() => splitTripsByDate(trips), [trips]);
@@ -101,7 +100,7 @@ export default function DashboardTripList({ currentUserId, trips }: Props) {
           aria-labelledby="tab-upcoming"
           className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
         >
-          <CreateTripFlow currentUserId={currentUserId} />
+          <CreateTripFlow />
           {upcoming.map((trip) => (
             <TripCard
               key={trip.id}

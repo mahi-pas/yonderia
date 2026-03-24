@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo } from "react";
+import { useTripNavThemeSetter } from "@/components/navigation/TripNavThemeContext";
 import type { TripTheme } from "@/lib/types";
 
 /** CSS variables for the trip theme. Used by portaled content (e.g. event detail modal) so they inherit the theme. */
@@ -62,10 +63,17 @@ function buildGoogleFontsUrl(display: string, body: string): string {
 
 type TripThemeProviderProps = {
   children: React.ReactNode;
+  /** When false, theme is not pushed to the app header (e.g. theme editor preview). Default true. */
+  applyToAppNavigation?: boolean;
   theme: TripTheme | null | undefined;
 };
 
-export default function TripThemeProvider({ children, theme }: TripThemeProviderProps) {
+export default function TripThemeProvider({
+  children,
+  theme,
+  applyToAppNavigation = true,
+}: TripThemeProviderProps) {
+  const setNavThemeStyle = useTripNavThemeSetter();
   const hasCustomFonts =
     theme?.font?.display?.trim() || theme?.font?.body?.trim();
   const fontUrl = useMemo(() => {
@@ -147,6 +155,16 @@ export default function TripThemeProvider({ children, theme }: TripThemeProvider
 
     return base;
   }, [theme]);
+
+  useEffect(() => {
+    if (!applyToAppNavigation) {
+      return;
+    }
+    setNavThemeStyle(style);
+    return () => {
+      setNavThemeStyle(null);
+    };
+  }, [applyToAppNavigation, setNavThemeStyle, style]);
 
   useEffect(() => {
     if (!fontUrl) return;
