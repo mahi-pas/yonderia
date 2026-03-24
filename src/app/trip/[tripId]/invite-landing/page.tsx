@@ -283,11 +283,11 @@ export default async function TripInviteLandingPage({ params, searchParams }: Pa
               {preview.trip.name}
             </h2>
 
-            <div className="mt-6 flex flex-wrap gap-3 text-sm font-bold text-[#888888]">
-              <div className="border-2 border-[#121212] bg-[#D02020]/10 px-4 py-2">
+            <div className="mt-6 flex min-w-0 flex-wrap gap-3 text-sm font-bold text-[#888888]">
+              <div className="min-w-0 max-w-full break-words border-2 border-[#121212] bg-[#D02020]/10 px-4 py-2">
                 {formatInviteDateRange(preview.trip.start_date, preview.trip.end_date)}
               </div>
-              <div className="border-2 border-[#121212] bg-[#1040C0]/10 px-4 py-2">
+              <div className="min-w-0 max-w-full break-words border-2 border-[#121212] bg-[#1040C0]/10 px-4 py-2">
                 {preview.trip.location_name || "Location coming together"}
               </div>
             </div>

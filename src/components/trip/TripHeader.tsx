@@ -62,7 +62,7 @@ export default function TripHeader({
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-2 min-w-0">
-          <p className="text-xs font-bold uppercase tracking-widest text-[var(--foreground)] sm:text-sm">
+          <p className="break-words text-xs font-bold uppercase tracking-widest text-[var(--foreground)] sm:text-sm">
             {formatTripDateRange(startDate, endDate)}
           </p>
           <p className="flex items-center gap-2 text-sm font-medium text-[var(--foreground)] sm:text-base">

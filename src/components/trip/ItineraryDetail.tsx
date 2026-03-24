@@ -34,7 +34,7 @@ function DetailRow({ label, value }: { label: string; value: string | null }) {
   return (
     <div className="border-2 border-[#121212] bg-white px-3 py-2.5">
       <p className="text-xs font-bold uppercase tracking-widest text-[var(--trip-paper-text,#121212)]">{label}</p>
-      <p className="mt-0.5 text-sm leading-5 text-[var(--trip-paper-muted,#666666)]">{value}</p>
+      <p className="mt-0.5 break-words text-sm leading-5 text-[var(--trip-paper-muted,#666666)]">{value}</p>
     </div>
   );
 }

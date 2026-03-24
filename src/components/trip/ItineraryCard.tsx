@@ -112,7 +112,7 @@ export default function ItineraryCard({
     <div className="relative" id={`itinerary-item-${item.id}`}>
       <button
         className={[
-          "group flex w-full items-center gap-4 border-2 border-[#121212] bg-white p-3 text-left shadow-[4px_4px_0px_0px_black] transition focus:outline-none focus:ring-4 focus:ring-[#D02020]/20 sm:p-4",
+          "group flex min-w-0 w-full items-center gap-4 border-2 border-[#121212] bg-white p-3 text-left shadow-[4px_4px_0px_0px_black] transition focus:outline-none focus:ring-4 focus:ring-[#D02020]/20 sm:p-4",
           canEdit ? "pr-14 sm:pr-16" : "",
         ]
           .filter(Boolean)
@@ -132,12 +132,14 @@ export default function ItineraryCard({
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex min-h-7 items-center gap-1 bg-[#D02020]/10 px-2.5 text-xs font-bold tracking-widest uppercase text-[#D02020]">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <span className="inline-flex min-h-7 max-w-full shrink-0 items-center gap-1 bg-[#D02020]/10 px-2.5 text-xs font-bold tracking-widest uppercase text-[#D02020]">
               <span aria-hidden="true">{badge.icon}</span>
               {badge.label}
             </span>
-            <span className="text-xs font-bold text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))]">{formatItineraryItemTime(item)}</span>
+            <span className="min-w-0 max-w-full break-words text-xs font-bold text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))]">
+              {formatItineraryItemTime(item)}
+            </span>
             {item.item_type === "event" ? (
               <RsvpButtons
                 currentUserId={currentUserId}

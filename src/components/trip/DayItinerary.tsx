@@ -158,8 +158,8 @@ export default function DayItinerary({
                   }));
                 }}
               >
-                <div>
-                  <h3 className="text-lg font-black uppercase tracking-tighter text-[var(--foreground,#121212)]">
+                <div className="min-w-0 flex-1">
+                  <h3 className="break-words text-lg font-black uppercase tracking-tighter text-[var(--foreground,#121212)]">
                     {`Day ${day.index + 1} — ${day.label}`}
                   </h3>
                   <p className="mt-1 text-sm font-bold text-[var(--muted-foreground,#666666)]">
@@ -171,7 +171,7 @@ export default function DayItinerary({
                 <span
                   aria-hidden="true"
                   className={[
-                    "text-2xl font-bold text-[var(--foreground,#121212)] opacity-90 transition-transform duration-300",
+                    "shrink-0 text-2xl font-bold text-[var(--foreground,#121212)] opacity-90 transition-transform duration-300",
                     isExpanded ? "rotate-90" : "",
                   ]
                     .filter(Boolean)

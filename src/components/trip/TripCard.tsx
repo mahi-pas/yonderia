@@ -41,14 +41,14 @@ export default function TripCard({
   const visibleParticipants = participants.slice(0, 4);
 
   return (
-    <article className="card-hover group relative overflow-hidden border-2 sm:border-4 border-[#121212] bg-white shadow-[4px_4px_0px_0px_black] sm:shadow-[8px_8px_0px_0px_black]">
+    <article className="card-hover group relative min-w-0 overflow-hidden border-2 sm:border-4 border-[#121212] bg-white shadow-[4px_4px_0px_0px_black] sm:shadow-[8px_8px_0px_0px_black]">
       <Link
         aria-label={`Open ${name}`}
         className="absolute inset-0 z-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D02020]"
         href={`/trip/${id}`}
       />
 
-      <div className="pointer-events-none relative z-10">
+      <div className="pointer-events-none relative z-10 min-w-0">
         <div className="relative aspect-[16/11] overflow-hidden bg-[#E0E0E0]">
           {imageUrl ? (
             <Image
@@ -67,7 +67,7 @@ export default function TripCard({
 
         <div className="border-t-2 border-[#121212] p-5 space-y-4">
           <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#D02020]">
+            <p className="break-words text-xs font-bold uppercase tracking-widest text-[#D02020]">
               {formatTripDateRange(startDate, endDate)}
             </p>
             <h3 className="font-display text-2xl font-black uppercase leading-[0.9] tracking-tighter text-[#121212] sm:text-3xl">{name}</h3>
