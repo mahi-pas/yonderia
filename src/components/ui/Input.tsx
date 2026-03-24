@@ -7,7 +7,7 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 };
 
 const INPUT_CLASSES =
-  "min-h-12 w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-4 py-3 text-base text-[#fafafa] outline-none transition-all duration-200 placeholder:text-[var(--muted-foreground)] focus:border-[#8b5cf6] focus:ring-4 focus:ring-[#8b5cf6]/20 focus:shadow-[0_0_0_1px_rgba(139,92,246,0.3)] disabled:cursor-not-allowed disabled:bg-[var(--background)] disabled:text-[var(--muted-foreground)]";
+  "min-h-12 w-full border-2 border-[#121212] bg-white px-4 py-3 text-base text-[#121212] font-medium outline-none transition-all duration-200 placeholder:text-[#888888] focus:ring-2 focus:ring-[#1040C0] focus:ring-offset-2 focus:ring-offset-[#F0F0F0] disabled:cursor-not-allowed disabled:bg-[#E0E0E0] disabled:text-[#888888]";
 
 export function inputClassName(className = ""): string {
   return [INPUT_CLASSES, className].filter(Boolean).join(" ");
@@ -19,10 +19,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 ) {
   return (
     <label className="block space-y-2">
-      {label ? <span className="block text-sm font-medium text-[var(--foreground)]">{label}</span> : null}
+      {label ? (
+        <span className="block text-sm font-bold uppercase tracking-widest text-[#121212]">
+          {label}
+        </span>
+      ) : null}
       <input ref={ref} className={inputClassName(className)} {...props} />
-      {error ? <span className="block text-sm text-[#f87171]">{error}</span> : null}
-      {!error && hint ? <span className="block text-sm text-[var(--muted-foreground)]">{hint}</span> : null}
+      {error ? <span className="block text-sm font-medium text-[#D02020]">{error}</span> : null}
+      {!error && hint ? <span className="block text-sm text-[#888888]">{hint}</span> : null}
     </label>
   );
 });

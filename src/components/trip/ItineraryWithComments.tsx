@@ -204,7 +204,7 @@ function ItineraryWithCommentsShell({
           <div
             role="tablist"
             aria-label="Itinerary and comments"
-            className="trip-card inline-flex rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-1"
+            className="trip-card inline-flex divide-x-2 divide-[#121212] border-2 border-[#121212] bg-white shadow-[4px_4px_0px_0px_black]"
           >
             <button
               type="button"
@@ -212,11 +212,11 @@ function ItineraryWithCommentsShell({
               aria-selected={activeTab === "itinerary"}
               aria-controls="itinerary-panel"
               id="itinerary-tab"
-              className="min-w-[7rem] rounded-lg px-4 py-2.5 text-sm font-semibold transition sm:min-w-[8rem] sm:py-3"
-              style={{
-                backgroundColor: activeTab === "itinerary" ? "var(--accent)" : "transparent",
-                color: activeTab === "itinerary" ? "white" : "var(--foreground)",
-              }}
+              className={`min-w-[7rem] px-4 py-2.5 text-sm font-bold uppercase tracking-wide transition-colors sm:min-w-[8rem] sm:py-3 ${
+                activeTab === "itinerary"
+                  ? "bg-[var(--accent)] text-white"
+                  : "bg-[var(--surface-elevated)] text-[var(--foreground)]"
+              }`}
               onClick={() => setActiveTab("itinerary")}
             >
               Itinerary
@@ -227,16 +227,22 @@ function ItineraryWithCommentsShell({
               aria-selected={activeTab === "comments"}
               aria-controls="comments-panel"
               id="comments-tab"
-              className="min-w-[7rem] rounded-lg px-4 py-2.5 text-sm font-semibold transition sm:min-w-[8rem] sm:py-3"
-              style={{
-                backgroundColor: activeTab === "comments" ? "var(--accent)" : "transparent",
-                color: activeTab === "comments" ? "white" : "var(--foreground)",
-              }}
+              className={`inline-flex min-w-[7rem] items-center justify-center gap-1 px-4 py-2.5 text-sm font-bold uppercase tracking-wide transition-colors sm:min-w-[8rem] sm:py-3 ${
+                activeTab === "comments"
+                  ? "bg-[var(--accent)] text-white"
+                  : "bg-[var(--surface-elevated)] text-[var(--foreground)]"
+              }`}
               onClick={() => setActiveTab("comments")}
             >
               Comments
               {comments.length > 0 ? (
-                <span className="ml-1.5 rounded-full bg-[var(--accent)]/20 px-1.5 py-0.5 text-xs tabular-nums text-[var(--accent)]">
+                <span
+                  className={
+                    activeTab === "comments"
+                      ? "ml-0.5 min-w-[1.25rem] rounded-full border border-[#121212] bg-white px-1.5 py-0.5 text-center text-xs font-bold tabular-nums text-[#121212]"
+                      : "ml-0.5 min-w-[1.25rem] rounded-full bg-[var(--accent)]/15 px-1.5 py-0.5 text-center text-xs font-bold tabular-nums text-[var(--accent)]"
+                  }
+                >
                   {comments.length}
                 </span>
               ) : null}

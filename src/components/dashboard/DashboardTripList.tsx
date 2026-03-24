@@ -57,7 +57,7 @@ export default function DashboardTripList({ trips }: Props) {
   return (
     <div className="mt-8">
       <div
-        className="mb-6 w-fit flex gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/60 p-1"
+        className="mb-6 flex w-fit gap-0 border-2 border-[#121212]"
         role="tablist"
         aria-label="Trip filter"
       >
@@ -68,10 +68,10 @@ export default function DashboardTripList({ trips }: Props) {
           aria-controls="upcoming-trips"
           id="tab-upcoming"
           onClick={() => setActiveTab("upcoming")}
-          className={`min-w-[7rem] rounded-lg px-4 py-2.5 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]/50 ${
+          className={`min-w-[7rem] px-4 py-2.5 text-sm font-bold uppercase tracking-wider transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D02020] ${
             activeTab === "upcoming"
-              ? "bg-[var(--surface)] text-[#fafafa] shadow-sm"
-              : "text-[var(--muted)] hover:text-[#e4e4e7]"
+              ? "bg-[#121212] text-white"
+              : "bg-white text-[#121212] hover:bg-[#F0C020]"
           }`}
         >
           Upcoming ({upcoming.length})
@@ -83,10 +83,10 @@ export default function DashboardTripList({ trips }: Props) {
           aria-controls="past-trips"
           id="tab-past"
           onClick={() => setActiveTab("past")}
-          className={`min-w-[7rem] rounded-lg px-4 py-2.5 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8b5cf6]/50 ${
+          className={`min-w-[7rem] border-l-2 border-[#121212] px-4 py-2.5 text-sm font-bold uppercase tracking-wider transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D02020] ${
             activeTab === "past"
-              ? "bg-[var(--surface)] text-[#fafafa] shadow-sm"
-              : "text-[var(--muted)] hover:text-[#e4e4e7]"
+              ? "bg-[#121212] text-white"
+              : "bg-white text-[#121212] hover:bg-[#F0C020]"
           }`}
         >
           Past ({past.length})
@@ -98,7 +98,7 @@ export default function DashboardTripList({ trips }: Props) {
           id="upcoming-trips"
           role="tabpanel"
           aria-labelledby="tab-upcoming"
-          className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+          className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
         >
           <CreateTripFlow />
           {upcoming.map((trip) => (
@@ -121,7 +121,7 @@ export default function DashboardTripList({ trips }: Props) {
           id="past-trips"
           role="tabpanel"
           aria-labelledby="tab-past"
-          className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+          className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
         >
           {past.map((trip) => (
             <TripCard
@@ -139,13 +139,13 @@ export default function DashboardTripList({ trips }: Props) {
       )}
 
       {activeTab === "upcoming" && upcoming.length === 0 && (
-        <div className="mt-6 px-5 py-4 text-sm leading-6 text-[var(--muted)]">
+        <div className="mt-6 border-2 border-[#121212] bg-white px-5 py-4 text-sm font-medium leading-6 text-[#888888] shadow-[4px_4px_0px_0px_black]">
           No upcoming trips. Create one to get started.
         </div>
       )}
 
       {activeTab === "past" && past.length === 0 && (
-        <div className="mt-6 px-5 py-4 text-sm leading-6 text-[var(--muted)]">
+        <div className="mt-6 border-2 border-[#121212] bg-white px-5 py-4 text-sm font-medium leading-6 text-[#888888] shadow-[4px_4px_0px_0px_black]">
           No past trips yet.
         </div>
       )}

@@ -93,7 +93,7 @@ function ClearFieldButton({
 
   return (
     <button
-      className="text-sm font-semibold text-[#8b5cf6] transition hover:text-[#a78bfa] disabled:cursor-not-allowed disabled:opacity-60"
+      className="text-sm font-bold text-[#D02020] transition hover:text-[#D02020]/80 disabled:cursor-not-allowed disabled:opacity-60"
       disabled={disabled}
       type="button"
       onClick={onClick}
@@ -116,7 +116,7 @@ function FieldHeader({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="block text-sm font-medium text-[#d4d4d8]">{label}</span>
+      <span className="block text-sm font-bold text-[#888888]">{label}</span>
       <ClearFieldButton disabled={disabled} isVisible={isClearVisible} onClick={onClear} />
     </div>
   );
@@ -275,13 +275,13 @@ export default function NicknameModal({
               setNickname(event.target.value);
             }}
           />
-          <span className="block text-sm text-[var(--muted)]">Trip nicknames are separate from your profile name.</span>
+          <span className="block text-sm font-bold text-[#888888]">Trip nicknames are separate from your profile name.</span>
         </label>
 
-        <section className="space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5">
+        <section className="space-y-4 border-2 border-[#121212] bg-white p-4 shadow-[4px_4px_0px_0px_black] sm:p-5">
           <div>
-            <h3 className="text-lg font-semibold text-[#fafafa]">When are you arriving?</h3>
-            <p className="mt-1 text-sm leading-6 text-[#d4d4d8]">
+            <h3 className="text-lg font-black uppercase tracking-tighter text-[#121212]">When are you arriving?</h3>
+            <p className="mt-1 text-sm font-bold leading-6 text-[#888888]">
               Add a date, time, and where you&apos;re landing or meeting up.
             </p>
           </div>
@@ -318,7 +318,7 @@ export default function NicknameModal({
                 }}
               />
             </div>
-            <p className="text-sm text-[var(--muted)]">Use the date and time pickers to share your arrival plan.</p>
+            <p className="text-sm font-bold text-[#888888]">Use the date and time pickers to share your arrival plan.</p>
           </div>
 
           <label className="block space-y-2">
@@ -343,10 +343,10 @@ export default function NicknameModal({
           </label>
         </section>
 
-        <section className="space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5">
+        <section className="space-y-4 border-2 border-[#121212] bg-white p-4 shadow-[4px_4px_0px_0px_black] sm:p-5">
           <div>
-            <h3 className="text-lg font-semibold text-[#fafafa]">When are you leaving?</h3>
-            <p className="mt-1 text-sm leading-6 text-[#d4d4d8]">
+            <h3 className="text-lg font-black uppercase tracking-tighter text-[#121212]">When are you leaving?</h3>
+            <p className="mt-1 text-sm font-bold leading-6 text-[#888888]">
               Share your departure timing and the place you&apos;re heading out from.
             </p>
           </div>
@@ -383,7 +383,7 @@ export default function NicknameModal({
                 }}
               />
             </div>
-            <p className="text-sm text-[var(--muted)]">Use the date and time pickers to share when you&apos;re heading out.</p>
+            <p className="text-sm font-bold text-[#888888]">Use the date and time pickers to share when you&apos;re heading out.</p>
           </div>
 
           <label className="block space-y-2">
@@ -409,7 +409,7 @@ export default function NicknameModal({
         </section>
 
         {errorMessage ? (
-          <div className="rounded-2xl border border-[#ef4444/30] bg-[#450a0a/90] px-4 py-3 text-sm text-[#fca5a5]">
+          <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm font-bold text-[#D02020]">
             {errorMessage}
           </div>
         ) : null}

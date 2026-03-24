@@ -126,14 +126,14 @@ export default function JoinTripFlow({
       <>
         <main className="page-bg min-h-screen px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
           <div className="mx-auto max-w-lg p-6 sm:p-8">
-            <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Join trip</p>
-            <h1 className="mt-3 font-display text-4xl leading-none text-[#fafafa]">Checking your invite</h1>
-            <p className="mt-3 text-sm leading-6 text-[#d4d4d8]">
+            <p className="text-[#D02020] text-xs font-bold uppercase tracking-widest">Join trip</p>
+            <h1 className="mt-3 font-display text-4xl uppercase tracking-tighter font-black leading-[0.9] text-[#121212]">Checking your invite</h1>
+            <p className="mt-3 text-sm leading-6 text-[#888888]">
               We&apos;re validating your code and getting your spot ready.
             </p>
 
-            <div className="mt-8 flex items-center gap-3 px-4 py-4 text-sm text-[#d4d4d8]">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--border-strong)] border-t-[#8b5cf6]" />
+            <div className="mt-8 flex items-center gap-3 px-4 py-4 text-sm text-[#888888]">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#121212] border-t-[#D02020]" />
               <span>Validating invite code...</span>
             </div>
           </div>
@@ -155,9 +155,9 @@ export default function JoinTripFlow({
     <>
       <main className="page-bg min-h-screen px-4 py-8 pb-24 sm:px-6 sm:py-10 sm:pb-10">
         <div className="mx-auto max-w-lg p-6 sm:p-8">
-          <p className="gradient-text text-xs font-semibold uppercase tracking-wide">Trip access</p>
-          <h1 className="mt-3 font-display text-4xl leading-none text-[#fafafa]">Join this trip</h1>
-          <p className="mt-3 text-sm leading-6 text-[#d4d4d8]">
+          <p className="text-[#D02020] text-xs font-bold uppercase tracking-widest">Trip access</p>
+          <h1 className="mt-3 font-display text-4xl uppercase tracking-tighter font-black leading-[0.9] text-[#121212]">Join this trip</h1>
+          <p className="mt-3 text-sm leading-6 text-[#888888]">
             Drop in a join code and we&apos;ll bring you straight to the plan.
           </p>
 
@@ -182,7 +182,7 @@ export default function JoinTripFlow({
             />
 
             {errorMessage ? (
-              <div className="rounded-2xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
+              <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm text-[#D02020]">
                 {errorMessage}
               </div>
             ) : null}

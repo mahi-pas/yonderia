@@ -95,7 +95,7 @@ export default function EditProfileButton({
 
   return (
     <>
-      <Button className="w-full sm:w-auto" variant="secondary" onClick={() => setIsOpen(true)}>
+      <Button className="w-full sm:w-auto" variant="outline" onClick={() => setIsOpen(true)}>
         Edit Profile
       </Button>
 
@@ -107,7 +107,7 @@ export default function EditProfileButton({
         title="Edit profile"
         footer={
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <Button disabled={isSaving || isUploading} variant="secondary" onClick={closeModal}>
+            <Button disabled={isSaving || isUploading} variant="outline" onClick={closeModal}>
               Cancel
             </Button>
             <Button isLoading={isSaving} disabled={isUploading} onClick={() => void handleSave()}>
@@ -117,8 +117,8 @@ export default function EditProfileButton({
         }
       >
         <div className="space-y-6">
-          <div className="flex items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] text-2xl font-semibold text-[#8b5cf6]">
+          <div className="flex items-center gap-4 border-2 border-[#121212] bg-[#F8F8F8] p-4">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden border-2 border-[#121212] bg-[#F0C020] text-2xl font-black text-[#121212]">
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img alt={previewLabel} className="h-full w-full object-cover" src={avatarUrl} />
@@ -128,8 +128,8 @@ export default function EditProfileButton({
             </div>
 
             <div className="min-w-0">
-              <p className="gradient-text text-sm font-medium uppercase tracking-wide">Preview</p>
-              <p className="mt-1 text-sm leading-6 text-[#d4d4d8]">
+              <p className="text-sm font-bold uppercase tracking-widest text-[#D02020]">Preview</p>
+              <p className="mt-1 text-sm font-medium leading-6 text-[#888888]">
                 This is how your profile photo and name show up around the app.
               </p>
             </div>
@@ -152,11 +152,9 @@ export default function EditProfileButton({
             pathPrefix={`${userId}/avatar`}
             onChange={(value) => {
               if (value) {
-                // Append cache-busting param so mobile/browser caches show the new image
                 const separator = value.publicUrl.includes("?") ? "&" : "?";
                 setAvatarUrl(`${value.publicUrl}${separator}v=${Date.now()}`);
                 setErrorMessage(null);
-                // Remove previous avatar files (e.g. avatar.png when new is avatar.jpg)
                 void deleteOldAvatarFiles(supabase, userId, value.path);
               }
             }}
@@ -164,7 +162,7 @@ export default function EditProfileButton({
           />
 
           {errorMessage ? (
-            <div className="rounded-2xl border border-[#ef4444/30] bg-[#450a0a/90] px-4 py-3 text-sm text-[#fca5a5]">
+            <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm font-medium text-[#D02020]">
               {errorMessage}
             </div>
           ) : null}

@@ -216,6 +216,12 @@ export interface Database {
         Update: Partial<EventComment>;
         Relationships: [];
       };
+      event_comment_reactions: {
+        Row: EventCommentReaction;
+        Insert: Omit<EventCommentReaction, "id" | "created_at"> & { id?: string; created_at?: string };
+        Update: Partial<EventCommentReaction>;
+        Relationships: [];
+      };
       notification_reads: {
         Row: NotificationRead;
         Insert: Omit<NotificationRead, "read_at"> & { read_at?: string };

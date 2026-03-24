@@ -40,39 +40,37 @@ export default function TripCard({
   const visibleParticipants = participants.slice(0, 4);
 
   return (
-    <article className="card-hover group relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 shadow-[0_1px_3px_rgba(0,0,0,0.2),0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm gradient-border-hover">
+    <article className="card-hover group relative overflow-hidden border-2 sm:border-4 border-[#121212] bg-white shadow-[4px_4px_0px_0px_black] sm:shadow-[8px_8px_0px_0px_black]">
       <Link
         aria-label={`Open ${name}`}
-        className="absolute inset-0 z-0 rounded-2xl focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8b5cf6]/30"
+        className="absolute inset-0 z-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D02020]"
         href={`/trip/${id}`}
       />
 
       <div className="pointer-events-none relative z-10">
-        <div className="relative aspect-[16/11] overflow-hidden bg-[linear-gradient(135deg,var(--surface-elevated),var(--surface))]">
+        <div className="relative aspect-[16/11] overflow-hidden bg-[#E0E0E0]">
           {imageUrl ? (
             <Image
               alt={`${name} cover`}
-              className="object-cover transition duration-500 group-hover:scale-[1.03]"
+              className="object-cover"
               fill
               sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
               src={imageUrl}
             />
           ) : (
-            <div className="flex h-full items-end bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.15),transparent_40%),linear-gradient(135deg,var(--surface-elevated),var(--surface))] p-5">
-              <span className="font-display text-4xl gradient-text">{name.charAt(0).toUpperCase()}</span>
+            <div className="flex h-full items-end bg-[#E0E0E0] p-5">
+              <span className="font-display text-6xl font-black uppercase text-[#121212]/10">{name.charAt(0).toUpperCase()}</span>
             </div>
           )}
-
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[var(--background)]/70 to-transparent" />
         </div>
 
-        <div className="space-y-4 p-5">
+        <div className="border-t-2 border-[#121212] p-5 space-y-4">
           <div className="space-y-2">
-            <p className="text-xs font-semibold tracking-wide uppercase gradient-text">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#D02020]">
               {formatTripDateRange(startDate, endDate)}
             </p>
-            <h3 className="font-display text-3xl leading-none text-[#fafafa]">{name}</h3>
-            <p className="min-h-6 text-sm text-[var(--muted)]">{locationName || "Location coming together"}</p>
+            <h3 className="font-display text-2xl font-black uppercase leading-[0.9] tracking-tighter text-[#121212] sm:text-3xl">{name}</h3>
+            <p className="min-h-6 text-sm font-medium text-[#888888]">{locationName || "Location coming together"}</p>
           </div>
 
           <div className="flex items-center justify-between gap-4">
@@ -88,10 +86,10 @@ export default function TripCard({
                   >
                     <Link
                       aria-label={`View ${label}'s profile`}
-                      className="relative block rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8b5cf6]/30"
+                      className="relative block rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D02020]"
                       href={buildProfileHref(participant.userId, `/trip/${id}`)}
                     >
-                      <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--surface)] bg-[var(--surface-elevated)] text-sm font-semibold text-[var(--muted)] shadow-sm ring-1 ring-[#8b5cf6]/20">
+                      <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-[#121212] bg-[#F0C020] text-sm font-bold text-[#121212]">
                         {participant.avatarUrl ? (
                           <Image
                             alt={label}
@@ -111,8 +109,8 @@ export default function TripCard({
             </div>
 
             <div className="text-right">
-              <p className="text-lg font-semibold text-[#fafafa]">{participants.length}</p>
-              <p className="text-xs uppercase tracking-wide text-[var(--muted-foreground)]">
+              <p className="text-lg font-black text-[#121212]">{participants.length}</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#888888]">
                 {participants.length === 1 ? "traveler" : "travelers"}
               </p>
             </div>

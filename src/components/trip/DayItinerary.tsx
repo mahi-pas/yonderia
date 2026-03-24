@@ -126,14 +126,14 @@ export default function DayItinerary({
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold tracking-wide uppercase text-[var(--foreground)]">Itinerary</p>
-          <h2 className="mt-1 font-display text-3xl leading-none text-[var(--foreground)]">Daily plan</h2>
+          <p className="text-xs font-bold tracking-widest uppercase text-[#121212]">Itinerary</p>
+          <h2 className="mt-1 font-black text-3xl uppercase tracking-tighter leading-[0.9] text-[#121212]">Daily plan</h2>
         </div>
-        <p className="text-sm text-[var(--foreground)]/90">{items.length} items</p>
+        <p className="text-sm font-bold text-[#121212]/90">{items.length} items</p>
       </div>
 
       {error ? (
-        <div className="rounded-xl border border-[#ef4444]/30 bg-[#450a0a]/90 px-4 py-3 text-sm text-[#fca5a5]">
+        <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm text-[#D02020]">
           {error}
         </div>
       ) : null}
@@ -146,10 +146,10 @@ export default function DayItinerary({
           return (
             <div
               key={day.dayDate}
-              className="overflow-hidden border-b border-[var(--border)] pb-3 last:border-b-0 last:pb-0"
+              className="overflow-hidden border-b-2 border-[#121212] pb-3 last:border-b-0 last:pb-0"
             >
               <button
-                className="flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-[var(--surface-elevated)]"
+                className="flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-[#F8F8F8]"
                 type="button"
                 onClick={() => {
                   setExpandedDays((current) => ({
@@ -159,10 +159,10 @@ export default function DayItinerary({
                 }}
               >
                 <div>
-                  <h3 className="text-lg font-semibold text-[var(--foreground)]">
+                  <h3 className="text-lg font-black uppercase tracking-tighter text-[#121212]">
                     {`Day ${day.index + 1} — ${day.label}`}
                   </h3>
-                  <p className="mt-1 text-sm text-[var(--foreground)]/90">
+                  <p className="mt-1 text-sm font-bold text-[#121212]/90">
                     {dayItems.length === 0
                       ? "Nothing added yet."
                       : `${dayItems.length} item${dayItems.length === 1 ? "" : "s"}`}
@@ -171,7 +171,7 @@ export default function DayItinerary({
                 <span
                   aria-hidden="true"
                   className={[
-                    "text-2xl font-medium text-[var(--foreground)] opacity-90 transition-transform duration-300",
+                    "text-2xl font-bold text-[#121212] opacity-90 transition-transform duration-300",
                     isExpanded ? "rotate-90" : "",
                   ]
                     .filter(Boolean)
@@ -190,7 +190,7 @@ export default function DayItinerary({
                   .join(" ")}
               >
                 <div className="overflow-hidden">
-                  <div className="space-y-3 border-t border-[var(--border)] px-4 py-4 sm:px-5">
+                  <div className="space-y-3 border-t-2 border-[#121212] px-4 py-4 sm:px-5">
                     {dayItems.length > 0 ? (
                       dayItems.map((item) => (
                         <ItineraryCard
@@ -204,14 +204,14 @@ export default function DayItinerary({
                         />
                       ))
                     ) : (
-                      <div className="rounded-lg border border-dashed border-[var(--border-strong)] bg-[var(--surface-elevated)]/50 px-5 py-8 text-center text-sm leading-6 text-[var(--surface-muted,var(--muted-foreground))]">
+                      <div className="border-2 border-dashed border-[#121212] bg-[#F8F8F8]/50 px-5 py-8 text-center text-sm font-bold leading-6 text-[#666666]">
                         {isLoading ? "Loading the plan..." : "Your crew hasn't added anything to this day yet."}
                       </div>
                     )}
 
                     {canManage && currentUserId ? (
                       <button
-                        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[image:var(--accent-gradient)] px-4 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
+                        className="inline-flex min-h-11 items-center justify-center bg-[#D02020] px-4 text-sm font-bold uppercase tracking-widest text-white shadow-[4px_4px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#D02020]/30"
                         type="button"
                         onClick={() => {
                           setActiveDayForAdd(day.dayDate);

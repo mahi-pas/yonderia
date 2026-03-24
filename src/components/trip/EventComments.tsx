@@ -41,7 +41,7 @@ function CommentRow({
 
   return (
     <div className="group flex gap-3 py-2">
-      <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-[var(--surface-elevated)]">
+      <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-[#F8F8F8]">
         {comment.author.avatar_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -50,17 +50,17 @@ function CommentRow({
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-xs text-[var(--muted-foreground)]">
+          <div className="flex h-full w-full items-center justify-center text-xs text-[#666666]">
             {(comment.author.nickname || comment.author.display_name || "?")[0]}
           </div>
         )}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-[#fafafa]">
+          <span className="text-sm font-bold text-[#121212]">
             {comment.author.nickname || comment.author.display_name || "Someone"}
           </span>
-          <span className="text-xs text-[var(--muted-foreground)]">
+          <span className="text-xs text-[#666666]">
             {format(new Date(comment.created_at), "MMM d, h:mm a")}
           </span>
           {canDelete ? (
@@ -70,12 +70,12 @@ function CommentRow({
               className="ml-auto opacity-0 transition group-hover:opacity-100 focus:opacity-100"
               onClick={() => onDelete(comment.id)}
             >
-              <span className="text-[var(--muted-foreground)] hover:text-[#f87171]" aria-hidden>🗑</span>
+              <span className="text-[#666666] hover:text-[#D02020]" aria-hidden>🗑</span>
             </button>
           ) : null}
         </div>
         {comment.content ? (
-          <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-[#d4d4d8]">
+          <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-[#121212]/80">
             {comment.content}
           </p>
         ) : null}
@@ -85,7 +85,7 @@ function CommentRow({
             <img
               src={comment.gif_url}
               alt="GIF"
-              className="max-h-40 max-w-full rounded-lg object-contain"
+              className="max-h-40 max-w-full object-contain"
             />
           </div>
         ) : null}
@@ -155,10 +155,10 @@ export default function EventComments({
   const commentList = (
     <>
       {error ? (
-        <p className="px-1 py-2 text-sm text-[#f87171]">{error}</p>
+        <p className="px-1 py-2 text-sm text-[#D02020]">{error}</p>
       ) : null}
       {comments.length === 0 ? (
-        <p className="py-8 text-center text-sm text-[var(--muted-foreground)]">
+        <p className="py-8 text-center text-sm text-[#666666]">
           No comments yet — start the conversation!
         </p>
       ) : (
@@ -187,12 +187,12 @@ export default function EventComments({
           onChange={(e) => setDraft(e.target.value.slice(0, MAX_LENGTH))}
           onKeyDown={handleKeyDown}
           rows={1}
-          className="min-h-9 max-h-24 flex-1 resize-none rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-3 py-2 text-sm text-[#fafafa] placeholder:text-[var(--muted-foreground)] focus:border-[#8b5cf6] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/20"
+          className="min-h-9 max-h-24 flex-1 resize-none border-2 border-[#121212] bg-[#F8F8F8] px-3 py-2 text-sm text-[#121212] placeholder:text-[#666666] focus:border-[#D02020] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
         />
         <button
           type="button"
           aria-label="Add GIF"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--border-strong)] bg-[var(--surface-elevated)] text-sm text-[var(--muted-foreground)] transition hover:bg-[var(--surface)] hover:text-[#d4d4d8] focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/20"
+          className="flex h-9 w-9 shrink-0 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-sm text-[#666666] transition hover:bg-white hover:text-[#121212] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
           onClick={() => setShowGifPicker(true)}
         >
           GIF
@@ -200,7 +200,7 @@ export default function EventComments({
         <button
           type="button"
           disabled={!canSend}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[image:var(--accent-gradient)] text-white shadow-sm transition hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#8b5cf6]/30"
+          className="flex h-9 w-9 shrink-0 items-center justify-center bg-[#D02020] text-white shadow-[4px_4px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#D02020]/30"
           onClick={handleSend}
           aria-label="Send comment"
         >
@@ -213,12 +213,12 @@ export default function EventComments({
           <img
             src={pendingGif}
             alt="Selected GIF"
-            className="h-14 w-14 rounded object-cover"
+            className="h-14 w-14 object-cover"
           />
-          <span className="text-xs text-[var(--muted-foreground)]">GIF added</span>
+          <span className="text-xs text-[#666666]">GIF added</span>
           <button
             type="button"
-            className="text-xs text-[#a78bfa] underline"
+            className="text-xs text-[#D02020] underline"
             onClick={() => setPendingGif(null)}
           >
             Remove
@@ -226,7 +226,7 @@ export default function EventComments({
         </div>
       ) : null}
       {draft.length > MAX_LENGTH * 0.9 ? (
-        <p className="text-xs text-[var(--muted-foreground)]">
+        <p className="text-xs text-[#666666]">
           {draft.length}/{MAX_LENGTH}
         </p>
       ) : null}
@@ -239,7 +239,7 @@ export default function EventComments({
         <div className="min-h-0 flex-1 overflow-y-auto py-2">
           {commentList}
         </div>
-        <div className="shrink-0 space-y-2 border-t border-[var(--border)] pt-4">
+        <div className="shrink-0 space-y-2 border-t-2 border-[#121212] pt-4">
           {addCommentArea}
         </div>
         <GifPicker
@@ -252,11 +252,11 @@ export default function EventComments({
   }
 
   return (
-    <div className="space-y-3 border-t border-[var(--border)] pt-4">
-      <p className="text-xs font-semibold uppercase tracking-wide gradient-text">
+    <div className="space-y-3 border-t-2 border-[#121212] pt-4">
+      <p className="text-xs font-bold uppercase tracking-widest text-[#D02020]">
         Comments
       </p>
-      <div className="max-h-64 min-h-[6rem] overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3">
+      <div className="max-h-64 min-h-[6rem] overflow-y-auto border-2 border-[#121212] bg-[#F8F8F8] p-3">
         {commentList}
       </div>
       {addCommentArea}

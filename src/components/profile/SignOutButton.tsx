@@ -33,7 +33,7 @@ export default function SignOutButton() {
   return (
     <div className="flex w-full flex-col items-center gap-2 sm:w-auto">
       <Button
-        className="w-full text-[#fca5a5] hover:bg-[#450a0a]/40 hover:text-[#fecaca] sm:w-auto"
+        className="w-full text-[#D02020] hover:bg-[#D02020]/10 sm:w-auto"
         isLoading={isSigningOut}
         variant="ghost"
         type="button"
@@ -41,7 +41,7 @@ export default function SignOutButton() {
       >
         Sign out
       </Button>
-      {errorMessage ? <p className="text-center text-sm text-[#fca5a5]">{errorMessage}</p> : null}
+      {errorMessage ? <p className="text-center text-sm font-medium text-[#D02020]">{errorMessage}</p> : null}
     </div>
   );
 }
