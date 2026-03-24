@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { avatarImageReferrerPolicy, isGoogleUserContentAvatarUrl } from "@/lib/avatar-image";
 import { useRouter } from "next/navigation";
 import { buildProfileHref } from "@/lib/trip-navigation";
 
@@ -52,12 +53,12 @@ export default function ParticipantsRow({
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold tracking-widest uppercase text-[#121212]">
+          <p className="text-xs font-bold tracking-widest uppercase text-[var(--foreground,#121212)]">
             Travelers
           </p>
-          <h2 className="mt-1 font-display text-3xl uppercase tracking-tighter font-black leading-[0.9] text-[#121212]">Who&apos;s in</h2>
+          <h2 className="mt-1 font-display text-3xl uppercase tracking-tighter font-black leading-[0.9] text-[var(--foreground,#121212)]">Who&apos;s in</h2>
         </div>
-        <p className="text-sm text-[#121212]/90">{participants.length} total</p>
+        <p className="text-sm text-[var(--muted-foreground,#666666)]">{participants.length} total</p>
       </div>
 
       <div
@@ -89,8 +90,10 @@ export default function ParticipantsRow({
                         alt={participant.name}
                         className="object-cover"
                         fill
+                        referrerPolicy={avatarImageReferrerPolicy}
                         sizes="64px"
                         src={participant.avatarUrl}
+                        unoptimized={isGoogleUserContentAvatarUrl(participant.avatarUrl)}
                       />
                     ) : (
                       <span>{getInitials(participant.name)}</span>
@@ -108,7 +111,7 @@ export default function ParticipantsRow({
                     </div>
                   ) : null}
                 </div>
-                <p className="mt-3 line-clamp-2 text-xs font-bold leading-5 text-[#121212]/90">
+                <p className="mt-3 line-clamp-2 text-xs font-bold leading-5 text-[var(--foreground,#121212)]">
                   {participant.name}
                 </p>
               </div>
@@ -139,7 +142,7 @@ export default function ParticipantsRow({
 
           {showSeeAll ? (
             <button
-              className="flex h-[92px] w-[92px] shrink-0 snap-start flex-col items-center justify-center border-2 border-dashed border-[#121212] bg-white/50 text-center transition hover:bg-[#F8F8F8]"
+              className="flex h-[92px] w-[92px] shrink-0 snap-start flex-col items-center justify-center border-2 border-dashed border-[#121212] bg-[#F8F8F8] text-center transition hover:bg-white"
               type="button"
               onClick={(event) => {
                 event.stopPropagation();
@@ -149,7 +152,7 @@ export default function ParticipantsRow({
               <span className="font-display text-3xl leading-none text-[#D02020]">
                 +{participants.length}
               </span>
-              <span className="mt-1 text-xs font-bold tracking-widest uppercase text-[#666666]">
+              <span className="mt-1 text-xs font-bold tracking-widest uppercase text-[var(--trip-paper-muted,#666666)]">
                 See all
               </span>
             </button>

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { avatarImageReferrerPolicy } from "@/lib/avatar-image";
 import type { EventRsvp } from "@/lib/types";
 
 type RsvpGoingAvatarsProps = {
@@ -89,6 +90,7 @@ export default function RsvpGoingAvatars({
                 <img
                   alt=""
                   className="h-full w-full object-cover"
+                  referrerPolicy={avatarImageReferrerPolicy}
                   src={avatarUrl}
                 />
               ) : (

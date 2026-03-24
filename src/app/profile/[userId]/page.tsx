@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { avatarImageReferrerPolicy, isGoogleUserContentAvatarUrl } from "@/lib/avatar-image";
 import { notFound } from "next/navigation";
 import EditProfileButton from "@/components/profile/EditProfileButton";
 import SignOutButton from "@/components/profile/SignOutButton";
@@ -234,8 +235,10 @@ export default async function ProfilePage({ params, searchParams }: PageProps) {
                   alt={displayName}
                   className="object-cover"
                   fill
+                  referrerPolicy={avatarImageReferrerPolicy}
                   sizes="(max-width: 639px) 120px, 160px"
                   src={profile.avatar_url}
+                  unoptimized={isGoogleUserContentAvatarUrl(profile.avatar_url)}
                 />
               ) : (
                 <span>{getInitials(displayName) || "Y"}</span>

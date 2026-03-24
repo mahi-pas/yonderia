@@ -2,12 +2,14 @@ import type {
   TripTheme,
   TripThemeBackgroundType,
   TripThemeCardStyle,
+  TripThemeColorScheme,
   TripThemeEffect,
 } from "@/lib/types";
 
 const BACKGROUND_TYPES: TripThemeBackgroundType[] = ["gradient", "image", "solid"];
 const EFFECTS: TripThemeEffect[] = ["none", "confetti", "sparkles", "snow", "fireflies", "aurora"];
 const CARD_STYLES: TripThemeCardStyle[] = ["glass", "solid", "outline"];
+const COLOR_SCHEMES: TripThemeColorScheme[] = ["original", "night", "beach", "urban", "snowy", "sunny", "mountains"];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -19,6 +21,14 @@ export function validateTripTheme(payload: unknown): { ok: true; theme: TripThem
   }
 
   const theme: TripTheme = {};
+
+  if (Object.prototype.hasOwnProperty.call(payload, "color_scheme")) {
+    const v = payload.color_scheme;
+    if (typeof v !== "string" || !COLOR_SCHEMES.includes(v as TripThemeColorScheme)) {
+      return { ok: false, error: "Theme color_scheme must be one of: original, night, beach, urban, snowy, sunny, mountains." };
+    }
+    theme.color_scheme = v as TripThemeColorScheme;
+  }
 
   if (Object.prototype.hasOwnProperty.call(payload, "background")) {
     const bg = payload.background;

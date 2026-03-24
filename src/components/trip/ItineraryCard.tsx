@@ -137,7 +137,7 @@ export default function ItineraryCard({
               <span aria-hidden="true">{badge.icon}</span>
               {badge.label}
             </span>
-            <span className="text-xs font-bold text-[#666666]">{formatItineraryItemTime(item)}</span>
+            <span className="text-xs font-bold text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))]">{formatItineraryItemTime(item)}</span>
             {item.item_type === "event" ? (
               <RsvpButtons
                 currentUserId={currentUserId}
@@ -148,14 +148,14 @@ export default function ItineraryCard({
               />
             ) : null}
             {currentUserId != null && commentCount != null && commentCount > 0 ? (
-              <span className="text-xs text-[#666666]" title="Comments">
+              <span className="text-xs text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))]" title="Comments">
                 💬 {commentCount}
               </span>
             ) : null}
           </div>
 
-          <h3 className="mt-2 line-clamp-2 text-base font-bold text-[#121212] sm:text-lg">{item.title}</h3>
-          <p className="mt-1 line-clamp-1 text-sm text-[#666666]">{locationLabel}</p>
+          <h3 className="mt-2 line-clamp-2 text-base font-bold text-[var(--trip-card-text,var(--foreground,#121212))] sm:text-lg">{item.title}</h3>
+          <p className="mt-1 line-clamp-1 text-sm text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))]">{locationLabel}</p>
         </div>
       </button>
       {canEdit && onEdit ? (

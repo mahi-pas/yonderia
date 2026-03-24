@@ -8,6 +8,7 @@ import { useEventComments } from "@/hooks/useEventComments";
 import { useCommentReactions } from "@/hooks/useCommentReactions";
 import CommentReactions from "./CommentReactions";
 import GifPicker from "@/components/ui/GifPicker";
+import { avatarImageReferrerPolicy } from "@/lib/avatar-image";
 
 const MAX_LENGTH = 500;
 
@@ -48,19 +49,20 @@ function CommentRow({
             src={comment.author.avatar_url}
             alt=""
             className="h-full w-full object-cover"
+            referrerPolicy={avatarImageReferrerPolicy}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-xs text-[#666666]">
+          <div className="flex h-full w-full items-center justify-center text-xs text-[var(--trip-paper-muted,#666666)]">
             {(comment.author.nickname || comment.author.display_name || "?")[0]}
           </div>
         )}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-bold text-[#121212]">
+          <span className="text-sm font-bold text-[var(--trip-paper-text,#121212)]">
             {comment.author.nickname || comment.author.display_name || "Someone"}
           </span>
-          <span className="text-xs text-[#666666]">
+          <span className="text-xs text-[var(--trip-paper-muted,#666666)]">
             {format(new Date(comment.created_at), "MMM d, h:mm a")}
           </span>
           {canDelete ? (
@@ -70,12 +72,12 @@ function CommentRow({
               className="ml-auto opacity-0 transition group-hover:opacity-100 focus:opacity-100"
               onClick={() => onDelete(comment.id)}
             >
-              <span className="text-[#666666] hover:text-[#D02020]" aria-hidden>🗑</span>
+              <span className="text-[var(--trip-paper-muted,#666666)] hover:text-[#D02020]" aria-hidden>🗑</span>
             </button>
           ) : null}
         </div>
         {comment.content ? (
-          <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-[#121212]/80">
+          <p className="mt-0.5 whitespace-pre-wrap break-words text-sm text-[var(--trip-paper-text,#121212)]/80">
             {comment.content}
           </p>
         ) : null}
@@ -158,7 +160,7 @@ export default function EventComments({
         <p className="px-1 py-2 text-sm text-[#D02020]">{error}</p>
       ) : null}
       {comments.length === 0 ? (
-        <p className="py-8 text-center text-sm text-[#666666]">
+        <p className="py-8 text-center text-sm text-[var(--trip-paper-muted,#666666)]">
           No comments yet — start the conversation!
         </p>
       ) : (
@@ -187,12 +189,12 @@ export default function EventComments({
           onChange={(e) => setDraft(e.target.value.slice(0, MAX_LENGTH))}
           onKeyDown={handleKeyDown}
           rows={1}
-          className="min-h-9 max-h-24 flex-1 resize-none border-2 border-[#121212] bg-[#F8F8F8] px-3 py-2 text-sm text-[#121212] placeholder:text-[#666666] focus:border-[#D02020] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
+          className="min-h-9 max-h-24 flex-1 resize-none border-2 border-[#121212] bg-[#F8F8F8] px-3 py-2 text-sm text-[var(--foreground,#121212)] placeholder:text-[var(--muted-foreground,#666666)] focus:border-[#D02020] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
         />
         <button
           type="button"
           aria-label="Add GIF"
-          className="flex h-9 w-9 shrink-0 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-sm text-[#666666] transition hover:bg-white hover:text-[#121212] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
+          className="flex h-9 w-9 shrink-0 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-sm text-[var(--trip-paper-muted,#666666)] transition hover:bg-white hover:text-[var(--trip-paper-text,#121212)] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
           onClick={() => setShowGifPicker(true)}
         >
           GIF
@@ -215,7 +217,7 @@ export default function EventComments({
             alt="Selected GIF"
             className="h-14 w-14 object-cover"
           />
-          <span className="text-xs text-[#666666]">GIF added</span>
+          <span className="text-xs text-[var(--muted-foreground,#666666)]">GIF added</span>
           <button
             type="button"
             className="text-xs text-[#D02020] underline"
@@ -226,7 +228,7 @@ export default function EventComments({
         </div>
       ) : null}
       {draft.length > MAX_LENGTH * 0.9 ? (
-        <p className="text-xs text-[#666666]">
+        <p className="text-xs text-[var(--trip-paper-muted,#666666)]">
           {draft.length}/{MAX_LENGTH}
         </p>
       ) : null}

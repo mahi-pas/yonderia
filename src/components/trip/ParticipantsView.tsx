@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { format, isValid, parseISO } from "date-fns";
 import Link from "next/link";
+import { avatarImageReferrerPolicy } from "@/lib/avatar-image";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -83,20 +84,20 @@ function getRoleBadge(role: TripParticipantRole): {
 } {
   if (role === "organizer") {
     return {
-      className: "border-[#121212] bg-[#F0C020]/20 text-[#121212]",
+      className: "border-2 border-[#121212] bg-[#F0C020]/40 text-[var(--trip-paper-text,#121212)]",
       label: "♛ Organizer",
     };
   }
 
   if (role === "planner") {
     return {
-      className: "border-[#121212] bg-[#D02020]/20 text-[#D02020]",
+      className: "border-2 border-[#121212] bg-[#D02020]/15 text-[#D02020]",
       label: "★ Planner",
     };
   }
 
   return {
-    className: "border-[#121212] bg-[#F8F8F8] text-[#666666]",
+    className: "border-2 border-[#121212] bg-[#F8F8F8] text-[var(--trip-paper-muted,#666666)]",
     label: "Member",
   };
 }
@@ -330,10 +331,12 @@ export default function ParticipantsView({
       <section className="p-4 sm:p-5">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-[#121212]">People</p>
-            <h2 className="mt-1 font-display text-3xl uppercase tracking-tighter font-black leading-[0.9] text-[#121212]">Your crew</h2>
+            <p className="text-xs font-bold uppercase tracking-widest text-[var(--foreground,#121212)]">People</p>
+            <h2 className="mt-1 font-display text-3xl uppercase tracking-tighter font-black leading-[0.9] text-[var(--foreground,#121212)]">
+              Your crew
+            </h2>
           </div>
-          <p className="text-sm text-[#121212]/90">{participants.length} total</p>
+          <p className="text-sm text-[var(--muted-foreground,#666666)]">{participants.length} total</p>
         </div>
 
         <ul className="mt-5 space-y-3">
@@ -347,7 +350,7 @@ export default function ParticipantsView({
             return (
               <li
                 key={participant.participantId}
-                className="relative border-2 border-[#121212] p-4"
+                className="relative border-2 border-[#121212] bg-white p-4 shadow-[4px_4px_0px_0px_black]"
               >
                 <div className="flex items-start gap-3">
                   <Link
@@ -355,12 +358,13 @@ export default function ParticipantsView({
                     className="inline-flex min-h-11 min-w-11 shrink-0 rounded-full"
                     href={buildProfileHref(participant.userId, `/trip/${tripId}`)}
                   >
-                    <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 border-[#121212] bg-[#F8F8F8] text-base font-bold text-[#666666] shadow-[4px_4px_0px_0px_black]">
+                    <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-2 border-[#121212] bg-[#F8F8F8] text-base font-bold text-[var(--trip-paper-muted,#666666)] shadow-[4px_4px_0px_0px_black]">
                       {participant.avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           alt={participant.nickname}
                           className="h-full w-full object-cover"
+                          referrerPolicy={avatarImageReferrerPolicy}
                           src={participant.avatarUrl}
                         />
                       ) : (
@@ -371,7 +375,7 @@ export default function ParticipantsView({
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-base font-bold text-[#121212]">{participant.nickname}</p>
+                      <p className="text-base font-bold text-[var(--trip-paper-text,#121212)]">{participant.nickname}</p>
                       <span
                         className={`inline-flex min-h-8 items-center border-2 px-3 text-xs font-bold ${roleBadge.className}`}
                       >
@@ -380,17 +384,19 @@ export default function ParticipantsView({
                     </div>
 
                     {shouldShowDisplayName(participant) ? (
-                      <p className="mt-1 text-sm text-[#666666]">{participant.displayName}</p>
+                      <p className="mt-1 text-sm text-[var(--trip-paper-muted,#666666)]">{participant.displayName}</p>
                     ) : null}
 
-                    <p className="mt-2 text-sm leading-6 text-[#121212]/90">{formatTravelSummary(participant)}</p>
+                    <p className="mt-2 text-sm leading-6 text-[var(--trip-paper-muted,#666666)]">
+                      {formatTravelSummary(participant)}
+                    </p>
                   </div>
 
                   {showActions ? (
                     <div className="relative shrink-0">
                       <button
                         aria-label={`Open actions for ${participant.nickname}`}
-                        className="inline-flex min-h-11 min-w-11 items-center justify-center border-2 border-[#121212] bg-white text-xl text-[#121212] transition hover:bg-[#F8F8F8] disabled:opacity-60"
+                        className="inline-flex min-h-11 min-w-11 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-xl text-[var(--trip-paper-text,#121212)] transition hover:bg-[#F0F0F0] disabled:opacity-60"
                         disabled={isPending}
                         type="button"
                         onClick={() => {
@@ -406,7 +412,7 @@ export default function ParticipantsView({
                         <div className="absolute right-0 top-12 z-10 w-48 border-2 border-[#121212] bg-white p-2 shadow-[4px_4px_0px_0px_black]">
                           {canChangeRole && participant.role !== "planner" ? (
                             <button
-                              className="flex min-h-11 w-full items-center px-3 text-left text-sm font-bold text-[#121212] transition hover:bg-[#F8F8F8]"
+                              className="flex min-h-11 w-full items-center px-3 text-left text-sm font-bold text-[var(--trip-paper-text,#121212)] transition hover:bg-[#F8F8F8]"
                               type="button"
                               onClick={() => {
                                 void changeRole(participant.participantId, "planner");
@@ -418,7 +424,7 @@ export default function ParticipantsView({
 
                           {canChangeRole && participant.role !== "member" ? (
                             <button
-                              className="flex min-h-11 w-full items-center px-3 text-left text-sm font-bold text-[#121212] transition hover:bg-[#F8F8F8]"
+                              className="flex min-h-11 w-full items-center px-3 text-left text-sm font-bold text-[var(--trip-paper-text,#121212)] transition hover:bg-[#F8F8F8]"
                               type="button"
                               onClick={() => {
                                 void changeRole(participant.participantId, "member");
@@ -430,7 +436,7 @@ export default function ParticipantsView({
 
                           {isOrganizer ? (
                             <button
-                              className="flex min-h-11 w-full items-center px-3 text-left text-sm font-bold text-[#121212] transition hover:bg-[#F8F8F8]"
+                              className="flex min-h-11 w-full items-center px-3 text-left text-sm font-bold text-[var(--trip-paper-text,#121212)] transition hover:bg-[#F8F8F8]"
                               type="button"
                               onClick={() => {
                                 setMenuParticipantId(null);
@@ -497,7 +503,7 @@ export default function ParticipantsView({
           </div>
         }
       >
-        <p className="text-sm leading-6 text-[#666666]">
+        <p className="text-sm leading-6 text-[var(--trip-paper-muted,#666666)]">
           This will remove them from the participant list right away.
         </p>
       </Modal>

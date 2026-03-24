@@ -33,8 +33,8 @@ function DetailRow({ label, value }: { label: string; value: string | null }) {
 
   return (
     <div className="border-2 border-[#121212] bg-white px-3 py-2.5">
-      <p className="text-xs font-bold uppercase tracking-widest text-[#121212]">{label}</p>
-      <p className="mt-0.5 text-sm leading-5 text-[#666666]">{value}</p>
+      <p className="text-xs font-bold uppercase tracking-widest text-[var(--trip-paper-text,#121212)]">{label}</p>
+      <p className="mt-0.5 text-sm leading-5 text-[var(--trip-paper-muted,#666666)]">{value}</p>
     </div>
   );
 }
@@ -141,8 +141,8 @@ export default function ItineraryDetail({
               onClick={() => setActiveTab("details")}
               className={`flex-none px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition focus:outline-none focus:ring-2 focus:ring-[#D02020]/30 ${
                 activeTab === "details"
-                  ? "bg-[#F8F8F8] text-[#121212]"
-                  : "text-[#666666] hover:text-[#121212]"
+                  ? "bg-[var(--surface,#F8F8F8)] text-[var(--foreground,#121212)]"
+                  : "text-[var(--trip-paper-muted,#666666)] hover:text-[var(--trip-paper-text,#121212)]"
               }`}
             >
               Event details
@@ -156,8 +156,8 @@ export default function ItineraryDetail({
               onClick={() => setActiveTab("comments")}
               className={`flex-none px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition focus:outline-none focus:ring-2 focus:ring-[#D02020]/30 ${
                 activeTab === "comments"
-                  ? "bg-[#F8F8F8] text-[#121212]"
-                  : "text-[#666666] hover:text-[#121212]"
+                  ? "bg-[var(--surface,#F8F8F8)] text-[var(--foreground,#121212)]"
+                  : "text-[var(--trip-paper-muted,#666666)] hover:text-[var(--trip-paper-text,#121212)]"
               }`}
             >
               Comments
@@ -189,7 +189,7 @@ export default function ItineraryDetail({
             <span aria-hidden="true">{badge.icon}</span>
             {badge.label}
           </span>
-          <span className="text-sm text-[#666666]">{formatItineraryItemTime(item)}</span>
+          <span className="text-sm text-[var(--trip-paper-muted,#666666)]">{formatItineraryItemTime(item)}</span>
           {canEdit ? (
             <button
               type="button"
@@ -203,7 +203,7 @@ export default function ItineraryDetail({
         </div>
 
         {item.description ? (
-          <p className="text-sm leading-6 text-[#666666] sm:text-base">{item.description}</p>
+          <p className="text-sm leading-6 text-[var(--trip-paper-muted,#666666)] sm:text-base">{item.description}</p>
         ) : null}
 
         <div className="space-y-2">

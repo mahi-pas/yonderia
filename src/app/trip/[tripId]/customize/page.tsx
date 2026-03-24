@@ -1,6 +1,5 @@
 import { notFound, redirect } from "next/navigation";
 import TripThemeEditor from "@/components/trip/TripThemeEditor";
-import PageBackground from "@/components/ui/PageBackground";
 import { createClient } from "@/lib/supabase/server";
 import { getParticipantMembership } from "@/lib/trips";
 import type { TripTheme } from "@/lib/types";
@@ -44,13 +43,10 @@ export default async function TripCustomizePage({ params }: PageProps) {
   const theme = trip.theme && Object.keys(trip.theme).length > 0 ? trip.theme : null;
 
   return (
-    <>
-      <PageBackground />
-      <TripThemeEditor
-        initialTheme={theme}
-        tripId={trip.id}
-        tripName={trip.name}
-      />
-    </>
+    <TripThemeEditor
+      initialTheme={theme}
+      tripId={trip.id}
+      tripName={trip.name}
+    />
   );
 }

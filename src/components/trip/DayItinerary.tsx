@@ -126,10 +126,10 @@ export default function DayItinerary({
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-bold tracking-widest uppercase text-[#121212]">Itinerary</p>
-          <h2 className="mt-1 font-black text-3xl uppercase tracking-tighter leading-[0.9] text-[#121212]">Daily plan</h2>
+          <p className="text-xs font-bold tracking-widest uppercase text-[var(--foreground,#121212)]">Itinerary</p>
+          <h2 className="mt-1 font-black text-3xl uppercase tracking-tighter leading-[0.9] text-[var(--foreground,#121212)]">Daily plan</h2>
         </div>
-        <p className="text-sm font-bold text-[#121212]/90">{items.length} items</p>
+        <p className="text-sm font-bold text-[var(--muted-foreground,#666666)]">{items.length} items</p>
       </div>
 
       {error ? (
@@ -146,10 +146,10 @@ export default function DayItinerary({
           return (
             <div
               key={day.dayDate}
-              className="overflow-hidden border-b-2 border-[#121212] pb-3 last:border-b-0 last:pb-0"
+              className="overflow-hidden border-b-2 border-[var(--border,#121212)] pb-3 last:border-b-0 last:pb-0"
             >
               <button
-                className="flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-[#F8F8F8]"
+                className="flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-[var(--surface,#F8F8F8)]"
                 type="button"
                 onClick={() => {
                   setExpandedDays((current) => ({
@@ -159,10 +159,10 @@ export default function DayItinerary({
                 }}
               >
                 <div>
-                  <h3 className="text-lg font-black uppercase tracking-tighter text-[#121212]">
+                  <h3 className="text-lg font-black uppercase tracking-tighter text-[var(--foreground,#121212)]">
                     {`Day ${day.index + 1} — ${day.label}`}
                   </h3>
-                  <p className="mt-1 text-sm font-bold text-[#121212]/90">
+                  <p className="mt-1 text-sm font-bold text-[var(--muted-foreground,#666666)]">
                     {dayItems.length === 0
                       ? "Nothing added yet."
                       : `${dayItems.length} item${dayItems.length === 1 ? "" : "s"}`}
@@ -171,7 +171,7 @@ export default function DayItinerary({
                 <span
                   aria-hidden="true"
                   className={[
-                    "text-2xl font-bold text-[#121212] opacity-90 transition-transform duration-300",
+                    "text-2xl font-bold text-[var(--foreground,#121212)] opacity-90 transition-transform duration-300",
                     isExpanded ? "rotate-90" : "",
                   ]
                     .filter(Boolean)
@@ -190,7 +190,7 @@ export default function DayItinerary({
                   .join(" ")}
               >
                 <div className="overflow-hidden">
-                  <div className="space-y-3 border-t-2 border-[#121212] px-4 py-4 sm:px-5">
+                  <div className="space-y-3 border-t-2 border-[var(--border,#121212)] px-4 py-4 sm:px-5">
                     {dayItems.length > 0 ? (
                       dayItems.map((item) => (
                         <ItineraryCard
@@ -204,7 +204,7 @@ export default function DayItinerary({
                         />
                       ))
                     ) : (
-                      <div className="border-2 border-dashed border-[#121212] bg-[#F8F8F8]/50 px-5 py-8 text-center text-sm font-bold leading-6 text-[#666666]">
+                      <div className="border-2 border-dashed border-[var(--border,#121212)] bg-[var(--surface,#F8F8F8)]/50 px-5 py-8 text-center text-sm font-bold leading-6 text-[var(--muted-foreground,#666666)]">
                         {isLoading ? "Loading the plan..." : "Your crew hasn't added anything to this day yet."}
                       </div>
                     )}

@@ -232,7 +232,7 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
 
   return (
     <TripThemeProvider theme={theme}>
-      <main className="page-bg relative min-h-screen bg-[#F0F0F0] px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
+      <main className="page-bg relative min-h-screen px-4 py-5 sm:px-6 sm:py-7 lg:px-10">
         <PageBackground />
         <BackgroundEffects effect={effect} />
         <div className="relative z-10 mx-auto max-w-5xl space-y-5">
@@ -240,15 +240,15 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
           <div className="flex items-start gap-4">
             <Link
               aria-label="Back to trip"
-              className="inline-flex min-h-11 min-w-11 items-center justify-center border-2 border-[#121212] bg-white text-xl text-[#121212] transition hover:bg-[#F8F8F8] shadow-[2px_2px_0px_0px_black]"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center border-2 border-[#121212] bg-white text-xl text-[var(--trip-paper-text,#121212)] transition hover:bg-[#F8F8F8] shadow-[2px_2px_0px_0px_black]"
               href={`/trip/${tripId}`}
             >
               ←
             </Link>
 
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#121212]">Participants</p>
-              <h1 className="mt-2 text-balance text-4xl uppercase tracking-tighter font-black leading-[0.9] text-[#121212] sm:text-5xl">
+              <p className="text-xs font-bold uppercase tracking-widest text-[var(--foreground,#121212)]">Participants</p>
+              <h1 className="mt-2 text-balance text-4xl uppercase tracking-tighter font-black leading-[0.9] text-[var(--foreground,#121212)] sm:text-5xl">
                 {resolvedTrip.name}
               </h1>
             </div>
@@ -261,7 +261,7 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
                 "inline-flex min-h-11 items-center justify-center px-4 text-sm font-bold transition",
                 activeTab === "people"
                   ? "bg-[#D02020] text-white shadow-[4px_4px_0px_0px_black]"
-                  : "border-2 border-[#121212] bg-white text-[#121212] hover:bg-[#D02020]/10 hover:border-[#D02020]",
+                  : "border-2 border-[#121212] bg-white text-[var(--trip-paper-text,#121212)] hover:bg-[#D02020]/10 hover:border-[#D02020]",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -277,7 +277,7 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
                   "inline-flex min-h-11 items-center justify-center px-4 text-sm font-bold transition",
                   activeTab === "invites"
                     ? "bg-[#D02020] text-white shadow-[4px_4px_0px_0px_black]"
-                    : "border-2 border-[#121212] bg-white text-[#121212] hover:bg-[#D02020]/10 hover:border-[#D02020]",
+                    : "border-2 border-[#121212] bg-white text-[var(--trip-paper-text,#121212)] hover:bg-[#D02020]/10 hover:border-[#D02020]",
                 ]
                   .filter(Boolean)
                   .join(" ")}

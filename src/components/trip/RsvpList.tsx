@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { avatarImageReferrerPolicy } from "@/lib/avatar-image";
 import { useEventRsvps } from "@/hooks/useEventRsvps";
 import type { EventRsvp, RsvpStatus } from "@/lib/types";
 import Modal from "@/components/ui/Modal";
@@ -34,7 +35,12 @@ function AvatarRow({ avatarUrl, displayName }: { avatarUrl: string | null; displ
       <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-[#F8F8F8] ring-2 ring-[#121212]">
         {avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img alt="" className="h-full w-full object-cover" src={avatarUrl} />
+          <img
+            alt=""
+            className="h-full w-full object-cover"
+            referrerPolicy={avatarImageReferrerPolicy}
+            src={avatarUrl}
+          />
         ) : (
           <span className="flex h-full w-full items-center justify-center text-sm font-bold text-[#888888]">
             {name.charAt(0).toUpperCase()}
