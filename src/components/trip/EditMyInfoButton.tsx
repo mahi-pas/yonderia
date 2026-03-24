@@ -71,13 +71,13 @@ export default function EditMyInfoButton({
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#121212]">
+            <p className="text-xs font-bold uppercase tracking-widest text-[var(--trip-paper-text,#121212)]">
               Your trip details
             </p>
-            <h2 className="text-3xl uppercase tracking-tighter font-black leading-[0.9] text-[#121212]">
+            <h2 className="text-3xl uppercase tracking-tighter font-black leading-[0.9] text-[var(--trip-paper-text,#121212)]">
               {hasTravelDetails ? "Update your info" : "Set your travel details"}
             </h2>
-            <p className="text-sm font-bold leading-6 text-[#121212]/90">
+            <p className="text-sm font-bold leading-6 text-[var(--trip-paper-muted,#666666)]">
               {summary || "Add your nickname, arrival, and departure details so the crew knows your plan."}
             </p>
           </div>

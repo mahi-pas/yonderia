@@ -75,8 +75,10 @@ export interface Profile {
 export type TripThemeBackgroundType = "gradient" | "image" | "solid";
 export type TripThemeEffect = "none" | "confetti" | "sparkles" | "snow" | "fireflies" | "aurora";
 export type TripThemeCardStyle = "glass" | "solid" | "outline";
+export type TripThemeColorScheme = "original" | "night" | "beach" | "urban" | "snowy" | "sunny" | "mountains";
 
 export interface TripTheme {
+  color_scheme?: TripThemeColorScheme;
   background?: {
     type: TripThemeBackgroundType;
     value: string;

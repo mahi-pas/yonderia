@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { deleteOldAvatarFiles } from "@/lib/avatars";
+import { avatarImageReferrerPolicy } from "@/lib/avatar-image";
 import type { Database, Profile } from "@/lib/types";
 
 type OnboardingModalProps = {
@@ -175,6 +176,7 @@ export default function OnboardingModal({
                   src={previewUrl}
                   alt="Profile preview"
                   className="h-full w-full object-cover"
+                  referrerPolicy={avatarImageReferrerPolicy}
                 />
               ) : (
                 <span className="text-[#121212]">{(displayName.trim() || user.email || "Y").charAt(0).toUpperCase()}</span>

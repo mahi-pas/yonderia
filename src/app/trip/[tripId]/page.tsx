@@ -263,7 +263,7 @@ function TripPageLayout({
 
         <section className="space-y-2">
           <p className="text-xs font-bold uppercase tracking-widest text-[var(--foreground)]">About this trip</p>
-          <div className="text-sm font-medium leading-7 text-[#888888] sm:text-base">
+          <div className="text-sm font-medium leading-7 text-[var(--muted-foreground,#888888)] sm:text-base">
             {data.trip.description?.trim() || "Trip details are still coming together."}
           </div>
         </section>

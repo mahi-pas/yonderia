@@ -7,6 +7,7 @@ import Input from "@/components/ui/Input";
 import Modal from "@/components/ui/Modal";
 import ImageUploader from "@/components/ui/ImageUploader";
 import { deleteOldAvatarFiles } from "@/lib/avatars";
+import { avatarImageReferrerPolicy } from "@/lib/avatar-image";
 import { createClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/types";
 
@@ -121,7 +122,12 @@ export default function EditProfileButton({
             <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden border-2 border-[#121212] bg-[#F0C020] text-2xl font-black text-[#121212]">
               {avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img alt={previewLabel} className="h-full w-full object-cover" src={avatarUrl} />
+                <img
+                  alt={previewLabel}
+                  className="h-full w-full object-cover"
+                  referrerPolicy={avatarImageReferrerPolicy}
+                  src={avatarUrl}
+                />
               ) : (
                 <span>{getInitials(previewLabel || "Y") || "Y"}</span>
               )}

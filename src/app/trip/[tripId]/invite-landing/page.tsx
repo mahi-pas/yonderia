@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { avatarImageReferrerPolicy, isGoogleUserContentAvatarUrl } from "@/lib/avatar-image";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import LoginButton from "@/components/auth/LoginButton";
@@ -165,7 +166,15 @@ function OrganizerAvatar({
   return (
     <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-[#121212] bg-[#D02020]/15 shadow-[2px_2px_0px_0px_black]">
       {avatarUrl ? (
-        <Image alt={`${displayName || "Host"} avatar`} className="object-cover" fill sizes="48px" src={avatarUrl} />
+        <Image
+          alt={`${displayName || "Host"} avatar`}
+          className="object-cover"
+          fill
+          referrerPolicy={avatarImageReferrerPolicy}
+          sizes="48px"
+          src={avatarUrl}
+          unoptimized={isGoogleUserContentAvatarUrl(avatarUrl)}
+        />
       ) : (
         <div className="flex h-full w-full items-center justify-center bg-[#D02020]/15 text-base font-bold text-[#D02020]">
           {fallbackLabel}

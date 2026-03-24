@@ -520,9 +520,9 @@ export default function TripMap({
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-[#121212]">Map</p>
-          <h2 className="mt-1 text-3xl uppercase tracking-tighter font-black leading-[0.9] text-[#121212]">Trip at a glance</h2>
-          <p className="mt-2 text-sm font-bold text-[#121212]/90">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--foreground,#121212)]">Map</p>
+          <h2 className="mt-1 text-3xl uppercase tracking-tighter font-black leading-[0.9] text-[var(--foreground,#121212)]">Trip at a glance</h2>
+          <p className="mt-2 text-sm font-bold text-[var(--muted-foreground,#666666)]">
             {visiblePoints.length} pin{visiblePoints.length === 1 ? "" : "s"} visible
           </p>
         </div>
@@ -563,8 +563,8 @@ export default function TripMap({
                 <div className="flex shrink-0 flex-col gap-2 border-b-2 border-[#121212] px-4 py-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:px-5 sm:py-3">
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#121212] sm:text-xs">Map</p>
-                      <h2 className="truncate text-xl uppercase tracking-tighter font-black leading-[0.9] text-[#121212] sm:text-2xl">Trip at a glance</h2>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--trip-card-text,var(--foreground,#121212))] sm:text-xs">Map</p>
+                      <h2 className="truncate text-xl uppercase tracking-tighter font-black leading-[0.9] text-[var(--trip-card-text,var(--foreground,#121212))] sm:text-2xl">Trip at a glance</h2>
                     </div>
                     <button
                       aria-label="Close full screen map"

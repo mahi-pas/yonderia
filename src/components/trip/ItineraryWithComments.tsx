@@ -236,13 +236,7 @@ function ItineraryWithCommentsShell({
             >
               Comments
               {comments.length > 0 ? (
-                <span
-                  className={
-                    activeTab === "comments"
-                      ? "ml-0.5 min-w-[1.25rem] rounded-full border border-[#121212] bg-white px-1.5 py-0.5 text-center text-xs font-bold tabular-nums text-[#121212]"
-                      : "ml-0.5 min-w-[1.25rem] rounded-full bg-[var(--accent)]/15 px-1.5 py-0.5 text-center text-xs font-bold tabular-nums text-[var(--accent)]"
-                  }
-                >
+                <span className="ml-0.5 min-w-[1.25rem] rounded-full border border-[#121212] bg-white px-1.5 py-0.5 text-center text-xs font-bold tabular-nums text-[#121212]">
                   {comments.length}
                 </span>
               ) : null}

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, type ComponentType } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { avatarImageReferrerPolicy, isGoogleUserContentAvatarUrl } from "@/lib/avatar-image";
 import { usePathname } from "next/navigation";
 import { Bell, BriefcaseBusiness, MapPin, Plus, Circle, Square, Triangle } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -67,9 +68,9 @@ function isCurrentTripActive(pathname: string, tripId: string | null): boolean {
 const linkBaseClass =
   "relative inline-flex min-h-11 items-center justify-center gap-2 px-3 py-2 text-sm font-bold uppercase tracking-wider transition duration-200";
 const linkActiveClass =
-  "bg-[#D02020] text-white border-2 border-[#121212] shadow-[3px_3px_0px_0px_black]";
+  "bg-[var(--accent)] text-white border-2 border-[var(--border)] shadow-[3px_3px_0px_0px_var(--border)]";
 const linkInactiveClass =
-  "text-[#121212] hover:bg-[#F0C020] border-2 border-transparent hover:border-[#121212]";
+  "text-[var(--foreground)] hover:bg-[#F0C020] border-2 border-transparent hover:border-[var(--border)]";
 
 export default function AppNavigation({ mobile = false }: AppNavigationProps) {
   const pathname = usePathname();
@@ -195,7 +196,7 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
     : "hidden md:sticky md:top-0 md:z-50 md:block md:w-full";
 
   const mobileShellClass =
-    "mx-auto max-w-lg border-2 border-[#121212] bg-white px-2 py-2 shadow-[0_-4px_0px_0px_black]";
+    "mx-auto max-w-lg border-2 border-[var(--border)] bg-[var(--surface)] px-2 py-2 shadow-[0_-4px_0px_0px_var(--border)]";
 
   const cardClassName = mobile ? mobileShellClass : "w-full";
 
@@ -204,7 +205,7 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
   const currentTripActive = isCurrentTripActive(pathname, currentTripId);
 
   const newTripButtonClass =
-    "inline-flex shrink-0 items-center justify-center bg-[#D02020] border-2 border-[#121212] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white shadow-[3px_3px_0px_0px_black] transition hover:bg-[#D02020]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:outline-none focus:ring-2 focus:ring-[#D02020]/40 sm:text-sm sm:px-4 sm:py-2";
+    "inline-flex shrink-0 items-center justify-center bg-[var(--accent)] border-2 border-[var(--border)] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white shadow-[3px_3px_0px_0px_var(--border)] transition hover:opacity-90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40 sm:text-sm sm:px-4 sm:py-2";
 
   if (!user) {
     return null;
@@ -225,7 +226,7 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
         <span className="relative">
           <Icon className="h-5 w-5" />
           {item.id === "notifications" && unreadCount > 0 ? (
-            <span className="absolute -right-2 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center bg-[#D02020] border border-[#121212] px-1 text-[10px] font-bold leading-none text-white">
+            <span className="absolute -right-2 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center bg-[var(--accent)] border border-[var(--border)] px-1 text-[10px] font-bold leading-none text-white">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           ) : null}
@@ -242,7 +243,7 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
       return (
         <span
           aria-label="Loading current trip"
-          className={`${linkBaseClass} pointer-events-none text-[#888888] opacity-50 ${layoutClass}`}
+          className={`${linkBaseClass} pointer-events-none text-[var(--muted-foreground)] opacity-50 ${layoutClass}`}
         >
           <MapPin className="h-5 w-5" />
           {layout === "desktop" ? <span>Current trip</span> : <span className="sr-only">Current trip</span>}
@@ -273,12 +274,12 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
             <span className="sr-only">
               You have no upcoming trips. Want a new adventure? Use the New adventure link to create a trip.
             </span>
-            <p className="line-clamp-2 text-[9px] font-bold uppercase tracking-wider leading-tight text-[#888888]" aria-hidden>
+            <p className="line-clamp-2 text-[9px] font-bold uppercase tracking-wider leading-tight text-[var(--muted-foreground)]" aria-hidden>
               No trips
             </p>
             <Link
               href="/trips/new"
-              className="text-[10px] font-bold leading-none text-[#D02020] uppercase tracking-wider underline-offset-2 hover:underline"
+              className="text-[10px] font-bold leading-none text-[var(--accent)] uppercase tracking-wider underline-offset-2 hover:underline"
             >
               New adventure
             </Link>
@@ -288,10 +289,10 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
 
       return (
         <div
-          className="flex max-w-xl min-w-0 flex-wrap items-center gap-2 border-2 border-[#121212] bg-white px-3 py-2 sm:gap-3"
+          className="flex max-w-xl min-w-0 flex-wrap items-center gap-2 border-2 border-[var(--border)] bg-[var(--surface)] px-3 py-2 sm:gap-3"
           role="status"
         >
-          <p className="min-w-0 text-sm leading-snug font-medium text-[#121212]">
+          <p className="min-w-0 text-sm leading-snug font-medium text-[var(--foreground)]">
             You have no upcoming trips. Want a new adventure?
           </p>
           <Link href="/trips/new" className={newTripButtonClass}>
@@ -324,14 +325,16 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
       } ${layout === "mobile" ? "w-full min-w-0" : ""}`}
       href={profileHref}
     >
-      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#121212] bg-[#F0C020] text-xs font-bold text-[#121212]">
+      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--border)] bg-[#F0C020] text-xs font-bold text-[#121212]">
         {profile?.avatar_url ? (
           <Image
             alt={profileLabel}
             className="object-cover"
             fill
+            referrerPolicy={avatarImageReferrerPolicy}
             sizes="36px"
             src={profile.avatar_url}
+            unoptimized={isGoogleUserContentAvatarUrl(profile.avatar_url)}
           />
         ) : (
           <span>{profileInitials || "Y"}</span>
@@ -357,7 +360,7 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
         ) : (
           <nav
             aria-label="Primary"
-            className="flex min-h-[3.25rem] w-full items-center justify-between gap-4 border-b-4 border-[#121212] bg-white px-4 py-2 sm:px-6 lg:px-8"
+            className="flex min-h-[3.25rem] w-full items-center justify-between gap-4 border-b-4 border-[var(--border)] bg-[var(--surface)] px-4 py-2 sm:px-6 lg:px-8"
             style={tripNavTheme ?? undefined}
           >
             <div className="flex min-w-0 items-center gap-1">

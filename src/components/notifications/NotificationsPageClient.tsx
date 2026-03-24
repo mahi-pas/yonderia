@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { avatarImageReferrerPolicy, isGoogleUserContentAvatarUrl } from "@/lib/avatar-image";
 import { formatDistanceToNow } from "date-fns";
 import type { UserNotification } from "@/lib/notifications";
 
@@ -123,8 +124,10 @@ export default function NotificationsPageClient({ notifications }: Notifications
                     alt={actorName}
                     className="object-cover"
                     fill
+                    referrerPolicy={avatarImageReferrerPolicy}
                     sizes="48px"
                     src={notification.actor.avatarUrl}
+                    unoptimized={isGoogleUserContentAvatarUrl(notification.actor.avatarUrl)}
                   />
                 ) : (
                   <span>{getInitials(actorName) || "Y"}</span>

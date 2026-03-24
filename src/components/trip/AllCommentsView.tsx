@@ -9,6 +9,7 @@ import { useCommentReactions } from "@/hooks/useCommentReactions";
 import { useMyEventRsvps } from "@/hooks/useMyEventRsvps";
 import GifPicker from "@/components/ui/GifPicker";
 import CommentReactions from "./CommentReactions";
+import { avatarImageReferrerPolicy } from "@/lib/avatar-image";
 
 export type CommentsSortBy = "newest" | "oldest" | "most_reactions";
 
@@ -45,18 +46,18 @@ function AnnouncementCard({
   return (
     <article
       id={`event-comment-${row.comment.id}`}
-      className="trip-card border-2 border-[#D02020] bg-[#D02020]/10 p-3 shadow-[4px_4px_0px_0px_black] sm:p-4"
+      className="trip-card trip-announcement-card border-2 border-[#D02020] bg-white p-3 shadow-[4px_4px_0px_0px_black] sm:p-4"
       aria-label="Announcement"
     >
-      <div className="flex items-center gap-2 text-xs text-[#666666] sm:gap-3">
-        <span className="inline-flex items-center gap-1 bg-[#D02020]/30 px-1.5 py-0.5 font-bold uppercase tracking-widest text-[#D02020]">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:gap-x-3">
+        <span className="inline-flex items-center gap-1 bg-[#D02020]/12 px-1.5 py-0.5 font-bold uppercase tracking-widest text-[#D02020]">
           📢 Announcement
         </span>
-        <span>{authorName}</span>
-        <span>{format(new Date(comment.created_at), "MMM d, h:mm a")}</span>
+        <span className="font-bold text-[#121212]">{authorName}</span>
+        <span className="text-[#666666]">{format(new Date(comment.created_at), "MMM d, h:mm a")}</span>
       </div>
       <div className="mt-2 flex gap-2 sm:mt-3 sm:gap-3">
-        <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-[#F8F8F8] sm:h-8 sm:w-8">
+        <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-[var(--surface,#F8F8F8)] sm:h-8 sm:w-8">
           {comment.author.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -129,7 +130,7 @@ function CommentCard({
       id={`event-comment-${row.comment.id}`}
       className="trip-card border-2 border-[#121212] bg-white p-3 shadow-[4px_4px_0px_0px_black] sm:p-4"
     >
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#666666] sm:gap-x-3">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))] sm:gap-x-3">
         {isTripLevel ? (
           <span className="font-bold text-[#D02020]">Trip</span>
         ) : (
@@ -141,28 +142,29 @@ function CommentCard({
             {eventTitle}
           </button>
         )}
-        <span aria-hidden className="hidden sm:inline text-[#121212]">·</span>
+        <span aria-hidden className="hidden sm:inline text-[var(--trip-card-text,var(--foreground,#121212))]">·</span>
         <span>{authorName}</span>
         <span>{format(new Date(comment.created_at), "MMM d, h:mm a")}</span>
       </div>
       <div className="mt-2 flex gap-2 sm:mt-3 sm:gap-3">
-        <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-[#F8F8F8] sm:h-8 sm:w-8">
+        <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-[var(--surface,#F8F8F8)] sm:h-8 sm:w-8">
           {comment.author.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={comment.author.avatar_url}
               alt=""
               className="h-full w-full object-cover"
+              referrerPolicy={avatarImageReferrerPolicy}
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-[10px] text-[#666666] sm:text-xs">
+            <div className="flex h-full w-full items-center justify-center text-[10px] text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))] sm:text-xs">
               {authorName[0]}
             </div>
           )}
         </div>
         <div className="min-w-0 flex-1">
           {contentPreview ? (
-            <p className="whitespace-pre-wrap break-words text-sm text-[#666666] sm:text-[15px]">
+            <p className="whitespace-pre-wrap break-words text-sm text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))] sm:text-[15px]">
               {contentPreview}
               {hasMore ? "…" : ""}
             </p>
@@ -326,12 +328,12 @@ export default function AllCommentsView({
                 }
               }}
               rows={1}
-              className="min-h-10 max-h-40 flex-1 resize-none overflow-y-auto border-2 border-[#121212] bg-[#F8F8F8] px-3 py-2 text-sm leading-5 text-[#121212] placeholder:text-[#666666] focus:border-[#D02020] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
+              className="min-h-10 max-h-40 flex-1 resize-none overflow-y-auto border-2 border-[#121212] bg-[#F8F8F8] px-3 py-2 text-sm leading-5 text-[var(--trip-paper-text,#121212)] placeholder:text-[var(--trip-paper-muted,#666666)] focus:border-[#D02020] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
             />
             <button
               type="button"
               aria-label="Add GIF"
-              className="flex h-10 w-10 shrink-0 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-sm text-[#666666] transition hover:bg-white hover:text-[#121212] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
+              className="flex h-10 w-10 shrink-0 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-sm text-[var(--muted-foreground,#666666)] transition hover:bg-white hover:text-[var(--foreground,#121212)] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
               onClick={() => setShowGifPicker(true)}
             >
               GIF
@@ -354,7 +356,7 @@ export default function AllCommentsView({
                 alt="Selected GIF"
                 className="h-14 w-14 object-cover"
               />
-              <span className="text-xs text-[#666666]">GIF added</span>
+              <span className="text-xs text-[var(--trip-paper-muted,#666666)]">GIF added</span>
               <button
                 type="button"
                 className="text-xs text-[#D02020] underline"
@@ -365,12 +367,12 @@ export default function AllCommentsView({
             </div>
           ) : null}
           {tripDraft.length > MAX_LENGTH * 0.9 ? (
-            <p className="text-xs text-[#666666]">
+            <p className="text-xs text-[var(--muted-foreground,#666666)]">
               {tripDraft.length}/{MAX_LENGTH}
             </p>
           ) : null}
           {addAnnouncement && canSendAnnouncement ? (
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-[#666666]">
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))]">
               <input
                 type="checkbox"
                 checked={sendAsAnnouncement}
@@ -393,12 +395,12 @@ export default function AllCommentsView({
 
       {comments.length > 0 ? (
         <div className="trip-card flex flex-wrap items-center gap-3 border-2 border-[#121212] bg-white p-2 shadow-[4px_4px_0px_0px_black] sm:p-3">
-          <label className="flex items-center gap-2 text-sm text-[#666666]">
+          <label className="flex items-center gap-2 text-sm text-[var(--muted-foreground,#666666)]">
             <span className="shrink-0">Sort:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as CommentsSortBy)}
-              className="border-2 border-[#121212] bg-white px-3 py-1.5 text-sm text-[#121212] focus:border-[#D02020] focus:outline-none focus:ring-1 focus:ring-[#D02020]"
+              className="border-2 border-[#121212] bg-white px-3 py-1.5 text-sm text-[var(--foreground,#121212)] focus:border-[#D02020] focus:outline-none focus:ring-1 focus:ring-[#D02020]"
               aria-label="Sort comments by"
             >
               <option value="newest">Newest first</option>
@@ -407,7 +409,7 @@ export default function AllCommentsView({
             </select>
           </label>
           {currentUserId ? (
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-[#666666]">
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))]">
               <input
                 type="checkbox"
                 checked={filterByGoingOnly}
@@ -422,13 +424,13 @@ export default function AllCommentsView({
 
       {showEmptyState ? (
         <div className="border-2 border-dashed border-[#121212] px-4 py-8 text-center sm:py-12">
-          <p className="text-sm text-[#666666]">
+          <p className="text-sm text-[var(--muted-foreground,#666666)]">
             No comments yet. Add one above or open an event to comment there!
           </p>
         </div>
       ) : displayedComments.length === 0 ? (
         <div className="border-2 border-dashed border-[#121212] px-4 py-8 text-center sm:py-12">
-          <p className="text-sm text-[#666666]">
+          <p className="text-sm text-[var(--muted-foreground,#666666)]">
             {filterByGoingOnly
               ? "No comments in events you&apos;re going to."
               : "No comments yet. Open an event and start the conversation!"}

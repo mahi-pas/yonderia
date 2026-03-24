@@ -170,6 +170,12 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   backdrop-filter: none;
 }
 
+/* Announcements: always opaque white so trip background / card-style never bleeds through */
+.trip-theme-root .trip-card.trip-announcement-card {
+  background: #ffffff !important;
+  backdrop-filter: none;
+}
+
 /* Bauhaus animations – mechanical, snappy */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(8px); }

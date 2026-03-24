@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { avatarImageReferrerPolicy, isGoogleUserContentAvatarUrl } from "@/lib/avatar-image";
 import { buildProfileHref } from "@/lib/trip-navigation";
 import { formatTripDateRange } from "@/lib/utils";
 
@@ -95,8 +96,10 @@ export default function TripCard({
                             alt={label}
                             className="object-cover"
                             fill
+                            referrerPolicy={avatarImageReferrerPolicy}
                             sizes="44px"
                             src={participant.avatarUrl}
+                            unoptimized={isGoogleUserContentAvatarUrl(participant.avatarUrl)}
                           />
                         ) : (
                           <span>{getInitials(label || "Y")}</span>
