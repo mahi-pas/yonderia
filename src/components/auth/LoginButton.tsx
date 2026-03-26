@@ -48,15 +48,25 @@ export default function LoginButton({
       const callbackUrl = new URL("/auth/callback", window.location.origin);
       callbackUrl.searchParams.set("redirectTo", redirectTarget);
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: callbackUrl.toString(),
+          skipBrowserRedirect: true,
         },
       });
 
       if (error) {
         throw error;
+      }
+
+      if (data.url) {
+        // On native platforms, open in InAppBrowser; on web, redirect normally
+        const { openOAuthInNativeBrowser } = await import("@/lib/auth/native-oauth");
+        const handled = await openOAuthInNativeBrowser(data.url);
+        if (!handled) {
+          window.location.href = data.url;
+        }
       }
     } catch (error) {
       const message =

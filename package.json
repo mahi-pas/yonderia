@@ -10,9 +10,22 @@
     "test:db": "supabase test db",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
-    "test": "npm run test:db && npm run test:unit && npm run test:e2e"
+    "test": "npm run test:db && npm run test:unit && npm run test:e2e",
+    "cap:sync": "npx cap sync",
+    "cap:open:android": "npx cap open android",
+    "cap:open:ios": "npx cap open ios",
+    "cap:build": "npx cap sync && echo 'Open native IDE to build: npm run cap:open:android or cap:open:ios'"
   },
   "dependencies": {
+    "@capacitor-community/apple-sign-in": "^7.1.0",
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/app": "^8.0.1",
+    "@capacitor/browser": "^8.0.2",
+    "@capacitor/core": "^8.2.0",
+    "@capacitor/ios": "^8.2.0",
+    "@capacitor/network": "^8.0.1",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/push-notifications": "^8.0.2",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.99.0",
     "date-fns": "^4.1.0",
@@ -24,6 +37,7 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.2.0",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/react": "^16.0.0",

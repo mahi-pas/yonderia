@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(find /c/Users/Mahi/Documents/GitHub/yonderia -type f -name *.json)",
-      "Bash(find /c/Users/Mahi/Documents/GitHub/yonderia/src -type f \\\\\\(-name *.ts -o -name *.tsx -o -name *.js -o -name *.jsx \\\\\\))"
+      "Bash(find /c/Users/Mahi/Documents/GitHub/yonderia/src -type f \\\\\\(-name *.ts -o -name *.tsx -o -name *.js -o -name *.jsx \\\\\\))",
+      "Bash(ls -la /c/Users/Mahi/Documents/GitHub/yonderia/middleware.*)",
+      "Bash(npm install:*)",
+      "Bash(npx cap:*)",
+      "Bash(npm run:*)",
+      "Bash(ls -la \"C:\\\\Users\\\\Mahi\\\\Documents\\\\GitHub\\\\yonderia\\\\public\\\\.well-known\"\" 2>/dev/null || echo \"Directory not found \")"
     ]
   }
 }
