@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { avatarImageReferrerPolicy, isGoogleUserContentAvatarUrl } from "@/lib/avatar-image";
 import { notFound } from "next/navigation";
+import DeleteAccountButton from "@/components/profile/DeleteAccountButton";
 import EditProfileButton from "@/components/profile/EditProfileButton";
 import SignOutButton from "@/components/profile/SignOutButton";
 import TripCard from "@/components/trip/TripCard";
@@ -264,6 +265,7 @@ export default async function ProfilePage({ params, searchParams }: PageProps) {
                   userId={profile.id}
                 />
                 <SignOutButton />
+                <DeleteAccountButton />
               </div>
             ) : null}
           </div>

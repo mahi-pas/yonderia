@@ -12,7 +12,7 @@ import TripThemeProvider from "@/components/trip/TripThemeProvider";
 import ViewOnlyPromoOverlay from "@/components/trip/ViewOnlyPromoOverlay";
 import Input from "@/components/ui/Input";
 import PageBackground from "@/components/ui/PageBackground";
-import LoginButton from "@/components/auth/LoginButton";
+import AuthButtons from "@/components/auth/AuthButtons";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -213,7 +213,7 @@ function InviteEntryForm({
         <div className="mt-8 border-t-2 border-[#121212] pt-6">
           <p className="text-center text-sm font-medium text-[#888888]">Already in the trip? Sign in</p>
           <div className="mt-4 flex justify-center">
-            <LoginButton
+            <AuthButtons
               buttonLabel="Sign in with Google"
               redirectTo={`/trip/${tripId}`}
             />

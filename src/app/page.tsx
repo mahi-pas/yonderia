@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import LoginButton from "@/components/auth/LoginButton";
+import AuthButtons from "@/components/auth/AuthButtons";
 import { createClient } from "@/lib/supabase/server";
 import { Circle, Square, Triangle } from "lucide-react";
 
@@ -57,7 +57,7 @@ export default async function LandingPage() {
             </p>
 
             <div className="mt-10">
-              <LoginButton />
+              <AuthButtons />
             </div>
           </section>
 

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { avatarImageReferrerPolicy, isGoogleUserContentAvatarUrl } from "@/lib/avatar-image";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import LoginButton from "@/components/auth/LoginButton";
+import AuthButtons from "@/components/auth/AuthButtons";
 import PageBackground from "@/components/ui/PageBackground";
 import { getInvitePreview } from "@/lib/trips";
 import { getSiteUrl } from "@/lib/site-url";
@@ -304,7 +304,7 @@ export default async function TripInviteLandingPage({ params, searchParams }: Pa
             </div>
 
             <div className="mt-8 max-w-xl">
-              <LoginButton
+              <AuthButtons
                 buttonClassName="min-h-14 bg-[#D02020] px-6 py-4 text-lg font-bold text-white shadow-[4px_4px_0px_0px_black] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:ring-[#D02020]/20"
                 buttonLabel={buttonLabel}
                 containerClassName="max-w-none"

@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import AuthProvider from "@/components/auth/AuthProvider";
 import AppShell from "@/components/navigation/AppShell";
+import OfflineBanner from "@/components/ui/OfflineBanner";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -31,7 +32,12 @@ export const metadata: Metadata = {
   description:
     "Create and share trip itineraries with friends. Coordinate dates, locations, and activities in one place. Plan adventures together on Yonderia.",
   icons: {
-    icon: "/yonderia_logo.jpg",
+    icon: [
+      { url: "/favicon.jpg", type: "image/jpeg" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     title: "Yonderia – Plan & Share Adventures with Your People",
@@ -49,6 +55,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#D02020",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -59,6 +69,7 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} ${displayFont.variable} min-h-screen bg-background text-foreground antialiased`}
       >
+        <OfflineBanner />
         <AuthProvider>
           <AppShell>{children}</AppShell>
         </AuthProvider>

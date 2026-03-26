@@ -46,6 +46,15 @@ export interface NotificationRead {
   read_at: string;
 }
 
+export interface DeviceToken {
+  id: string;
+  user_id: string;
+  device_token: string;
+  platform: "ios" | "android";
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CommentReactionSummary {
   emoji: string;
   count: number;
@@ -230,9 +239,20 @@ export interface Database {
         Update: Partial<NotificationRead>;
         Relationships: [];
       };
+      device_tokens: {
+        Row: DeviceToken;
+        Insert: Omit<DeviceToken, "id" | "created_at" | "updated_at"> & {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<DeviceToken>;
+        Relationships: [];
+      };
     };
-    Views: Record<string, never>;
-    Functions: Record<string, never>;
+    // Mapped never so `keyof Views` is `never` — `Record<string, never>` makes every string a valid view key and breaks `.from()` overload resolution (upsert becomes `never`).
+    Views: { [_ in never]: never };
+    Functions: { [_ in never]: never };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

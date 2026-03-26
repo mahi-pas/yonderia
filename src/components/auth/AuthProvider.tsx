@@ -9,7 +9,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 import type { Session, SupabaseClient, User } from "@supabase/supabase-js";
+import { initDeepLinkListener } from "@/lib/deep-link";
 import { createClient } from "@/lib/supabase/client";
 import type { Database, Profile } from "@/lib/types";
 import OnboardingModal from "./OnboardingModal";
@@ -57,6 +59,7 @@ export function useAuth(): AuthContextValue {
 }
 
 export default function AuthProvider({ children }: AuthProviderProps) {
+  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -138,6 +141,11 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       subscription.unsubscribe();
     };
   }, [supabase]);
+
+  // Deep link handling for native apps
+  useEffect(() => {
+    return initDeepLinkListener((path) => router.push(path));
+  }, [router]);
 
   const value = useMemo<AuthContextValue>(
     () => ({

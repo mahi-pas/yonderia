@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Yonderia</string>
+    <string name="title_activity_main">Yonderia</string>
+    <string name="package_name">com.yonderia.app</string>
+    <string name="custom_url_scheme">com.yonderia.app</string>
+</resources>
