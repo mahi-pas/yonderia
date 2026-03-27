@@ -22,7 +22,7 @@ const SIZE_CLASSES: Record<ButtonSize, string> = {
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    "bg-[#D02020] text-white border-2 border-[#121212] shadow-[4px_4px_0px_0px_black] hover:bg-[#D02020]/90 focus:ring-[#D02020]",
+    "bg-[var(--accent)] text-white border-2 border-[#121212] shadow-[4px_4px_0px_0px_black] hover:opacity-90 focus:ring-[var(--accent)]/40",
   secondary:
     "bg-[#1040C0] text-white border-2 border-[#121212] shadow-[4px_4px_0px_0px_black] hover:bg-[#1040C0]/90 focus:ring-[#1040C0]",
   yellow:

@@ -211,7 +211,7 @@ export default function DayItinerary({
 
                     {canManage && currentUserId ? (
                       <button
-                        className="inline-flex min-h-11 items-center justify-center bg-[#D02020] px-4 text-sm font-bold uppercase tracking-widest text-white shadow-[4px_4px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[#D02020]/30"
+                        className="inline-flex min-h-11 items-center justify-center bg-[var(--accent)] px-4 text-sm font-bold uppercase tracking-widest text-white shadow-[4px_4px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
                         type="button"
                         onClick={() => {
                           setActiveDayForAdd(day.dayDate);

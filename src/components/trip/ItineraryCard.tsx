@@ -11,11 +11,12 @@ type ItineraryCardProps = {
   onClick: () => void;
   onEdit?: (item: ItineraryListItem) => void;
   rsvpSummary?: RsvpSummary | null;
+  variant?: "default" | "lodging";
 };
 
 function getBadgeLabel(itemType: ItineraryListItem["item_type"]): string {
   if (itemType === "hotel") {
-    return "Hotel";
+    return "Lodging";
   }
 
   if (itemType === "commute") {
@@ -101,12 +102,82 @@ export default function ItineraryCard({
   onClick,
   onEdit,
   rsvpSummary = null,
+  variant = "default",
 }: ItineraryCardProps) {
   const badge = getItineraryBadge(item.item_type);
+  const goingCount = rsvpSummary?.going ?? 0;
   const locationLabel =
     item.item_type === "commute"
       ? [item.location_name, item.destination_name].filter(Boolean).join(" to ")
       : (item.location_name ?? "Location coming together");
+
+  if (variant === "lodging") {
+    return (
+      <div className="relative" id={`itinerary-item-${item.id}`}>
+        <button
+          className="group w-full overflow-hidden border-2 border-[#121212] bg-white text-left shadow-[4px_4px_0px_0px_black] transition focus:outline-none focus:ring-4 focus:ring-[#D02020]/20"
+          type="button"
+          onClick={onClick}
+        >
+          <div className="relative h-44 w-full overflow-hidden bg-[#F8F8F8] sm:h-52">
+            {item.image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img alt={item.title} className="h-full w-full object-cover" src={item.image_url} />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-5xl text-[#888888]">{badge.icon}</div>
+            )}
+          </div>
+          <div className="space-y-3 p-4 sm:p-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex min-h-7 max-w-full shrink-0 items-center gap-1 bg-[#D02020]/10 px-2.5 text-xs font-bold tracking-widest uppercase text-[#D02020]">
+                <span aria-hidden="true">{badge.icon}</span>
+                {badge.label}
+              </span>
+              <span className="text-xs font-bold text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))]">
+                {goingCount} going
+              </span>
+              <RsvpButtons
+                currentUserId={currentUserId}
+                itineraryItemId={item.id}
+                itemType={item.item_type}
+                summary={rsvpSummary}
+                variant="compact"
+              />
+              {currentUserId != null && commentCount != null && commentCount > 0 ? (
+                <span
+                  className="text-xs text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))]"
+                  title="Comments"
+                >
+                  💬 {commentCount}
+                </span>
+              ) : null}
+            </div>
+
+            <h3 className="line-clamp-2 text-xl font-black tracking-tight text-[var(--trip-card-text,var(--foreground,#121212))]">
+              {item.title}
+            </h3>
+            <p className="line-clamp-1 text-sm text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))]">
+              📍 {locationLabel}
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <p className="border border-[#121212]/20 bg-[var(--surface,#F8F8F8)] px-2.5 py-2 text-xs font-bold text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))]">
+                <span className="block uppercase tracking-wide text-[var(--trip-card-text,var(--foreground,#121212))]">
+                  Start
+                </span>
+                {item.start_time ? format(new Date(item.start_time), "EEE, MMM d h:mm a") : "Time TBD"}
+              </p>
+              <p className="border border-[#121212]/20 bg-[var(--surface,#F8F8F8)] px-2.5 py-2 text-xs font-bold text-[var(--trip-card-text-muted,var(--muted-foreground,#666666))]">
+                <span className="block uppercase tracking-wide text-[var(--trip-card-text,var(--foreground,#121212))]">
+                  End
+                </span>
+                {item.end_time ? format(new Date(item.end_time), "EEE, MMM d h:mm a") : "Time TBD"}
+              </p>
+            </div>
+          </div>
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="relative" id={`itinerary-item-${item.id}`}>

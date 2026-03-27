@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { avatarImageReferrerPolicy, isGoogleUserContentAvatarUrl } from "@/lib/avatar-image";
 import { usePathname } from "next/navigation";
-import { Bell, BriefcaseBusiness, MapPin, Plus, Circle, Square, Triangle } from "lucide-react";
+import { Bell, BriefcaseBusiness, MapPin, Plus } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import {
   LAST_TRIP_UPDATED_EVENT,
@@ -363,13 +363,22 @@ export default function AppNavigation({ mobile = false }: AppNavigationProps) {
             className="flex min-h-[3.25rem] w-full items-center justify-between gap-4 border-b-4 border-[var(--border)] bg-[var(--surface)] px-4 py-2 sm:px-6 lg:px-8"
             style={tripNavTheme ?? undefined}
           >
-            <div className="flex min-w-0 items-center gap-1">
-              <Link href="/dashboard" className="mr-3 flex items-center gap-1.5" aria-label="Yonderia home">
-                <Circle className="h-4 w-4 fill-[#D02020] text-[#D02020]" />
-                <Square className="h-4 w-4 fill-[#1040C0] text-[#1040C0]" />
-                <Triangle className="h-4 w-4 fill-[#F0C020] text-[#F0C020]" />
+            <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+              <Link
+                href="/dashboard"
+                className="group relative inline-flex h-11 w-11 shrink-0 overflow-hidden border-2 border-[var(--border)] shadow-[3px_3px_0px_0px_var(--border)] transition-[transform,box-shadow] duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] will-change-transform hover:-translate-y-0.5 hover:-translate-x-0.5 hover:scale-[1.06] hover:shadow-[6px_6px_0px_0px_var(--border)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/40 motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100 motion-reduce:hover:shadow-[3px_3px_0px_0px_var(--border)] active:translate-x-[2px] active:translate-y-[2px] active:scale-100 active:shadow-none"
+                aria-label="Yonderia home"
+              >
+                <Image
+                  alt=""
+                  className="object-cover object-center transition-transform duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-active:scale-100 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                  fill
+                  priority
+                  sizes="44px"
+                  src="/favicon.jpg"
+                />
               </Link>
-              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
+              <div className="flex min-w-0 flex-wrap items-center gap-1">
                 {leftItems.map((item) => renderSideLink(item, "desktop"))}
                 {renderCurrentTripControl("desktop")}
                 {renderNotificationsLink("desktop")}

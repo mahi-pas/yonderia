@@ -260,8 +260,8 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
               className={[
                 "inline-flex min-h-11 items-center justify-center px-4 text-sm font-bold transition",
                 activeTab === "people"
-                  ? "bg-[#D02020] text-white shadow-[4px_4px_0px_0px_black]"
-                  : "border-2 border-[#121212] bg-white text-[var(--trip-paper-text,#121212)] hover:bg-[#D02020]/10 hover:border-[#D02020]",
+                  ? "bg-[var(--accent)] text-white shadow-[4px_4px_0px_0px_black]"
+                  : "border-2 border-[#121212] bg-white text-[var(--trip-paper-text,#121212)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -276,8 +276,8 @@ export default async function TripParticipantsPage({ params, searchParams }: Pag
                 className={[
                   "inline-flex min-h-11 items-center justify-center px-4 text-sm font-bold transition",
                   activeTab === "invites"
-                    ? "bg-[#D02020] text-white shadow-[4px_4px_0px_0px_black]"
-                    : "border-2 border-[#121212] bg-white text-[var(--trip-paper-text,#121212)] hover:bg-[#D02020]/10 hover:border-[#D02020]",
+                    ? "bg-[var(--accent)] text-white shadow-[4px_4px_0px_0px_black]"
+                    : "border-2 border-[#121212] bg-white text-[var(--trip-paper-text,#121212)] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]",
                 ]
                   .filter(Boolean)
                   .join(" ")}

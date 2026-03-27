@@ -189,12 +189,12 @@ export default function EventComments({
           onChange={(e) => setDraft(e.target.value.slice(0, MAX_LENGTH))}
           onKeyDown={handleKeyDown}
           rows={1}
-          className="min-h-9 max-h-24 flex-1 resize-none border-2 border-[#121212] bg-[#F8F8F8] px-3 py-2 text-sm text-[var(--foreground,#121212)] placeholder:text-[var(--muted-foreground,#666666)] focus:border-[#D02020] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
+          className="min-h-9 max-h-24 flex-1 resize-none border-2 border-[#121212] bg-[#F8F8F8] px-3 py-2 text-sm text-[var(--foreground,#121212)] placeholder:text-[var(--muted-foreground,#666666)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
         />
         <button
           type="button"
           aria-label="Add GIF"
-          className="flex h-9 w-9 shrink-0 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-sm text-[var(--trip-paper-muted,#666666)] transition hover:bg-white hover:text-[var(--trip-paper-text,#121212)] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
+          className="flex h-9 w-9 shrink-0 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-sm text-[var(--trip-paper-muted,#666666)] transition hover:bg-white hover:text-[var(--trip-paper-text,#121212)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
           onClick={() => setShowGifPicker(true)}
         >
           GIF
@@ -202,7 +202,7 @@ export default function EventComments({
         <button
           type="button"
           disabled={!canSend}
-          className="flex h-9 w-9 shrink-0 items-center justify-center bg-[#D02020] text-white shadow-[4px_4px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#D02020]/30"
+          className="flex h-9 w-9 shrink-0 items-center justify-center bg-[var(--accent)] text-white shadow-[4px_4px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
           onClick={handleSend}
           aria-label="Send comment"
         >

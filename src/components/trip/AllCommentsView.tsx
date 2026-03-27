@@ -328,12 +328,12 @@ export default function AllCommentsView({
                 }
               }}
               rows={1}
-              className="min-h-10 max-h-40 flex-1 resize-none overflow-y-auto border-2 border-[#121212] bg-[#F8F8F8] px-3 py-2 text-sm leading-5 text-[var(--trip-paper-text,#121212)] placeholder:text-[var(--trip-paper-muted,#666666)] focus:border-[#D02020] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
+              className="min-h-10 max-h-40 flex-1 resize-none overflow-y-auto border-2 border-[#121212] bg-[#F8F8F8] px-3 py-2 text-sm leading-5 text-[var(--trip-paper-text,#121212)] placeholder:text-[var(--trip-paper-muted,#666666)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
             />
             <button
               type="button"
               aria-label="Add GIF"
-              className="flex h-10 w-10 shrink-0 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-sm text-[var(--muted-foreground,#666666)] transition hover:bg-white hover:text-[var(--foreground,#121212)] focus:outline-none focus:ring-2 focus:ring-[#D02020]/20"
+              className="flex h-10 w-10 shrink-0 items-center justify-center border-2 border-[#121212] bg-[#F8F8F8] text-sm text-[var(--muted-foreground,#666666)] transition hover:bg-white hover:text-[var(--foreground,#121212)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/20"
               onClick={() => setShowGifPicker(true)}
             >
               GIF
@@ -342,7 +342,7 @@ export default function AllCommentsView({
               type="button"
               disabled={!canSend}
               aria-label="Send comment"
-              className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#D02020] text-white shadow-[4px_4px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#D02020]/30"
+              className="flex h-10 w-10 shrink-0 items-center justify-center bg-[var(--accent)] text-white shadow-[4px_4px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
               onClick={handleSend}
             >
               ➤
@@ -359,7 +359,7 @@ export default function AllCommentsView({
               <span className="text-xs text-[var(--trip-paper-muted,#666666)]">GIF added</span>
               <button
                 type="button"
-                className="text-xs text-[#D02020] underline"
+                className="text-xs text-[var(--accent)] underline"
                 onClick={() => setPendingGif(null)}
               >
                 Remove
@@ -400,7 +400,7 @@ export default function AllCommentsView({
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as CommentsSortBy)}
-              className="border-2 border-[#121212] bg-white px-3 py-1.5 text-sm text-[var(--foreground,#121212)] focus:border-[#D02020] focus:outline-none focus:ring-1 focus:ring-[#D02020]"
+              className="border-2 border-[#121212] bg-white px-3 py-1.5 text-sm text-[var(--foreground,#121212)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               aria-label="Sort comments by"
             >
               <option value="newest">Newest first</option>

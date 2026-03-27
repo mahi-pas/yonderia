@@ -5,9 +5,11 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { getItineraryItemDaySpan, type ItineraryListItem } from "@/hooks/useItinerary";
+import type { ItineraryItemType } from "@/lib/types";
 import { loadGoogleMapsApi, type GoogleMapsWindow } from "@/lib/google-maps";
 import AddEventModal from "./AddEventModal";
 import ItineraryDetail from "./ItineraryDetail";
+import { useTripThemeStyle } from "@/components/trip/TripThemeProvider";
 
 type TripMapProps = {
   currentUserId?: string | null;
@@ -47,26 +49,37 @@ type MarkerEntry = {
 type GoogleMapInstance = InstanceType<GoogleMapsWindow["maps"]["Map"]>;
 
 const DEFAULT_CENTER = { lat: 39.5, lng: -98.35 };
-const ITEM_STYLES = {
-  commute: {
-    color: "#1040C0",
-    emoji: "🚀",
-    label: "🚀",
-    pinColor: "#1040C0",
-  },
-  event: {
-    color: "#D02020",
-    emoji: "🎉",
-    label: "🎉",
-    pinColor: "#D02020",
-  },
-  hotel: {
-    color: "#F0C020",
-    emoji: "🏨",
-    label: "🏨",
-    pinColor: "#F0C020",
-  },
-} as const;
+const DEFAULT_TRIP_ACCENT = "#D02020";
+
+type ItemPinStyle = {
+  color: string;
+  emoji: string;
+  label: string;
+  pinColor: string;
+};
+
+function getItemStyles(eventAccent: string): Record<import("@/lib/types").ItineraryItemType, ItemPinStyle> {
+  return {
+    commute: {
+      color: "#1040C0",
+      emoji: "🚀",
+      label: "🚀",
+      pinColor: "#1040C0",
+    },
+    event: {
+      color: eventAccent,
+      emoji: "🎉",
+      label: "🎉",
+      pinColor: eventAccent,
+    },
+    hotel: {
+      color: "#F0C020",
+      emoji: "🏨",
+      label: "🏨",
+      pinColor: "#F0C020",
+    },
+  };
+}
 const MOCK_PIN_POSITIONS = [
   { left: "18%", top: "26%" },
   { left: "43%", top: "40%" },
@@ -154,13 +167,18 @@ function fitMapToPoints(map: GoogleMapInstance, googleApi: GoogleMapsWindow, poi
 
 const markerIconCache = new Map<string, { anchor: unknown; scaledSize: unknown; url: string }>();
 
-function createMarkerIcon(googleApi: GoogleMapsWindow, itemType: ItineraryListItem["item_type"]) {
-  const cached = markerIconCache.get(itemType);
+function createMarkerIcon(
+  googleApi: GoogleMapsWindow,
+  itemType: ItineraryListItem["item_type"],
+  eventAccentColor: string,
+) {
+  const cacheKey = itemType === "event" ? `event:${eventAccentColor}` : itemType;
+  const cached = markerIconCache.get(cacheKey);
   if (cached) {
     return { ...cached, anchor: new googleApi.maps.Point(24, 60), scaledSize: new googleApi.maps.Size(48, 60) };
   }
 
-  const style = ITEM_STYLES[itemType];
+  const style = getItemStyles(eventAccentColor)[itemType];
   const w = 48;
   const h = 60;
   const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 2;
@@ -206,7 +224,7 @@ function createMarkerIcon(googleApi: GoogleMapsWindow, itemType: ItineraryListIt
   ctx.fillText(style.emoji, 24, 24);
 
   const url = canvas.toDataURL();
-  markerIconCache.set(itemType, { anchor: null, scaledSize: null, url });
+  markerIconCache.set(cacheKey, { anchor: null, scaledSize: null, url });
 
   return { anchor: new googleApi.maps.Point(24, 60), scaledSize: new googleApi.maps.Size(w, h), url };
 }
@@ -221,6 +239,12 @@ export default function TripMap({
   tripStartDate,
   userRole = null,
 }: TripMapProps) {
+  const tripThemeStyle = useTripThemeStyle();
+  const accentHex =
+    String(tripThemeStyle?.["--trip-accent"] ?? tripThemeStyle?.["--accent"] ?? "").trim() ||
+    DEFAULT_TRIP_ACCENT;
+  const itemStyles = useMemo(() => getItemStyles(accentHex), [accentHex]);
+
   const searchParams = useSearchParams();
   const isMockMode = searchParams.get("mapMock") === "1";
   const canManage = userRole === "organizer" || userRole === "planner";
@@ -433,7 +457,7 @@ export default function TripMap({
           geodesic: true,
           map,
           path: [segment.origin, segment.destination],
-          strokeColor: ITEM_STYLES.commute.color,
+          strokeColor: itemStyles.commute.color,
           strokeOpacity: 0.8,
           strokeWeight: 3,
         }),
@@ -441,7 +465,7 @@ export default function TripMap({
 
     markerEntriesRef.current = visiblePoints.map((point) => {
       const marker = new googleApi.maps.Marker({
-        icon: createMarkerIcon(googleApi, point.item.item_type),
+        icon: createMarkerIcon(googleApi, point.item.item_type, accentHex),
         map,
         position: point.position,
         title: point.item.title,
@@ -467,7 +491,7 @@ export default function TripMap({
     return () => {
       clearMapArtifacts();
     };
-  }, [clearMapArtifacts, commuteSegments, isFullscreen, isMockMode, mapStatus, visiblePoints]);
+  }, [accentHex, clearMapArtifacts, commuteSegments, isFullscreen, isMockMode, mapStatus, visiblePoints]);
 
   useEffect(() => {
     if (!isFullscreen) {
@@ -529,7 +553,7 @@ export default function TripMap({
 
         {mapStatus === "ready" ? (
           <button
-            className="inline-flex min-h-11 items-center justify-center bg-[#D02020] px-4 text-sm font-bold uppercase tracking-widest text-white shadow-[2px_2px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:outline-none focus:ring-2 focus:ring-[#D02020]/30 sm:hidden"
+            className="inline-flex min-h-11 items-center justify-center bg-[var(--accent)] px-4 text-sm font-bold uppercase tracking-widest text-white shadow-[2px_2px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 sm:hidden"
             type="button"
             onClick={() => {
               setIsFullscreen(true);
@@ -558,7 +582,7 @@ export default function TripMap({
                 className="trip-card relative flex h-[calc(100svh-env(safe-area-inset-top))] w-full flex-col overflow-hidden border-4 border-[#121212] bg-white sm:h-[90dvh] sm:max-w-4xl sm:shadow-[8px_8px_0px_0px_black]"
                 role="dialog"
               >
-                <div className="absolute inset-x-0 top-0 h-1 bg-[#D02020]" />
+                <div className="absolute inset-x-0 top-0 h-1 bg-[var(--accent)]" />
 
                 <div className="flex shrink-0 flex-col gap-2 border-b-2 border-[#121212] px-4 py-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:px-5 sm:py-3">
                   <div className="flex items-center justify-between gap-2">
@@ -604,8 +628,8 @@ export default function TripMap({
                           className={[
                             "inline-flex min-h-8 shrink-0 items-center justify-center px-3 text-xs font-bold transition sm:min-h-9 sm:px-4 sm:text-sm",
                             isActive
-                              ? "bg-[#D02020] text-white shadow-[2px_2px_0px_0px_black]"
-                              : "border-2 border-[#121212] bg-white text-[#121212] hover:bg-[#D02020]/10 hover:border-[#D02020]",
+                              ? "bg-[var(--accent)] text-white shadow-[2px_2px_0px_0px_black]"
+                              : "border-2 border-[#121212] bg-white text-[#121212] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]",
                           ]
                             .filter(Boolean)
                             .join(" ")}
@@ -623,7 +647,7 @@ export default function TripMap({
                 </div>
 
                 {mapStatus === "unavailable" ? (
-                  <div className="mx-4 mt-3 border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm font-bold leading-6 text-[#D02020]">
+                  <div className="mx-4 mt-3 border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-4 py-3 text-sm font-bold leading-6 text-[var(--accent)]">
                     Google Maps is unavailable right now. Add a valid <code className="bg-[#121212]/10 px-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> to use the trip map.
                   </div>
                 ) : null}
@@ -682,7 +706,7 @@ export default function TripMap({
                       })}
 
                       {visiblePoints.map((point, index) => {
-                        const style = ITEM_STYLES[point.item.item_type];
+                        const style = itemStyles[point.item.item_type];
                         const position = MOCK_PIN_POSITIONS[index % MOCK_PIN_POSITIONS.length];
 
                         return (
@@ -743,8 +767,8 @@ export default function TripMap({
               className={[
                 "inline-flex min-h-11 shrink-0 items-center justify-center px-4 text-sm font-bold transition",
                 activeDay === "all"
-                  ? "bg-[#D02020] text-white shadow-[4px_4px_0px_0px_black]"
-                  : "border-2 border-[#121212] bg-white text-[#121212] hover:bg-[#D02020]/10 hover:border-[#D02020]",
+                  ? "bg-[var(--accent)] text-white shadow-[4px_4px_0px_0px_black]"
+                  : "border-2 border-[#121212] bg-white text-[#121212] hover:bg-[var(--accent)]/10 hover:border-[var(--accent)]",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -784,7 +808,7 @@ export default function TripMap({
           </div>
 
           {mapStatus === "unavailable" ? (
-            <div className="mt-4 border-2 border-[#D02020] bg-[#D02020]/10 px-5 py-4 text-sm font-bold leading-6 text-[#D02020]">
+            <div className="mt-4 border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-5 py-4 text-sm font-bold leading-6 text-[var(--accent)]">
               Google Maps is unavailable right now. Add a valid `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` to use the trip
               map.
             </div>
@@ -844,7 +868,7 @@ export default function TripMap({
                 })}
 
                 {visiblePoints.map((point, index) => {
-                  const style = ITEM_STYLES[point.item.item_type];
+                  const style = itemStyles[point.item.item_type];
                   const position = MOCK_PIN_POSITIONS[index % MOCK_PIN_POSITIONS.length];
 
                   return (

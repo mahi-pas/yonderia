@@ -65,7 +65,7 @@ export default function EditMyInfoButton({
   return (
     <>
       <button
-        className="group w-full border-2 border-[#121212] bg-white p-5 text-left shadow-[4px_4px_0px_0px_black] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none focus:outline-none focus:ring-2 focus:ring-[#D02020]/30"
+        className="group w-full border-2 border-[#121212] bg-white p-5 text-left shadow-[4px_4px_0px_0px_black] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
         type="button"
         onClick={() => setIsOpen(true)}
       >
@@ -82,7 +82,7 @@ export default function EditMyInfoButton({
             </p>
           </div>
 
-          <span className="inline-flex min-h-11 items-center justify-center bg-[#D02020] px-4 py-2 text-sm font-bold uppercase tracking-widest text-white shadow-[2px_2px_0px_0px_black] transition group-hover:translate-x-[1px] group-hover:translate-y-[1px] group-hover:shadow-none">
+          <span className="inline-flex min-h-11 items-center justify-center bg-[var(--accent)] px-4 py-2 text-sm font-bold uppercase tracking-widest text-white shadow-[2px_2px_0px_0px_black] transition group-hover:translate-x-[1px] group-hover:translate-y-[1px] group-hover:shadow-none">
             {hasTravelDetails ? "Update info" : "Set details"}
           </span>
         </div>

@@ -104,7 +104,7 @@ export default function ParticipantsRow({
                       className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 text-xs shadow-[2px_2px_0px_0px_black] ${
                         participant.role === "organizer"
                           ? "border-[#121212] bg-[#F0C020] text-[#121212]"
-                          : "border-[#121212] bg-[#D02020] text-white"
+                          : "border-[#121212] bg-[var(--accent)] text-white"
                       }`}
                     >
                       {badge}

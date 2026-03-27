@@ -167,7 +167,7 @@ function GuestBanner({ tripId }: { tripId: string }) {
     <div className="border-2 border-[#121212] bg-[#F0C020] p-4 shadow-[3px_3px_0px_0px_black]">
       <p className="text-sm font-medium leading-6 text-[#121212]">
         You&apos;re viewing this trip as a guest. Have an invite code?{" "}
-        <Link className="font-bold underline underline-offset-4 hover:text-[#D02020]" href={`/trip/${tripId}/join`}>
+        <Link className="font-bold underline underline-offset-4 hover:text-[var(--accent)]" href={`/trip/${tripId}/join`}>
           Enter it to join!
         </Link>
       </p>
@@ -186,8 +186,8 @@ function InviteEntryForm({
     <main className="page-bg relative min-h-screen px-4 py-12 pb-24 sm:px-6 sm:py-16 sm:pb-16">
       <PageBackground />
       <div className="relative z-10 mx-auto max-w-lg border-2 sm:border-4 border-[#121212] bg-white p-6 shadow-[6px_6px_0px_0px_black] sm:shadow-[8px_8px_0px_0px_black] sm:p-8">
-        <div className="mb-3 h-2 w-2 bg-[#D02020]" />
-        <p className="text-xs font-bold uppercase tracking-widest text-[#D02020]">Trip access</p>
+        <div className="mb-3 h-2 w-2 bg-[var(--accent)]" />
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--accent)]">Trip access</p>
         <h1 className="mt-3 font-display text-3xl font-black uppercase leading-[0.9] tracking-tighter text-[#121212] sm:text-4xl">Enter your invite code</h1>
         <p className="mt-3 text-sm font-medium leading-6 text-[#888888]">
           This trip is private. Drop in a join code to continue.
@@ -196,13 +196,13 @@ function InviteEntryForm({
         <form action={`/trip/${tripId}/join`} className="mt-6 space-y-4" method="get">
           <Input label="Invite code" name="code" placeholder="abc123join" />
           {errorMessage ? (
-            <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm font-medium text-[#D02020]">
+            <div className="border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-4 py-3 text-sm font-medium text-[var(--accent)]">
               {errorMessage}
             </div>
           ) : null}
           <div className="sticky bottom-3 z-10 -mx-1 p-3 sm:static sm:mx-0 sm:p-0">
             <button
-              className="inline-flex min-h-11 w-full items-center justify-center border-2 border-[#121212] bg-[#D02020] px-5 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-[4px_4px_0px_0px_black] transition duration-200 hover:bg-[#D02020]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:outline-none focus:ring-2 focus:ring-[#D02020]/40"
+              className="inline-flex min-h-11 w-full items-center justify-center border-2 border-[#121212] bg-[var(--accent)] px-5 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-[4px_4px_0px_0px_black] transition duration-200 hover:opacity-90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40"
               type="submit"
             >
               Continue to join
