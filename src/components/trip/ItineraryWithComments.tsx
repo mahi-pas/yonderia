@@ -8,6 +8,7 @@ import { useAllEventComments } from "@/hooks/useAllEventComments";
 import AddEventModal from "./AddEventModal";
 import AllCommentsView from "./AllCommentsView";
 import DayItinerary from "./DayItinerary";
+import ItineraryCard from "./ItineraryCard";
 import ItineraryDetail from "./ItineraryDetail";
 
 const FOCUS_QUERY_KEYS = ["item", "comment", "tab", "open", "detailComments"] as const;
@@ -73,7 +74,7 @@ function ItineraryWithCommentsShell({
   const router = useRouter();
   const processingRef = useRef<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<"itinerary" | "comments">("itinerary");
+  const [activeTab, setActiveTab] = useState<"itinerary" | "lodging" | "comments">("itinerary");
   const [editingItem, setEditingItem] = useState<ItineraryListItem | null>(null);
   const [selectedItem, setSelectedItem] = useState<ItineraryListItem | null>(null);
   const [revealItemId, setRevealItemId] = useState<string | null>(null);
@@ -90,6 +91,17 @@ function ItineraryWithCommentsShell({
     tripId,
   });
   const itemById = useMemo(() => new Map(items.map((i) => [i.id, i])), [items]);
+  const lodgingItems = useMemo(
+    () =>
+      items
+        .filter((item) => item.item_type === "hotel")
+        .sort((left, right) => {
+          const leftTime = left.start_time ? new Date(left.start_time).getTime() : new Date(left.day_date).getTime();
+          const rightTime = right.start_time ? new Date(right.start_time).getTime() : new Date(right.day_date).getTime();
+          return leftTime - rightTime;
+        }),
+    [items],
+  );
 
   const querySignature = searchParams.toString();
 
@@ -149,7 +161,7 @@ function ItineraryWithCommentsShell({
       }
 
       queueMicrotask(() => {
-        setActiveTab("itinerary");
+        setActiveTab(item.item_type === "hotel" ? "lodging" : "itinerary");
         setRevealItemId(itemId);
       });
 
@@ -188,7 +200,7 @@ function ItineraryWithCommentsShell({
 
   function handleOpenEdit(item: ItineraryListItem) {
     setSelectedItem(null);
-    setActiveTab("itinerary");
+    setActiveTab(item.item_type === "hotel" ? "lodging" : "itinerary");
     setEditingItem(item);
   }
 
@@ -203,7 +215,7 @@ function ItineraryWithCommentsShell({
         <div className="flex items-center justify-between gap-4">
           <div
             role="tablist"
-            aria-label="Itinerary and comments"
+            aria-label="Itinerary, lodging, and comments"
             className="trip-card inline-flex divide-x-2 divide-[#121212] border-2 border-[#121212] bg-white shadow-[4px_4px_0px_0px_black]"
           >
             <button
@@ -220,6 +232,21 @@ function ItineraryWithCommentsShell({
               onClick={() => setActiveTab("itinerary")}
             >
               Itinerary
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "lodging"}
+              aria-controls="lodging-panel"
+              id="lodging-tab"
+              className={`min-w-[7rem] px-4 py-2.5 text-sm font-bold uppercase tracking-wide transition-colors sm:min-w-[8rem] sm:py-3 ${
+                activeTab === "lodging"
+                  ? "bg-[var(--accent)] text-white"
+                  : "bg-[var(--surface-elevated)] text-[var(--foreground)]"
+              }`}
+              onClick={() => setActiveTab("lodging")}
+            >
+              Lodging
             </button>
             <button
               type="button"
@@ -271,6 +298,51 @@ function ItineraryWithCommentsShell({
               tripId={tripId}
               tripStartDate={tripStartDate}
             />
+          ) : null}
+        </div>
+
+        <div
+          id="lodging-panel"
+          role="tabpanel"
+          aria-labelledby="lodging-tab"
+          hidden={activeTab !== "lodging"}
+          className="focus:outline-none"
+        >
+          {activeTab === "lodging" ? (
+            <section className="space-y-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-bold tracking-widest uppercase text-[var(--foreground,#121212)]">
+                    Lodging
+                  </p>
+                  <h2 className="mt-1 font-black text-3xl uppercase tracking-tighter leading-[0.9] text-[var(--foreground,#121212)]">
+                    Where everyone is staying
+                  </h2>
+                </div>
+                <p className="text-sm font-bold text-[var(--muted-foreground,#666666)]">
+                  {lodgingItems.length} stay{lodgingItems.length === 1 ? "" : "s"}
+                </p>
+              </div>
+              {lodgingItems.length > 0 ? (
+                <div className="grid gap-4">
+                  {lodgingItems.map((item) => (
+                    <ItineraryCard
+                      commentCount={commentCountByItemId[item.id] ?? null}
+                      currentUserId={currentUserId}
+                      item={item}
+                      key={item.id}
+                      onClick={() => setSelectedItem(item)}
+                      rsvpSummary={item.rsvpSummary ?? null}
+                      variant="lodging"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-[var(--border,#121212)] bg-[var(--surface,#F8F8F8)]/50 px-5 py-8 text-center text-sm font-bold leading-6 text-[var(--muted-foreground,#666666)]">
+                  No lodging added yet.
+                </div>
+              )}
+            </section>
           ) : null}
         </div>
 

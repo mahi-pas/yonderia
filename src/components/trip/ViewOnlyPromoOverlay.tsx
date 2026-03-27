@@ -67,8 +67,8 @@ export default function ViewOnlyPromoOverlay() {
             </button>
           </div>
 
-          <div className="mb-3 h-2 w-2 rounded-full bg-[#D02020]" />
-          <p className="text-xs font-bold uppercase tracking-widest text-[#D02020]">Yonderia</p>
+          <div className="mb-3 h-2 w-2 rounded-full bg-[var(--accent)]" />
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--accent)]">Yonderia</p>
           <h2 className="mt-3 pr-10 font-display text-2xl font-black uppercase leading-[0.9] tracking-tighter text-[#121212] sm:text-3xl" id={titleId}>
             Want to make a trip invite like this?
           </h2>
@@ -78,7 +78,7 @@ export default function ViewOnlyPromoOverlay() {
 
           <div className="mt-6">
             <Link
-              className="inline-flex min-h-12 w-full items-center justify-center border-2 border-[#121212] bg-[#D02020] px-6 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-[4px_4px_0px_0px_black] transition duration-200 hover:bg-[#D02020]/90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:outline-none focus:ring-2 focus:ring-[#D02020]/40 sm:w-auto"
+              className="inline-flex min-h-12 w-full items-center justify-center border-2 border-[#121212] bg-[var(--accent)] px-6 py-3 text-sm font-bold uppercase tracking-wider text-white shadow-[4px_4px_0px_0px_black] transition duration-200 hover:opacity-90 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40 sm:w-auto"
               href="/"
               onClick={() => {
                 setOpen(false);

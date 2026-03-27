@@ -4,6 +4,8 @@ import { useEffect, useId, useRef, useState, type ReactNode, type TouchEvent } f
 import { createPortal } from "react-dom";
 
 type ModalProps = {
+  /** Renders flush below the title header, full panel width (e.g. copy confirmation). Not inside the scroll area. */
+  belowHeader?: ReactNode;
   children: ReactNode;
   description?: string;
   footer?: ReactNode;
@@ -15,6 +17,7 @@ type ModalProps = {
 };
 
 export default function Modal({
+  belowHeader,
   children,
   description,
   footer,
@@ -191,6 +194,8 @@ export default function Modal({
               </button>
             </div>
           </div>
+
+          {belowHeader ? <div className="shrink-0 w-full">{belowHeader}</div> : null}
 
           <div ref={scrollAreaRef} className="flex-1 overflow-y-auto px-5 py-5 sm:px-8 sm:py-6">
             {children}

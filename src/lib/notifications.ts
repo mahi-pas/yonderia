@@ -72,7 +72,7 @@ export function isNotificationReadsTableUnavailable(error: { message?: string } 
 
 function getItemLabel(itemType: ItineraryItem["item_type"]): string {
   if (itemType === "hotel") {
-    return "hotel stay";
+    return "lodging stay";
   }
 
   if (itemType === "commute") {

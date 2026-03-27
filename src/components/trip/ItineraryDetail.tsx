@@ -39,6 +39,68 @@ function DetailRow({ label, value }: { label: string; value: string | null }) {
   );
 }
 
+async function copyTextToClipboard(text: string): Promise<boolean> {
+  const trimmed = text.trim();
+  if (!trimmed) {
+    return false;
+  }
+
+  try {
+    await navigator.clipboard.writeText(trimmed);
+    return true;
+  } catch {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = trimmed;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+}
+
+function CopyableLocationRow({
+  label,
+  copyText,
+  displayValue,
+  onCopied,
+}: {
+  label: string;
+  copyText: string;
+  displayValue: string;
+  onCopied: () => void;
+}) {
+  if (!displayValue) {
+    return null;
+  }
+
+  return (
+    <button
+      type="button"
+      aria-label={`Copy ${label} to clipboard`}
+      className="w-full cursor-pointer border-2 border-[#121212] bg-white px-3 py-2.5 text-left transition hover:bg-[#F8F8F8] focus:outline-none focus:ring-2 focus:ring-[#D02020]/30"
+      onClick={() => {
+        void (async () => {
+          const ok = await copyTextToClipboard(copyText);
+          if (ok) {
+            onCopied();
+          }
+        })();
+      }}
+    >
+      <p className="text-xs font-bold uppercase tracking-widest text-[var(--trip-paper-text,#121212)]">{label}</p>
+      <p className="mt-0.5 break-words text-sm leading-5 text-[var(--trip-paper-muted,#666666)]">{displayValue}</p>
+    </button>
+  );
+}
+
 function formatDetailDateTime(value: string | null): string | null {
   if (!value) {
     return null;
@@ -61,8 +123,39 @@ export default function ItineraryDetail({
   const [showRsvpList, setShowRsvpList] = useState(false);
   const [activeTab, setActiveTab] = useState<DetailTab>("details");
   const [creatorName, setCreatorName] = useState<string | null>(null);
+  const [copiedBanner, setCopiedBanner] = useState(false);
+  const copyBannerTimeoutRef = useRef<number | null>(null);
   const wasOpenRef = useRef(false);
   const lastItemIdRef = useRef<string | null>(null);
+
+  const showCopiedBanner = () => {
+    if (copyBannerTimeoutRef.current) {
+      window.clearTimeout(copyBannerTimeoutRef.current);
+    }
+    setCopiedBanner(true);
+    copyBannerTimeoutRef.current = window.setTimeout(() => {
+      setCopiedBanner(false);
+      copyBannerTimeoutRef.current = null;
+    }, 2500);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (copyBannerTimeoutRef.current) {
+        window.clearTimeout(copyBannerTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setCopiedBanner(false);
+      if (copyBannerTimeoutRef.current) {
+        window.clearTimeout(copyBannerTimeoutRef.current);
+        copyBannerTimeoutRef.current = null;
+      }
+    }
+  }, [isOpen]);
   const themeStyle = useTripThemeStyle();
   const displayCreatorName = item?.created_by ? creatorName : null;
 
@@ -234,19 +327,39 @@ export default function ItineraryDetail({
             <>
               <DetailRow label="Departure" value={startTimeLabel} />
               <DetailRow label="Arrival" value={endTimeLabel} />
-              <DetailRow label="Origin" value={`📍 ${originLabel}`} />
-              <DetailRow label="Destination" value={`📍 ${destinationLabel}`} />
+              <CopyableLocationRow
+                copyText={originLabel}
+                displayValue={`📍 ${originLabel}`}
+                label="Origin"
+                onCopied={showCopiedBanner}
+              />
+              <CopyableLocationRow
+                copyText={destinationLabel}
+                displayValue={`📍 ${destinationLabel}`}
+                label="Destination"
+                onCopied={showCopiedBanner}
+              />
             </>
           ) : item.item_type === "event" ? (
             <>
               <DetailRow label="Time" value={eventTimeLabel} />
-              <DetailRow label="Location" value={`📍 ${originLabel}`} />
+              <CopyableLocationRow
+                copyText={originLabel}
+                displayValue={`📍 ${originLabel}`}
+                label="Location"
+                onCopied={showCopiedBanner}
+              />
             </>
           ) : (
             <>
               <DetailRow label="Starts" value={startTimeLabel} />
               <DetailRow label="Ends" value={endTimeLabel} />
-              <DetailRow label="Location" value={`📍 ${originLabel}`} />
+              <CopyableLocationRow
+                copyText={originLabel}
+                displayValue={`📍 ${originLabel}`}
+                label="Location"
+                onCopied={showCopiedBanner}
+              />
             </>
           )}
         </div>
@@ -272,6 +385,17 @@ export default function ItineraryDetail({
 
   return (
     <Modal
+      belowHeader={
+        copiedBanner ? (
+          <div
+            className="border-b-2 border-[#121212] bg-[#F0C020] px-4 py-2.5 text-center text-sm font-bold text-[#121212]"
+            role="status"
+            aria-live="polite"
+          >
+            Copied to clipboard
+          </div>
+        ) : null
+      }
       description={formatItineraryItemTime(item)}
       isOpen={isOpen}
       onClose={onClose}

@@ -59,7 +59,7 @@ type FormState = {
 
 const ITEM_TYPES: { id: ItineraryItemType; label: string }[] = [
   { id: "event", label: "Event" },
-  { id: "hotel", label: "Hotel" },
+  { id: "hotel", label: "Lodging" },
   { id: "commute", label: "Commute" },
 ];
 
@@ -363,7 +363,7 @@ export default function AddEventModal({
     }
 
     if (itemType === "hotel" && !sanitizeSingleLine(formState.hotelLocation.name)) {
-      setErrorMessage("Add the hotel location.");
+      setErrorMessage("Add the lodging location.");
       return;
     }
 
@@ -533,7 +533,7 @@ export default function AddEventModal({
       footer={
         <div className="space-y-3">
           {errorMessage ? (
-            <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm text-[#D02020]">
+            <div className="border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-4 py-3 text-sm text-[var(--accent)]">
               {errorMessage}
             </div>
           ) : null}
@@ -563,8 +563,8 @@ export default function AddEventModal({
                 className={[
                   "min-h-11 px-4 text-sm font-bold uppercase tracking-widest transition",
                   itemType === type.id
-                    ? "bg-[#D02020] text-white"
-                    : "border-2 border-[#121212] bg-white text-[#888888] hover:bg-[#F8F8F8] focus:outline-none focus:ring-2 focus:ring-[#D02020]/30",
+                    ? "bg-[var(--accent)] text-white"
+                    : "border-2 border-[#121212] bg-white text-[#888888] hover:bg-[#F8F8F8] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30",
                 ]
                   .filter(Boolean)
                   .join(" ")}
@@ -590,7 +590,7 @@ export default function AddEventModal({
                 itemType === "event"
                   ? "Sunset rooftop dinner"
                   : itemType === "hotel"
-                    ? "Check in at Hotel Teatro"
+                    ? "Check in at Casa Azul"
                     : "Flight to Barcelona"
               }
               value={formState.title}
@@ -833,7 +833,7 @@ export default function AddEventModal({
                             key={suggestion.imageUrl}
                             className={[
                               "overflow-hidden border-2 bg-white transition",
-                              isSelected ? "border-[#D02020] ring-2 ring-[#D02020]/30" : "border-[#121212] hover:border-[#888888]",
+                              isSelected ? "border-[var(--accent)] ring-2 ring-[var(--accent)]/30" : "border-[#121212] hover:border-[#888888]",
                             ]
                               .filter(Boolean)
                               .join(" ")}
@@ -854,7 +854,7 @@ export default function AddEventModal({
                       <p className="text-xs text-[#666666]">
                         Photo by{" "}
                         <a
-                          className="underline hover:text-[#D02020]"
+                          className="underline hover:text-[var(--accent)]"
                           href={selectedSuggestion.photographerUrl}
                           rel="noopener noreferrer"
                           target="_blank"
@@ -863,7 +863,7 @@ export default function AddEventModal({
                         </a>{" "}
                         on{" "}
                         <a
-                          className="underline hover:text-[#D02020]"
+                          className="underline hover:text-[var(--accent)]"
                           href="https://unsplash.com?utm_source=yonderia&utm_medium=referral"
                           rel="noopener noreferrer"
                           target="_blank"
@@ -886,7 +886,7 @@ export default function AddEventModal({
             </p>
             <button
               type="button"
-              className="text-sm text-[#D02020] underline decoration-[#D02020]/40 underline-offset-2 hover:decoration-[#D02020]"
+              className="text-sm text-[var(--accent)] underline decoration-[var(--accent)]/40 underline-offset-2 hover:decoration-[var(--accent)]"
               onClick={() => setIsDeleteConfirmOpen(true)}
               disabled={isSaving}
             >
@@ -909,7 +909,7 @@ export default function AddEventModal({
         footer={
           <div className="space-y-3">
             {deleteError ? (
-              <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm text-[#D02020]">
+              <div className="border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-4 py-3 text-sm text-[var(--accent)]">
                 {deleteError}
               </div>
             ) : null}
@@ -925,7 +925,6 @@ export default function AddEventModal({
                 Cancel
               </Button>
               <Button
-                className="border-2 border-[#D02020] bg-[#D02020] text-white hover:bg-[#D02020]/90 focus:ring-[#D02020]/30"
                 isLoading={isDeleting}
                 onClick={() => void handleDeleteItem()}
               >
