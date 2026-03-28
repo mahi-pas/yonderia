@@ -11,6 +11,7 @@ import type { Database } from "@/lib/types";
 import TripLocationInput from "./TripLocationInput";
 
 type TripEditFormProps = {
+  canDeleteTrip?: boolean;
   initialTrip: {
     description: string | null;
     endDate: string;
@@ -74,7 +75,9 @@ function createInitialImageState(imageUrl: string | null): ImageState | null {
   };
 }
 
-export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps) {
+const DELETE_CONFIRM_WORD = "delete";
+
+export default function TripEditForm({ canDeleteTrip = false, initialTrip, tripId }: TripEditFormProps) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const imageStateRef = useRef<ImageState | null>(createInitialImageState(initialTrip.imageUrl));
@@ -83,6 +86,13 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
   const [imageState, setImageState] = useState<ImageState | null>(() => createInitialImageState(initialTrip.imageUrl));
   const [isImageUploading, setIsImageUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDeletePanel, setShowDeletePanel] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
+
+  const formBusy = isSubmitting || isDeleting;
+  const deleteConfirmed = deleteConfirmText.trim().toLowerCase() === DELETE_CONFIRM_WORD;
 
   const setUploadedImageState = (value: ImageState | null) => {
     imageStateRef.current = value;
@@ -111,6 +121,10 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
 
     if (isImageUploading) {
       setErrorMessage("Your cover image is still uploading. Give it a second.");
+      return;
+    }
+
+    if (isDeleting) {
       return;
     }
 
@@ -149,6 +163,30 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
     }
   };
 
+  const handleDeleteTrip = async () => {
+    if (!deleteConfirmed || !canDeleteTrip) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteErrorMessage(null);
+
+    try {
+      const { error } = await supabase.from("trips").delete().eq("id", tripId);
+
+      if (error) {
+        throw error;
+      }
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch (error) {
+      setDeleteErrorMessage(error instanceof Error ? error.message : "We couldn't delete this trip right now.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <main className="page-bg min-h-screen bg-[#F0F0F0] px-4 py-5 pb-24 sm:px-6 sm:py-7 sm:pb-7 lg:px-10">
       <div className="mx-auto max-w-4xl">
@@ -171,7 +209,7 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
 
           <div className="mt-8 space-y-6">
             <Input
-              disabled={isSubmitting}
+              disabled={formBusy}
               label="Trip name"
               maxLength={100}
               placeholder="Summer in Lisbon"
@@ -186,7 +224,7 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
 
             <ImageUploader
               bucket="trip-images"
-              disabled={isSubmitting}
+              disabled={formBusy}
               initialImageUrl={imageState?.publicUrl ?? initialTrip.imageUrl}
               pathPrefix={`${tripId}/header`}
               onChange={setUploadedImageState}
@@ -195,7 +233,7 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
 
             <div className="grid gap-4 sm:grid-cols-2">
               <Input
-                disabled={isSubmitting}
+                disabled={formBusy}
                 label="Start date"
                 type="date"
                 value={formState.startDate}
@@ -207,7 +245,7 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
                 }}
               />
               <Input
-                disabled={isSubmitting}
+                disabled={formBusy}
                 label="End date"
                 type="date"
                 value={formState.endDate}
@@ -221,7 +259,7 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
             </div>
 
             <TripLocationInput
-              disabled={isSubmitting}
+              disabled={formBusy}
               value={formState.location}
               onChange={(location) => {
                 setFormState((current) => ({
@@ -235,7 +273,7 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
               <span className="block text-sm font-bold uppercase tracking-widest text-[#121212]">Description</span>
               <textarea
                 className={inputClassName("min-h-36 resize-none")}
-                disabled={isSubmitting}
+                disabled={formBusy}
                 maxLength={1000}
                 placeholder="What kind of trip is this? Drop in the vibe, the plan, or the notes your group should know."
                 value={formState.description}
@@ -256,7 +294,7 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
 
             <div className="sticky bottom-3 z-10 -mx-1 flex flex-col-reverse gap-3 border-2 border-[#121212] bg-white p-3 sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:pt-2">
               <Button
-                disabled={isSubmitting}
+                disabled={formBusy}
                 className="w-full sm:w-auto"
                 variant="secondary"
                 onClick={() => {
@@ -276,6 +314,70 @@ export default function TripEditForm({ initialTrip, tripId }: TripEditFormProps)
                 {isSubmitting ? "Saving..." : "Save changes"}
               </Button>
             </div>
+
+            {canDeleteTrip ? (
+              <div className="mt-10 border-t-2 border-[#121212] pt-8">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#D02020]">Danger zone</p>
+                <p className="mt-2 max-w-2xl text-sm font-bold leading-6 text-[#888888]">
+                  Delete this trip permanently. Everyone loses access and all itinerary data is removed. This cannot be
+                  undone.
+                </p>
+                {!showDeletePanel ? (
+                  <Button
+                    className="mt-4 border-[#D02020] bg-white text-[#D02020] hover:bg-[#D02020]/10"
+                    variant="outline"
+                    onClick={() => {
+                      setShowDeletePanel(true);
+                      setDeleteErrorMessage(null);
+                    }}
+                  >
+                    Delete trip
+                  </Button>
+                ) : (
+                  <div className="mt-4 space-y-4">
+                    <Input
+                      aria-label="Type delete to confirm"
+                      disabled={formBusy}
+                      hint="Any capitalization is fine (e.g. DELETE or Delete)."
+                      label='Type "delete" to confirm'
+                      value={deleteConfirmText}
+                      onChange={(event) => {
+                        setDeleteConfirmText(event.target.value);
+                        setDeleteErrorMessage(null);
+                      }}
+                    />
+                    {deleteErrorMessage ? (
+                      <div className="border-2 border-[#D02020] bg-[#D02020]/10 px-4 py-3 text-sm font-bold text-[#D02020]">
+                        {deleteErrorMessage}
+                      </div>
+                    ) : null}
+                    <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
+                      <Button
+                        disabled={formBusy}
+                        variant="secondary"
+                        onClick={() => {
+                          setShowDeletePanel(false);
+                          setDeleteConfirmText("");
+                          setDeleteErrorMessage(null);
+                        }}
+                      >
+                        Cancel delete
+                      </Button>
+                      <Button
+                        className="border-[#D02020] bg-[#D02020] text-white hover:opacity-90 focus:ring-[#D02020]/40"
+                        disabled={!deleteConfirmed || formBusy}
+                        isLoading={isDeleting}
+                        onClick={() => {
+                          void handleDeleteTrip();
+                        }}
+                      >
+                        Permanently delete trip
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : null}
           </div>
         </section>
       </div>

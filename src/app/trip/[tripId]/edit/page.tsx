@@ -12,7 +12,16 @@ type PageProps = {
 
 type EditableTrip = Pick<
   Trip,
-  "description" | "end_date" | "id" | "image_url" | "latitude" | "location_name" | "longitude" | "name" | "start_date"
+  | "created_by"
+  | "description"
+  | "end_date"
+  | "id"
+  | "image_url"
+  | "latitude"
+  | "location_name"
+  | "longitude"
+  | "name"
+  | "start_date"
 >;
 
 export default async function TripEditPage({ params }: PageProps) {
@@ -34,7 +43,9 @@ export default async function TripEditPage({ params }: PageProps) {
 
   const { data: trip, error } = await supabase
     .from("trips")
-    .select("id, name, description, image_url, location_name, latitude, longitude, start_date, end_date")
+    .select(
+      "id, name, description, image_url, location_name, latitude, longitude, start_date, end_date, created_by",
+    )
     .eq("id", tripId)
     .maybeSingle();
 
@@ -47,9 +58,11 @@ export default async function TripEditPage({ params }: PageProps) {
   }
 
   const editableTrip = trip as EditableTrip;
+  const canDeleteTrip = editableTrip.created_by === user.id;
 
   return (
     <TripEditForm
+      canDeleteTrip={canDeleteTrip}
       initialTrip={{
         description: editableTrip.description,
         endDate: editableTrip.end_date,

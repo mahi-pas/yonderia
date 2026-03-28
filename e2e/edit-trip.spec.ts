@@ -85,6 +85,16 @@ async function getTrip(adminClient: ReturnType<typeof createAdminClient>, tripId
   return data;
 }
 
+async function expectTripAbsent(adminClient: ReturnType<typeof createAdminClient>, tripId: string) {
+  const { data, error } = await adminClient.from("trips").select("id").eq("id", tripId).maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  expect(data).toBeNull();
+}
+
 function createPngBuffer(): Buffer {
   return Buffer.from(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9WlH0KsAAAAASUVORK5CYII=",
@@ -356,6 +366,31 @@ test("Edit button (pencil icon) on hero is only visible to organizer", async () 
   } finally {
     await organizerPage?.close();
     await memberPage?.close();
+    await cleanupScenario(scenario);
+  }
+});
+
+test("Trip creator can delete trip from edit page after typing delete", async () => {
+  const adminClient = createAdminClient();
+  let scenario: SeededEditTripScenario | null = null;
+  let page: Page | null = null;
+
+  try {
+    scenario = await seedEditTripScenario(adminClient);
+    page = await scenario.organizerContext.newPage();
+
+    await openEditPage(page, scenario.tripId);
+    await page.getByRole("button", { name: "Delete trip" }).click();
+    await expect(page.getByRole("button", { name: "Permanently delete trip" })).toBeDisabled();
+    await page.getByLabel("Type delete to confirm").fill("DeLeTe");
+    await expect(page.getByRole("button", { name: "Permanently delete trip" })).toBeEnabled();
+    await page.getByRole("button", { name: "Permanently delete trip" }).click();
+
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expectTripAbsent(adminClient, scenario.tripId);
+    scenario = null;
+  } finally {
+    await page?.close();
     await cleanupScenario(scenario);
   }
 });
