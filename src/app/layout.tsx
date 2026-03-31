@@ -26,11 +26,11 @@ const siteOrigin =
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
   title: {
-    default: "Yonderia – Plan & Share Adventures with Your People",
+    default: "Yonderia – Plan trips beautifully",
     template: "%s | Yonderia",
   },
   description:
-    "Create and share trip itineraries with friends. Coordinate dates, locations, and activities in one place. Plan adventures together on Yonderia.",
+    "Create and share trip itineraries with friends. Coordinate dates, locations, and activities in one place. Plan trips beautifully on Yonderia.",
   icons: {
     icon: [
       { url: "/favicon.jpg", type: "image/jpeg" },
@@ -40,17 +40,17 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
-    title: "Yonderia – Plan & Share Adventures with Your People",
+    title: "Yonderia – Plan trips beautifully",
     description:
-      "Create and share trip itineraries with friends. Coordinate dates, locations, and activities in one place. Plan adventures together on Yonderia.",
+      "Create and share trip itineraries with friends. Coordinate dates, locations, and activities in one place. Plan trips beautifully on Yonderia.",
     type: "website",
-    images: [{ url: "/yonderia_logo.jpg", alt: "Yonderia – Plan adventures with your people" }],
+    images: [{ url: "/yonderia_logo.jpg", alt: "Yonderia – Plan trips beautifully" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yonderia – Plan & Share Adventures with Your People",
+    title: "Yonderia – Plan trips beautifully",
     description:
-      "Create and share trip itineraries with friends. Coordinate dates, locations, and activities in one place. Plan adventures together on Yonderia.",
+      "Create and share trip itineraries with friends. Coordinate dates, locations, and activities in one place. Plan trips beautifully on Yonderia.",
     images: ["/yonderia_logo.jpg"],
   },
 };

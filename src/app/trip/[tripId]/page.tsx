@@ -64,9 +64,9 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const baseUrl = await getSiteUrl();
   const defaultImageUrl = `${baseUrl}${DEFAULT_OG_IMAGE_PATH}`;
 
-  const fallbackTitle = "Trip Details | Plan & Share Adventures with Friends | Yonderia";
+  const fallbackTitle = "Trip Details | Plan trips beautifully | Yonderia";
   const fallbackDescription =
-    "View trip details, dates, and locations. Plan adventures with your people and share itineraries on Yonderia.";
+    "View trip details, dates, and locations. Plan trips beautifully and share itineraries on Yonderia.";
   const fallbackMeta = {
     title: fallbackTitle,
     description: fallbackDescription,
@@ -75,7 +75,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
       description: fallbackDescription,
       type: "website" as const,
       url: `${baseUrl}/trip/${tripId}`,
-      images: [{ url: defaultImageUrl, alt: "Yonderia – Plan adventures with your people" }],
+      images: [{ url: defaultImageUrl, alt: "Yonderia – Plan trips beautifully" }],
     },
     twitter: {
       card: "summary_large_image" as const,

@@ -43,7 +43,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const defaultImageUrl = `${baseUrl}${DEFAULT_OG_IMAGE_PATH}`;
   const fallbackTitle = "You're Invited to a Trip | Join & Plan Adventures | Yonderia";
   const fallbackDescription =
-    "You've been invited to a trip on Yonderia. Sign in to view the itinerary, dates, and location. Plan adventures with your people.";
+    "You've been invited to a trip on Yonderia. Sign in to view the itinerary, dates, and location. Plan trips beautifully.";
 
   if (!code) {
     return {
@@ -54,7 +54,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
         description: fallbackDescription,
         type: "website",
         url: `${baseUrl}/trip/${tripId}/invite-landing`,
-        images: [{ url: defaultImageUrl, alt: "Yonderia – Plan adventures with your people" }],
+        images: [{ url: defaultImageUrl, alt: "Yonderia – Plan trips beautifully" }],
       },
       twitter: {
         card: "summary_large_image",
@@ -76,7 +76,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
         description: fallbackDescription,
         type: "website",
         url: `${baseUrl}/trip/${tripId}/invite-landing`,
-        images: [{ url: defaultImageUrl, alt: "Yonderia – Plan adventures with your people" }],
+        images: [{ url: defaultImageUrl, alt: "Yonderia – Plan trips beautifully" }],
       },
       twitter: {
         card: "summary_large_image",

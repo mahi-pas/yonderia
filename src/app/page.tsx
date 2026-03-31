@@ -49,7 +49,7 @@ export default async function LandingPage() {
               Yonderia
             </h1>
             <p className="mt-5 max-w-md text-lg font-medium leading-7 text-[#121212]/80 sm:text-xl">
-              Plan adventures with your people.
+              Plan trips beautifully.
             </p>
             <p className="mt-3 max-w-md text-sm font-medium leading-6 text-[#888888]">
               Invite your crew, keep the itinerary in one place, and make trip plans feel as
@@ -75,23 +75,30 @@ export default async function LandingPage() {
           </div>
         </div>
 
-        {/* Right panel – geometric composition */}
-        <div className="hidden lg:flex lg:w-[45%] border-l-4 border-[#121212] bg-[#1040C0] items-center justify-center relative overflow-hidden">
-          {/* Overlapping geometric shapes */}
-          <div className="absolute top-[15%] left-[10%] h-48 w-48 rounded-full border-4 border-white/30 bg-[#D02020]" />
-          <div className="absolute top-[35%] right-[15%] h-40 w-40 border-4 border-white/30 bg-[#F0C020] rotate-45" />
-          <div className="absolute bottom-[20%] left-[25%] h-36 w-36 border-4 border-white/30 bg-white" />
-          <div
-            className="absolute bottom-[35%] right-[30%] h-32 w-32 border-4 border-white/30 bg-[#D02020]/80"
-            style={{ clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)" }}
+        {/* Right panel – hero video */}
+        <div className="relative hidden min-h-[min(100vh,720px)] overflow-hidden border-l-4 border-[#121212] bg-[#1a2332] lg:flex lg:min-h-[calc(100vh-8px)] lg:w-[45%]">
+          <video
+            className="absolute inset-0 h-full min-h-full w-full scale-[1.02] object-cover"
+            src="/opening_splash.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-hidden="true"
           />
-          {/* Dot pattern overlay */}
+          {/* Muted cool wash + soften toward the left seam */}
           <div
-            className="absolute inset-0 opacity-[0.06]"
-            style={{
-              backgroundImage: "radial-gradient(white 1.5px, transparent 1.5px)",
-              backgroundSize: "20px 20px",
-            }}
+            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#7d8ca3]/40 via-[#8f9eb0]/14 to-transparent"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute inset-0 bg-[#9aa8b8]/10"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-black/25 to-transparent"
+            aria-hidden="true"
           />
         </div>
       </div>
