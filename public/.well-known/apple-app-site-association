@@ -3,7 +3,7 @@
     "apps": [],
     "details": [
       {
-        "appID": "TEAM_ID.com.yonderia.app",
+        "appID": "PVA447YFJH.com.yonderia.app",
         "paths": [
           "/trip/*/join/*",
           "/trip/*/invite-landing*",
@@ -16,7 +16,7 @@
   },
   "webcredentials": {
     "apps": [
-      "TEAM_ID.com.yonderia.app"
+      "PVA447YFJH.com.yonderia.app"
     ]
   }
 }

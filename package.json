@@ -11,6 +11,7 @@
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "test": "npm run test:db && npm run test:unit && npm run test:e2e",
+    "postinstall": "patch-package",
     "cap:sync": "npx cap sync",
     "cap:open:android": "npx cap open android",
     "cap:open:ios": "npx cap open ios",
@@ -37,7 +38,9 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.2.0",
+    "@capawesome/cli": "^4.6.0",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/react": "^16.0.0",
@@ -50,6 +53,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "jsdom": "^28.1.0",
+    "patch-package": "^8.0.1",
     "pg": "^8.20.0",
     "supabase": "^2.77.1",
     "tailwindcss": "^4",
