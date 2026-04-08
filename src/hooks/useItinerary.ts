@@ -30,6 +30,10 @@ type UseItineraryOptions = {
 };
 
 function getItemStartDay(item: Pick<ItineraryListItem, "day_date" | "start_time">): string {
+  if (!item.day_date) {
+    throw new Error("getItemStartDay expects a dated itinerary item.");
+  }
+
   if (!item.start_time) {
     return item.day_date;
   }
@@ -46,6 +50,10 @@ function getItemEndDay(item: Pick<ItineraryListItem, "end_time">, fallbackDay: s
 }
 
 export function getItineraryItemDaySpan(item: ItineraryListItem): string[] {
+  if (!item.day_date) {
+    return [];
+  }
+
   if (!item.start_time) {
     return [item.day_date];
   }
@@ -84,7 +92,28 @@ function compareNullableTimes(left: string | null, right: string | null): number
   return new Date(left).getTime() - new Date(right).getTime();
 }
 
+function isUndatedItem(item: ItineraryListItem): boolean {
+  return item.day_date === null;
+}
+
 export function compareItineraryItems(left: ItineraryListItem, right: ItineraryListItem): number {
+  const leftUndated = isUndatedItem(left);
+  const rightUndated = isUndatedItem(right);
+
+  if (leftUndated !== rightUndated) {
+    return leftUndated ? -1 : 1;
+  }
+
+  if (leftUndated) {
+    const sortOrderDifference = left.sort_order - right.sort_order;
+
+    if (sortOrderDifference !== 0) {
+      return sortOrderDifference;
+    }
+
+    return left.title.localeCompare(right.title);
+  }
+
   const dayDifference = getItemStartDay(left).localeCompare(getItemStartDay(right));
 
   if (dayDifference !== 0) {
@@ -136,11 +165,13 @@ export function groupItineraryItemsByDay(items: ItineraryListItem[]): Map<string
 }
 
 function toItineraryListItem(
-  item: Partial<ItineraryItem> & Pick<ItineraryItem, "day_date" | "id" | "item_type" | "sort_order" | "title">,
+  item: Partial<ItineraryItem> & Pick<ItineraryItem, "id" | "item_type" | "sort_order" | "title"> & {
+    day_date?: string | null;
+  },
 ): ItineraryListItem {
   return {
     created_by: item.created_by ?? null,
-    day_date: item.day_date,
+    day_date: item.day_date ?? null,
     description: item.description ?? null,
     destination_latitude: item.destination_latitude ?? null,
     destination_longitude: item.destination_longitude ?? null,

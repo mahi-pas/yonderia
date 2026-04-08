@@ -262,7 +262,7 @@ export async function getTripPageData(
         "id, item_type, title, description, image_url, day_date, start_time, end_time, location_name, latitude, longitude, destination_name, destination_latitude, destination_longitude, sort_order, created_by",
       )
       .eq("trip_id", tripId)
-      .order("day_date", { ascending: true })
+      .order("day_date", { ascending: true, nullsFirst: true })
       .order("sort_order", { ascending: true }),
   ]);
 

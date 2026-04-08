@@ -169,4 +169,41 @@ describe("useItinerary helpers", () => {
 
     expect(getItineraryItemDaySpan(untimedHotel)).toEqual(["2026-03-14"]);
   });
+
+  it("excludes items with no day from day grouping", () => {
+    const undated = createItem({
+      day_date: null,
+      id: "idea",
+      start_time: null,
+      title: "Museum idea",
+    });
+    const dated = createItem({
+      day_date: "2026-03-14",
+      id: "breakfast",
+      start_time: "2026-03-14T09:00:00.000Z",
+      title: "Breakfast",
+    });
+
+    expect(getItineraryItemDaySpan(undated)).toEqual([]);
+    const grouped = groupItineraryItemsByDay([undated, dated]);
+    expect(grouped.has("2026-03-14")).toBe(true);
+    expect(grouped.get("2026-03-14")?.map((item) => item.id)).toEqual(["breakfast"]);
+  });
+
+  it("sorts undated items before dated days", () => {
+    const undated = createItem({
+      day_date: null,
+      id: "undated",
+      sort_order: 1,
+      title: "Zoo",
+    });
+    const dated = createItem({
+      day_date: "2026-03-14",
+      id: "dated",
+      start_time: "2026-03-14T09:00:00.000Z",
+      title: "Breakfast",
+    });
+
+    expect(sortItineraryItems([dated, undated]).map((item) => item.id)).toEqual(["undated", "dated"]);
+  });
 });

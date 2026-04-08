@@ -319,7 +319,10 @@ export default function ItineraryDetail({
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2">
-          <DetailRow label="Day" value={formatDayLabel(item.day_date)} />
+          <DetailRow
+            label="Day"
+            value={item.day_date ? formatDayLabel(item.day_date) : "Not on the calendar yet"}
+          />
           {displayCreatorName !== null ? (
             <DetailRow label="Created by" value={displayCreatorName} />
           ) : null}

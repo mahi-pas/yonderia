@@ -96,8 +96,16 @@ function ItineraryWithCommentsShell({
       items
         .filter((item) => item.item_type === "hotel")
         .sort((left, right) => {
-          const leftTime = left.start_time ? new Date(left.start_time).getTime() : new Date(left.day_date).getTime();
-          const rightTime = right.start_time ? new Date(right.start_time).getTime() : new Date(right.day_date).getTime();
+          const leftTime = left.start_time
+            ? new Date(left.start_time).getTime()
+            : left.day_date
+              ? new Date(left.day_date).getTime()
+              : 0;
+          const rightTime = right.start_time
+            ? new Date(right.start_time).getTime()
+            : right.day_date
+              ? new Date(right.day_date).getTime()
+              : 0;
           return leftTime - rightTime;
         }),
     [items],
@@ -388,7 +396,9 @@ function ItineraryWithCommentsShell({
           editItem={editingItem}
           existingItems={items}
           isOpen
+          tripEndDate={tripEndDate}
           tripId={tripId}
+          tripStartDate={tripStartDate}
           onClose={() => setEditingItem(null)}
           onCreated={(item) => {
             onCreated?.(item);

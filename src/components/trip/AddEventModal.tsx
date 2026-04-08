@@ -1,3 +1,4 @@
+import { eachDayOfInterval, format, parseISO } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Button from "@/components/ui/Button";
 import ImageUploader from "@/components/ui/ImageUploader";
@@ -30,7 +31,8 @@ type ImageSuggestion = {
 
 type AddEventModalProps = {
   currentUserId: string;
-  dayDate: string;
+  /** Trip day to pre-select, or `null` when adding from the itinerary header (no day yet). */
+  dayDate: string | null;
   editItem?: ItineraryListItem | null;
   existingItems: ItineraryListItem[];
   isOpen: boolean;
@@ -38,7 +40,9 @@ type AddEventModalProps = {
   onCreated: (item: ItineraryListItem) => void;
   onDeleted?: (itemId: string) => void;
   onUpdated?: (item: ItineraryListItem) => void;
+  tripEndDate: string;
   tripId: string;
+  tripStartDate: string;
 };
 
 type FormState = {
@@ -71,18 +75,18 @@ function createEmptyLocation(): LocationState {
   };
 }
 
-function createInitialFormState(dayDate: string): FormState {
-  const datePart = dayDate || new Date().toISOString().slice(0, 10);
+function createInitialFormState(anchorDay: string | null, tripStartDate: string): FormState {
+  const datePart = anchorDay ?? tripStartDate;
   return {
     commuteArrivalDateTime: `${datePart}T10:00`,
     commuteDepartureDateTime: `${datePart}T09:00`,
     commuteDestination: createEmptyLocation(),
     commuteOrigin: createEmptyLocation(),
-    dayDate,
+    dayDate: datePart,
     description: "",
-    eventEndDateTime: `${datePart}T10:00`,
+    eventEndDateTime: anchorDay === null ? "" : `${datePart}T10:00`,
     eventLocation: createEmptyLocation(),
-    eventStartDateTime: `${datePart}T09:00`,
+    eventStartDateTime: anchorDay === null ? "" : `${datePart}T09:00`,
     hotelCheckInDateTime: `${datePart}T15:00`,
     hotelCheckOutDateTime: `${datePart}T11:00`,
     hotelLocation: createEmptyLocation(),
@@ -129,8 +133,10 @@ function isEndTimeAfterStart(startTime: string | null, endTime: string | null): 
   return new Date(endTime).getTime() > new Date(startTime).getTime();
 }
 
-function getNextSortOrder(items: ItineraryListItem[], dayDate: string): number {
-  const dayItems = items.filter((item) => item.day_date === dayDate);
+function getNextSortOrder(items: ItineraryListItem[], dayDateKey: string | null): number {
+  const dayItems = items.filter((item) =>
+    dayDateKey === null ? item.day_date === null : item.day_date === dayDateKey,
+  );
 
   if (dayItems.length === 0) {
     return 0;
@@ -143,7 +149,7 @@ function getItemTypeLabel(itemType: ItineraryItemType): string {
   return ITEM_TYPES.find((type) => type.id === itemType)?.label ?? "Item";
 }
 
-function createFormStateFromItem(item: ItineraryListItem): FormState {
+function createFormStateFromItem(item: ItineraryListItem, tripStartDate: string): FormState {
   return {
     commuteArrivalDateTime: item.item_type === "commute" ? toDateTimeInputValue(item.end_time) : "",
     commuteDepartureDateTime: item.item_type === "commute" ? toDateTimeInputValue(item.start_time) : "",
@@ -163,7 +169,7 @@ function createFormStateFromItem(item: ItineraryListItem): FormState {
             name: item.location_name ?? "",
           }
         : createEmptyLocation(),
-    dayDate: item.day_date,
+    dayDate: item.day_date ?? tripStartDate,
     description: item.description ?? "",
     eventEndDateTime: item.item_type === "event" ? toDateTimeInputValue(item.end_time) : "",
     eventLocation:
@@ -215,6 +221,25 @@ function getActiveLocationLabel(itemType: ItineraryItemType, formState: FormStat
   return formState.eventLocation.name;
 }
 
+function dateTimeTemplateForDay(day: string): Pick<
+  FormState,
+  | "commuteArrivalDateTime"
+  | "commuteDepartureDateTime"
+  | "eventEndDateTime"
+  | "eventStartDateTime"
+  | "hotelCheckInDateTime"
+  | "hotelCheckOutDateTime"
+> {
+  return {
+    commuteArrivalDateTime: `${day}T10:00`,
+    commuteDepartureDateTime: `${day}T09:00`,
+    eventEndDateTime: `${day}T10:00`,
+    eventStartDateTime: `${day}T09:00`,
+    hotelCheckInDateTime: `${day}T15:00`,
+    hotelCheckOutDateTime: `${day}T11:00`,
+  };
+}
+
 export default function AddEventModal({
   currentUserId,
   dayDate,
@@ -225,7 +250,9 @@ export default function AddEventModal({
   onCreated,
   onDeleted,
   onUpdated,
+  tripEndDate,
   tripId,
+  tripStartDate,
 }: AddEventModalProps) {
   const supabase = useMemo(() => createClient(), []);
   const customImageRef = useRef<ImageState | null>(null);
@@ -233,7 +260,7 @@ export default function AddEventModal({
   const [draftItemId, setDraftItemId] = useState<string>(() => crypto.randomUUID());
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
-  const [formState, setFormState] = useState<FormState>(() => createInitialFormState(dayDate));
+  const [formState, setFormState] = useState<FormState>(() => createInitialFormState(dayDate, tripStartDate));
   const [imageSuggestions, setImageSuggestions] = useState<ImageSuggestion[]>([]);
   const [isImageUploading, setIsImageUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -244,8 +271,22 @@ export default function AddEventModal({
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [noSpecificDay, setNoSpecificDay] = useState(false);
   const isEditMode = editItem !== null;
   const itemTypeLabel = getItemTypeLabel(itemType);
+
+  const tripDayOptions = useMemo(
+    () =>
+      eachDayOfInterval({
+        end: parseISO(tripEndDate),
+        start: parseISO(tripStartDate),
+      }).map((date, index) => ({
+        dayDate: format(date, "yyyy-MM-dd"),
+        index,
+        label: format(date, "EEE, MMM d"),
+      })),
+    [tripEndDate, tripStartDate],
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -257,7 +298,10 @@ export default function AddEventModal({
     setDraftItemId(editItem?.id ?? crypto.randomUUID());
     setErrorMessage(null);
     setExistingImageUrl(editItem?.image_url ?? null);
-    setFormState(editItem ? createFormStateFromItem(editItem) : createInitialFormState(dayDate));
+    setNoSpecificDay(editItem ? editItem.day_date === null : dayDate === null);
+    setFormState(
+      editItem ? createFormStateFromItem(editItem, tripStartDate) : createInitialFormState(dayDate, tripStartDate),
+    );
     setImageSuggestions([]);
     setIsImageUploading(false);
     setIsSaving(false);
@@ -268,7 +312,7 @@ export default function AddEventModal({
     setIsDeleteConfirmOpen(false);
     setDeleteError(null);
     setIsDeleting(false);
-  }, [dayDate, editItem, isOpen]);
+  }, [dayDate, editItem, isOpen, tripStartDate]);
 
   useEffect(() => {
     if (!isOpen || showCustomUploader || customImageRef.current) {
@@ -351,7 +395,7 @@ export default function AddEventModal({
     }
 
     if (itemType === "event") {
-      if (!formState.eventStartDateTime) {
+      if (!noSpecificDay && !formState.eventStartDateTime) {
         setErrorMessage("Add a start date and time for this event.");
         return;
       }
@@ -368,7 +412,7 @@ export default function AddEventModal({
     }
 
     if (itemType === "commute") {
-      if (!formState.commuteDepartureDateTime) {
+      if (!noSpecificDay && !formState.commuteDepartureDateTime) {
         setErrorMessage("Add a departure date and time for this commute.");
         return;
       }
@@ -396,26 +440,43 @@ export default function AddEventModal({
           ? getDatePart(formState.hotelCheckInDateTime)
           : getDatePart(formState.commuteDepartureDateTime);
 
-    if (itemType === "event" && !isEndTimeAfterStart(eventStartTime, eventEndTime)) {
+    if (
+      itemType === "event" &&
+      eventStartTime &&
+      eventEndTime &&
+      !isEndTimeAfterStart(eventStartTime, eventEndTime)
+    ) {
       setErrorMessage("Choose an end time that's after the start time.");
       setIsSaving(false);
       return;
     }
 
-    if (itemType === "commute" && !isEndTimeAfterStart(commuteDepartureTime, commuteArrivalTime)) {
+    if (
+      itemType === "commute" &&
+      commuteDepartureTime &&
+      commuteArrivalTime &&
+      !isEndTimeAfterStart(commuteDepartureTime, commuteArrivalTime)
+    ) {
       setErrorMessage("Choose an arrival time that's after the departure time.");
       setIsSaving(false);
       return;
     }
 
-    if (itemType === "hotel" && !isEndTimeAfterStart(hotelCheckInTime, hotelCheckOutTime)) {
+    if (
+      itemType === "hotel" &&
+      hotelCheckInTime &&
+      hotelCheckOutTime &&
+      !isEndTimeAfterStart(hotelCheckInTime, hotelCheckOutTime)
+    ) {
       setErrorMessage("Choose a check-out time that's after check-in.");
       setIsSaving(false);
       return;
     }
 
+    const rowDayDate = noSpecificDay ? null : itemDayDate ?? formState.dayDate;
+
     const nextItem = {
-      day_date: itemDayDate ?? formState.dayDate,
+      day_date: rowDayDate,
       description: description || null,
       destination_latitude: itemType === "commute" ? formState.commuteDestination.latitude : null,
       destination_longitude: itemType === "commute" ? formState.commuteDestination.longitude : null,
@@ -470,7 +531,7 @@ export default function AddEventModal({
           ...nextItem,
           created_by: currentUserId,
           id: draftItemId,
-          sort_order: getNextSortOrder(existingItems, itemDayDate ?? formState.dayDate),
+          sort_order: getNextSortOrder(existingItems, rowDayDate),
           trip_id: tripId,
         };
 
@@ -521,7 +582,11 @@ export default function AddEventModal({
 
   return (
     <Modal
-      description={`${isEditMode ? "Editing" : "Adding to"} ${formatDayLabel(formState.dayDate)}.`}
+      description={
+        noSpecificDay
+          ? `${isEditMode ? "Editing" : "Adding"} without a calendar day.`
+          : `${isEditMode ? "Editing" : "Adding to"} ${formatDayLabel(formState.dayDate)}.`
+      }
       isOpen={isOpen}
       onClose={() => {
         if (!isSaving) {
@@ -603,6 +668,84 @@ export default function AddEventModal({
               }}
             />
 
+            <div className="space-y-3 border-2 border-[#121212] bg-[#F8F8F8] p-4">
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  checked={noSpecificDay}
+                  className="mt-1 h-4 w-4 shrink-0 border-2 border-[#121212] accent-[var(--accent,#D02020)]"
+                  disabled={isSaving}
+                  type="checkbox"
+                  onChange={(event) => {
+                    const checked = event.target.checked;
+                    setErrorMessage(null);
+                    setNoSpecificDay(checked);
+                    if (checked) {
+                      setFormState((current) => ({
+                        ...current,
+                        commuteArrivalDateTime: "",
+                        commuteDepartureDateTime: "",
+                        eventEndDateTime: "",
+                        eventStartDateTime: "",
+                        hotelCheckInDateTime: "",
+                        hotelCheckOutDateTime: "",
+                      }));
+                    } else {
+                      const day = tripStartDate;
+                      const template = dateTimeTemplateForDay(day);
+                      setFormState((current) => ({
+                        ...current,
+                        commuteArrivalDateTime: current.commuteArrivalDateTime || template.commuteArrivalDateTime,
+                        commuteDepartureDateTime: current.commuteDepartureDateTime || template.commuteDepartureDateTime,
+                        dayDate: day,
+                        eventEndDateTime: current.eventEndDateTime || template.eventEndDateTime,
+                        eventStartDateTime: current.eventStartDateTime || template.eventStartDateTime,
+                        hotelCheckInDateTime: current.hotelCheckInDateTime || template.hotelCheckInDateTime,
+                        hotelCheckOutDateTime: current.hotelCheckOutDateTime || template.hotelCheckOutDateTime,
+                      }));
+                    }
+                  }}
+                />
+                <span className="text-sm font-bold leading-snug text-[#121212]">
+                  No day assigned yet{" "}
+                  <span className="block text-xs font-normal text-[#666666]">
+                    Uncheck to pin this to a trip day (defaults to day 1). While checked, it appears under ideas below the
+                    daily plan.
+                  </span>
+                </span>
+              </label>
+              {!noSpecificDay ? (
+                <label className="block space-y-2">
+                  <span className="block text-sm font-bold text-[#121212]">Trip day</span>
+                  <select
+                    className={inputClassName()}
+                    disabled={isSaving}
+                    value={formState.dayDate}
+                    onChange={(event) => {
+                      const nextDay = event.target.value;
+                      setErrorMessage(null);
+                      const template = dateTimeTemplateForDay(nextDay);
+                      setFormState((current) => ({
+                        ...current,
+                        commuteArrivalDateTime: current.commuteArrivalDateTime || template.commuteArrivalDateTime,
+                        commuteDepartureDateTime: current.commuteDepartureDateTime || template.commuteDepartureDateTime,
+                        dayDate: nextDay,
+                        eventEndDateTime: current.eventEndDateTime || template.eventEndDateTime,
+                        eventStartDateTime: current.eventStartDateTime || template.eventStartDateTime,
+                        hotelCheckInDateTime: current.hotelCheckInDateTime || template.hotelCheckInDateTime,
+                        hotelCheckOutDateTime: current.hotelCheckOutDateTime || template.hotelCheckOutDateTime,
+                      }));
+                    }}
+                  >
+                    {tripDayOptions.map((day) => (
+                      <option key={day.dayDate} value={day.dayDate}>
+                        Day {day.index + 1} — {day.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+            </div>
+
             <label className="block space-y-2">
               <span className="block text-sm font-bold text-[#121212]">Description</span>
               <textarea
@@ -622,34 +765,40 @@ export default function AddEventModal({
 
             {itemType === "event" ? (
               <>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Input
-                    disabled={isSaving}
-                    label="Start"
-                    type="datetime-local"
-                    value={formState.eventStartDateTime}
-                    onChange={(event) => {
-                      setErrorMessage(null);
-                      setFormState((current) => ({
-                        ...current,
-                        eventStartDateTime: event.target.value,
-                      }));
-                    }}
-                  />
-                  <Input
-                    disabled={isSaving}
-                    label="End"
-                    type="datetime-local"
-                    value={formState.eventEndDateTime}
-                    onChange={(event) => {
-                      setErrorMessage(null);
-                      setFormState((current) => ({
-                        ...current,
-                        eventEndDateTime: event.target.value,
-                      }));
-                    }}
-                  />
-                </div>
+                {!noSpecificDay ? (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Input
+                      disabled={isSaving}
+                      label="Start"
+                      type="datetime-local"
+                      value={formState.eventStartDateTime}
+                      onChange={(event) => {
+                        setErrorMessage(null);
+                        setFormState((current) => ({
+                          ...current,
+                          eventStartDateTime: event.target.value,
+                        }));
+                      }}
+                    />
+                    <Input
+                      disabled={isSaving}
+                      label="End"
+                      type="datetime-local"
+                      value={formState.eventEndDateTime}
+                      onChange={(event) => {
+                        setErrorMessage(null);
+                        setFormState((current) => ({
+                          ...current,
+                          eventEndDateTime: event.target.value,
+                        }));
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <p className="text-sm leading-6 text-[#666666]">
+                    Add a day when you&apos;re ready for a start time. Until then, time shows as TBD on the card.
+                  </p>
+                )}
 
                 <TripLocationInput
                   disabled={isSaving}
@@ -670,7 +819,7 @@ export default function AddEventModal({
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Input
                     disabled={isSaving}
-                    hint="Optional"
+                    hint={noSpecificDay ? "Optional when no day assigned" : "Optional"}
                     label="Check-in"
                     type="datetime-local"
                     value={formState.hotelCheckInDateTime}
@@ -684,7 +833,7 @@ export default function AddEventModal({
                   />
                   <Input
                     disabled={isSaving}
-                    hint="Optional"
+                    hint={noSpecificDay ? "Optional when no day assigned" : "Optional"}
                     label="Check-out"
                     type="datetime-local"
                     value={formState.hotelCheckOutDateTime}
@@ -716,6 +865,7 @@ export default function AddEventModal({
               <>
                 <Input
                   disabled={isSaving}
+                  hint={noSpecificDay ? "Optional when no day assigned" : undefined}
                   label="Departure"
                   type="datetime-local"
                   value={formState.commuteDepartureDateTime}
@@ -729,6 +879,7 @@ export default function AddEventModal({
                 />
                 <Input
                   disabled={isSaving}
+                  hint={noSpecificDay ? "Optional when no day assigned" : undefined}
                   label="Arrival"
                   type="datetime-local"
                   value={formState.commuteArrivalDateTime}

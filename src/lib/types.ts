@@ -162,7 +162,7 @@ export interface ItineraryItem {
   title: string;
   description: string | null;
   image_url: string | null;
-  day_date: string;
+  day_date: string | null;
   start_time: string | null;
   end_time: string | null;
   location_name: string | null;

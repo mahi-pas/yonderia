@@ -175,7 +175,9 @@ describe("AddEventModal edit mode", () => {
           onClose,
           onCreated,
           onUpdated,
+          tripEndDate: "2026-05-05",
           tripId: "trip-123",
+          tripStartDate: "2026-05-01",
         }),
       );
     });

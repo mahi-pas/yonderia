@@ -2,7 +2,11 @@
 
 import { eachDayOfInterval, format, parseISO } from "date-fns";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { groupItineraryItemsByDay, type ItineraryListItem } from "@/hooks/useItinerary";
+import {
+  groupItineraryItemsByDay,
+  sortItineraryItems,
+  type ItineraryListItem,
+} from "@/hooks/useItinerary";
 import type { TripParticipantRole } from "@/lib/types";
 import AddEventModal from "./AddEventModal";
 import ItineraryCard from "./ItineraryCard";
@@ -48,11 +52,14 @@ export default function DayItinerary({
   tripId,
   tripStartDate,
 }: DayItineraryProps) {
-  const [activeDayForAdd, setActiveDayForAdd] = useState<string | null>(null);
+  type AddModalOpen = { kind: "day"; dayDate: string } | { kind: "header" };
+
+  const [addModalOpen, setAddModalOpen] = useState<AddModalOpen | null>(null);
   const [editingItem, setEditingItem] = useState<ItineraryListItem | null>(null);
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>(() => ({
     [tripStartDate]: true,
   }));
+  const [undatedExpanded, setUndatedExpanded] = useState(true);
   const [internalSelectedItem, setInternalSelectedItem] = useState<ItineraryListItem | null>(null);
 
   const isControlled = controlledSelectedItem !== undefined && onSelectItem !== undefined;
@@ -67,6 +74,11 @@ export default function DayItinerary({
 
   const resolvedGroupedByDay = useMemo(() => groupedByDay ?? groupItineraryItemsByDay(items), [groupedByDay, items]);
 
+  const undatedItems = useMemo(
+    () => sortItineraryItems(items.filter((item) => item.day_date === null)),
+    [items],
+  );
+
   useEffect(() => {
     if (!revealItemId || items.length === 0) {
       return;
@@ -79,9 +91,15 @@ export default function DayItinerary({
     }
 
     queueMicrotask(() => {
+      if (match.day_date === null) {
+        setUndatedExpanded(true);
+        return;
+      }
+
+      const dayKey = match.day_date;
       setExpandedDays((current) => ({
         ...current,
-        [match.day_date]: true,
+        [dayKey]: true,
       }));
     });
   }, [items, revealItemId]);
@@ -105,9 +123,15 @@ export default function DayItinerary({
 
   function handleOpenEdit(item: ItineraryListItem) {
     setSelectedItem(null);
-    setActiveDayForAdd(null);
+    setAddModalOpen(null);
     setEditingItem(item);
   }
+
+  const modalAnchorDay = editingItem
+    ? editingItem.day_date
+    : addModalOpen?.kind === "day"
+      ? addModalOpen.dayDate
+      : null;
 
   const days = useMemo(
     () =>
@@ -124,12 +148,24 @@ export default function DayItinerary({
 
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="min-w-0">
           <p className="text-xs font-bold tracking-widest uppercase text-[var(--foreground,#121212)]">Itinerary</p>
-          <h2 className="mt-1 font-black text-3xl uppercase tracking-tighter leading-[0.9] text-[var(--foreground,#121212)]">Daily plan</h2>
+          <h2 className="mt-1 font-black text-3xl uppercase tracking-tighter leading-[0.9] text-[var(--foreground,#121212)]">
+            Daily plan
+          </h2>
         </div>
-        <p className="text-sm font-bold text-[var(--muted-foreground,#666666)]">{items.length} items</p>
+        {canManage && currentUserId ? (
+          <button
+            className="inline-flex min-h-11 shrink-0 items-center justify-center bg-[var(--accent)] px-4 text-sm font-bold uppercase tracking-widest text-white shadow-[4px_4px_0px_0px_black] transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            type="button"
+            onClick={() => {
+              setAddModalOpen({ kind: "header" });
+            }}
+          >
+            Add event
+          </button>
+        ) : null}
       </div>
 
       {error ? (
@@ -139,6 +175,73 @@ export default function DayItinerary({
       ) : null}
 
       <div className="space-y-3">
+        {undatedItems.length > 0 || (canManage && currentUserId) ? (
+          <div className="overflow-hidden border-b-2 border-[var(--border,#121212)] pb-3 last:border-b-0 last:pb-0">
+            <button
+              className="flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-[var(--surface,#F8F8F8)]"
+              type="button"
+              onClick={() => {
+                setUndatedExpanded((current) => !current);
+              }}
+            >
+              <div className="min-w-0 flex-1">
+                <h3 className="break-words text-lg font-black uppercase tracking-tighter text-[var(--foreground,#121212)]">
+                  Ideas &amp; stops
+                </h3>
+                <p className="mt-1 text-sm font-bold text-[var(--muted-foreground,#666666)]">
+                  {undatedItems.length === 0
+                    ? "Places and plans without a day yet."
+                    : `${undatedItems.length} item${undatedItems.length === 1 ? "" : "s"} not on the calendar`}
+                </p>
+              </div>
+              <span
+                aria-hidden="true"
+                className={[
+                  "shrink-0 text-2xl font-bold text-[var(--foreground,#121212)] opacity-90 transition-transform duration-300",
+                  undatedExpanded ? "rotate-90" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                ›
+              </span>
+            </button>
+
+            <div
+              className={[
+                "expand-collapse grid",
+                undatedExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              <div className="overflow-hidden">
+                <div className="space-y-3 border-t-2 border-[var(--border,#121212)] px-4 py-4 sm:px-5">
+                  {undatedItems.length > 0 ? (
+                    undatedItems.map((item) => (
+                      <ItineraryCard
+                        canEdit={false}
+                        commentCount={commentCountByItemId[item.id] ?? null}
+                        currentUserId={currentUserId}
+                        key={item.id}
+                        item={item}
+                        onClick={() => setSelectedItem(item)}
+                        rsvpSummary={item.rsvpSummary ?? null}
+                      />
+                    ))
+                  ) : (
+                    <div className="border-2 border-dashed border-[var(--border,#121212)] bg-[var(--surface,#F8F8F8)]/50 px-5 py-8 text-center text-sm font-bold leading-6 text-[var(--muted-foreground,#666666)]">
+                      {isLoading
+                        ? "Loading..."
+                        : 'Add an event from the button next to Daily plan, or check "No day assigned yet" when you add from a day.'}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         {days.map((day) => {
           const dayItems = resolvedGroupedByDay.get(day.dayDate) ?? [];
           const isExpanded = expandedDays[day.dayDate] ?? day.index === 0;
@@ -214,7 +317,7 @@ export default function DayItinerary({
                         className="inline-flex min-h-11 items-center justify-center bg-[var(--accent)] px-4 text-sm font-bold uppercase tracking-widest text-white shadow-[4px_4px_0px_0px_black] transition active:translate-x-[2px] active:translate-y-[2px] active:shadow-none hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
                         type="button"
                         onClick={() => {
-                          setActiveDayForAdd(day.dayDate);
+                          setAddModalOpen({ kind: "day", dayDate: day.dayDate });
                         }}
                       >
                         Add Event
@@ -228,16 +331,18 @@ export default function DayItinerary({
         })}
       </div>
 
-      {canManage && currentUserId && (activeDayForAdd || editingItem) ? (
+      {canManage && currentUserId && (addModalOpen !== null || editingItem) ? (
         <AddEventModal
           currentUserId={currentUserId}
-          dayDate={editingItem?.day_date ?? activeDayForAdd ?? tripStartDate}
+          dayDate={modalAnchorDay}
           editItem={editingItem}
           existingItems={items}
-          isOpen={Boolean(activeDayForAdd || editingItem)}
+          isOpen={Boolean(addModalOpen !== null || editingItem)}
+          tripEndDate={tripEndDate}
           tripId={tripId}
+          tripStartDate={tripStartDate}
           onClose={() => {
-            setActiveDayForAdd(null);
+            setAddModalOpen(null);
             setEditingItem(null);
           }}
           onCreated={(item) => {

@@ -714,7 +714,7 @@ export default function TripMap({
                             key={point.key}
                             aria-label={`Open ${point.item.title} pin`}
                             className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white text-lg shadow-[4px_4px_0px_0px_black]"
-                            data-day={point.item.day_date}
+                            data-day={point.item.day_date ?? ""}
                             data-item-id={point.item.id}
                             data-item-type={point.item.item_type}
                             data-point-kind={point.kind}
@@ -876,7 +876,7 @@ export default function TripMap({
                       key={point.key}
                       aria-label={`Open ${point.item.title} pin`}
                       className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white text-lg shadow-[4px_4px_0px_0px_black]"
-                      data-day={point.item.day_date}
+                      data-day={point.item.day_date ?? ""}
                       data-item-id={point.item.id}
                       data-item-type={point.item.item_type}
                       data-point-kind={point.kind}
@@ -936,7 +936,9 @@ export default function TripMap({
           editItem={editingItem}
           existingItems={items}
           isOpen={editingItem !== null}
+          tripEndDate={tripEndDate}
           tripId={tripId}
+          tripStartDate={tripStartDate}
           onClose={() => {
             setEditingItem(null);
           }}
